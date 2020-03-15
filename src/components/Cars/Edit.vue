@@ -165,10 +165,7 @@ export default {
                     color:'',
                     interior:'',
                     created_at:'',
-                    mainImgUrl:'',
-                    images: [],
-                    base64images: [],
-                    equipment: [],
+                    mainImgUrl:''
                },
                summary: {
                     boughtPrice:'',
