@@ -208,6 +208,8 @@ export default {
                   console.log(this.insertCar.Base64images);                
             },
             updateSoldStatus(carId) {
+                  window.location.href = "/not-inplemented";
+                  /*
                   this.soldDetails.car = carId;
                   this.soldDetails.sold = true;
                   this.soldDetails.soldPrice = 15000;
@@ -215,7 +217,7 @@ export default {
                   axios.put(backEndUrl + `/api/cars/${carId}/summary`, this.soldDetails)
                   .catch(function (error){
                         console.log(error);
-                  })
+                  })*/
             }
 
       }
