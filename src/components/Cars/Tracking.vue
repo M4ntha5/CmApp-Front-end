@@ -15,13 +15,13 @@
                         </div>
 
                         <div class="col-sm-8 col-12">
-                              <table class="table">
+                              <table class="table table-responsive">
                                     <tr>
                                           <th>Container number</th>
                                           <td>{{tracking.containerNumber}}</td>
                                     </tr>
                                     <tr>
-                                          <th>Bokking number</th>
+                                          <th>Booking number</th>
                                           <td>{{tracking.bookingNumber}}</td>
                                     </tr>
                                     <tr>
@@ -37,7 +37,7 @@
                         <h1>There is no tracking data yet</h1>
                   </center>
                   <center class="pt-3">
-                        <button @click="lookFortracking"  class="btn btn-primary">Check for available tracking info?</button>
+                        <button @click="lookForTracking"  class="btn btn-primary">Check for available tracking info?</button>
                   </center>
             </div>
             <div class="pt-3" v-else-if="loading">
@@ -57,6 +57,7 @@ export default {
                   tracking: {
                         containerNumber: '',
                         bookingNumber: '',
+                        auctionImages: [],
                         base64images: [],
                         url: '',
                         car: ''
@@ -82,15 +83,16 @@ export default {
       },
 
       methods: {
-            async fetchTracking() {
+            fetchTracking() {
                   let vm = this;
                   axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`)
                   .then(function (response) {
                         if(response.data)
                         {
                               vm.tracking = response.data;
+                              vm.fetchImages();
                               vm.loading = false;
-                              vm.empty = false;
+                              vm.empty = false;             
                         }
                         else
                         {
@@ -102,7 +104,7 @@ export default {
                         console.log(error);
                   });                                        
             },
-            lookFortracking(){
+            lookForTracking(){
                   if(confirm("Attention! This action could take more then a couple of minutes. Are you sure want to continue?"))
                   {
                         let vm = this;
@@ -127,7 +129,18 @@ export default {
                               console.log(error);
                         }); 
                   }
-            }
+            },
+            fetchImages() {
+                  var vm = this;
+                  axios.post(backEndUrl + "/api/get-images", vm.tracking.auctionImages)
+                  .then(function (response) {
+                        if(response.status == 200)
+                              vm.tracking.base64images = response.data;          
+                  })
+                  .catch(function (error) {
+                        console.log(error);
+                  });
+            },
       }
 }
 </script>

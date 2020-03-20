@@ -1,6 +1,11 @@
 <template>
 <div>
+     <center class="pt-4">
+          <h1 style="color:red;">Attention!!!! Form validation temporary disabled due to the deployment issues</h1>
+     </center>
+
      <div class="container" v-if="!loading">
+          <center class="pt-4"><h1>{{car.make}} {{car.model}}</h1></center>
           <form class="pt-4 needs-validation" novalidate>
                <div class="form-row">
                     <div class="col-md-4 mb-3">
@@ -55,7 +60,7 @@
                     </div>
                     <div class="col-md-3 mb-3">
                          <label for="validationServer06">Drive</label>
-                         <input v-model="car.drive" type="text" class="form-control " id="validationServer06" placeholder="HECK" required>
+                         <input v-model="car.drive" type="text" class="form-control " id="validationServer06" placeholder="Rear wheel dirve" required>
                          <div class="valid-feedback">
                               Looks good!
                          </div>
@@ -107,7 +112,10 @@
                          </div>
                     </div>        
                </div>
-               <a @click="updateCar" class="btn btn-primary" style="color:white;">Submit</a>
+               <div class="pt-3">
+                    <a @click="updateCar()" class="btn btn-primary" style="color:white;float:right;">Submit</a>
+               </div>
+               
           </form>       
      </div>
       <div class="pt-3" v-else>
@@ -118,7 +126,7 @@
 </template>
 
 <script>
-
+/*
 // Example starter JavaScript for disabling form submissions if there are invalid fields
 (function() 
 {
@@ -142,7 +150,7 @@
           });
      }, false);
 })();
-
+*/
 import axios from 'axios';
 const backEndUrl = process.env.VUE_APP_BACK_END_URL;
 export default {
@@ -165,10 +173,7 @@ export default {
                     color:'',
                     interior:'',
                     created_at:'',
-                    mainImgUrl:'',
-                    images: [],
-                    base64images: [],
-                    equipment: [],
+                    mainImgUrl:''
                },
                summary: {
                     boughtPrice:'',
@@ -184,7 +189,7 @@ export default {
      },
      methods: {
           
-          async fetchCar() {
+          fetchCar() {
                var vm = this;
                axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}`)
                .then(function (response) {
@@ -200,7 +205,7 @@ export default {
                     console.log(error);
                });               
           },
-          async updateCar() {
+          updateCar() {
                let vm = this;
                axios.put(backEndUrl + `/api/cars/${this.$route.params.id}`, this.car)
                .then(function (response) {

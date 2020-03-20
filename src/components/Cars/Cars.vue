@@ -4,33 +4,45 @@
             <b-alert v-model="alertFlag" variant="success" dismissible>{{alertMessage}}</b-alert>
 
             <button v-b-modal.car-insert-modal class="btn btn-primary"
-            @click="showBmwModal">
+            @click="showBmwModal"
+            @close="fetchCars()">
                   Add new
             </button>
             <!-- bmw modal-->
             <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal"/>
 
             <div class="row">
-                  <div class="pt-5 col-4" v-for="car in cars" v-bind:key="car._id">    
-                        <a v-bind:href="'/cars/'+ car._id">
-                              <div class="card" style="width: 20rem; height: 30rem;">                                                          
-                                    <img :src='car.mainImgUrl' class="card-img-top img-thumbnail" alt="Responsive image">
-                                    
-                                    <div class="pt-3 card-body">
-                                          <h2>{{car.make}} {{car.model}}</h2>
-                                          <h4 class="card-text">
-                                                {{car.vin}}
-                                          </h4>
+                  <div class="pt-5 col-4" v-for="car in cars" v-bind:key="car._id">     
+                        <div class="card" style="width: 20rem; height: 30rem;"> 
+                              <a v-bind:href="'/cars/'+ car._id">                                                         
+                                    <img :src='car.mainImgUrl' class="card-img-top img-thumbnail img-responsive" alt="Responsive image">
+                              </a>
+                              <div class="pt-3 card-body">
+                                    <div class="row">
+                                          <a v-bind:href="'/cars/'+ car._id">  
+                                                <h2>{{car.make}} {{car.model}}</h2>
+                                          </a>
                                     </div>
-                              </div>      
-                        </a>
+                                    <div class="row">           
+                                          <h4>Already paid: {{car.summary.total}} €</h4>
+                                    </div>
+                                    <div class="row">
+                                          <div v-if="car.summary.sold">
+                                                <h1 style="color:red;font-weight: bold;">SOLD {{car.summary.soldPrice}} €</h1>
+                                                <h2>Profit: {{car.summary.profit}} €</h2>
+                                          </div>
+                                    </div>            
+                              </div>
+                              <div v-if="!car.summary.sold">
+                                    <button @click="updateSoldStatus(car._id)" type="button" class="btn btn-warning">Sold?</button>
+                              </div>
+                        </div>             
                   </div>
             </div> 
       </div>
-
       <div class="pt-3" v-else>
             <center><h1>Loading... please wait</h1></center> 
-      </div>
+      </div>  
  
 </div>
 </template>
@@ -63,6 +75,7 @@
 
 import bmwModal from '../Modals/CarModal.vue';
 import axios from 'axios';
+
 const backEndUrl = process.env.VUE_APP_BACK_END_URL;
 export default {      
       data() {
@@ -92,8 +105,9 @@ export default {
                         summary: {
                               boughtPrice:'',
                               soldPrice:'',
-                              totalShipping: '',
-                              sold: Boolean,
+                              total: '',
+                              sold: '',
+                              profit: 0
                         },
                   },
                   insertCar: {
@@ -109,6 +123,12 @@ export default {
                   },
                   loading: true,
                   isBmwModalVisible: false,
+                  soldDetails: {
+                        soldPrice: 0,
+                        car: '',
+                        sold: ''
+                  }
+                  
             }
             
       },
@@ -121,7 +141,6 @@ export default {
       },
       created() {
             this.fetchCars();
-            this.fetchCarSummary();
          ///   alert(this.$route.params.id);
       },
       components: {
@@ -136,7 +155,7 @@ export default {
             },
             fetchCars() {
                   let vm = this;
-                  axios.get(backEndUrl + '/api/cars')
+                  axios.get(backEndUrl + "/api/cars")
                   .then(function (response) {
                         if(response.status == 200)
                         {
@@ -144,31 +163,33 @@ export default {
                               vm.loading = false;
                               //setting repair value to dafault - first of a list
                               vm.insertRepair.car = vm.cars[0]._id;
+                              vm.fetchCarSummary();
                         }
                         
                   })
                   .catch(function (err) {
+                        vm.loading = false;
                         console.log(err);
                   });
             },
             fetchCarSummary() {
                   let vm = this;
-                  for(let i =0; i< this.cars.length;i++)
+                  for(let i =0; i< vm.cars.length;i++)
                   {
-                        fetch(backEndUrl + `/api/cars/${this.cars[i]._id}/summary`)
+                        axios.get(backEndUrl + `/api/cars/${vm.cars[i]._id}/summary`)
                         .then(function (response) {
                               if(response.status == 200)
                               {
-                                    vm.car.summary = response.data;
-                                    vm.loading = false;
-                                    //setting repair value to dafault - first of a list
-                                    vm.insertRepair.car = vm.cars[0]._id;
+                                    vm.cars[i].summary = response.data;
+                                    vm.cars[i].summary.profit = 
+                                          vm.cars[i].summary.soldPrice -
+                                          vm.cars[i].summary.boughtPrice; 
                               }
-
+                                    
                         })
-                        .catch(function (err) {
-                              console.log(err);
-                        });
+                        .catch(function (error) {
+                              console.log(error);
+                        });           
                   }      
             },
             showAlert(message){
@@ -185,7 +206,19 @@ export default {
                         }                 
                   }
                   console.log(this.insertCar.Base64images);                
-            }, 
+            },
+            updateSoldStatus(carId) {
+                  window.location.href = "/not-inplemented";
+                  /*
+                  this.soldDetails.car = carId;
+                  this.soldDetails.sold = true;
+                  this.soldDetails.soldPrice = 15000;
+                  
+                  axios.put(backEndUrl + `/api/cars/${carId}/summary`, this.soldDetails)
+                  .catch(function (error){
+                        console.log(error);
+                  })*/
+            }
 
       }
 }
