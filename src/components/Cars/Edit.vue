@@ -1,5 +1,9 @@
 <template>
 <div>
+     <center class="pt-4">
+          <h1 style="color:red;">Attention!!!! Form validation temporary disabled due to the deployment issues</h1>
+     </center>
+
      <div class="container" v-if="!loading">
           <center class="pt-4"><h1>{{car.make}} {{car.model}}</h1></center>
           <form class="pt-4 needs-validation" novalidate>
@@ -122,7 +126,7 @@
 </template>
 
 <script>
-
+/*
 // Example starter JavaScript for disabling form submissions if there are invalid fields
 (function() 
 {
@@ -146,7 +150,7 @@
           });
      }, false);
 })();
-
+*/
 import axios from 'axios';
 const backEndUrl = process.env.VUE_APP_BACK_END_URL;
 export default {

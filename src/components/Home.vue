@@ -57,22 +57,3 @@
           </div>
           <!--/.Carousel Wrapper-->
 </template>
-
-<script>
-export default {
-      watch: {
-            //'$route' (to, from) {
-              //    alert("to", to.params.id);
-            //      alert("from", from.params.id);
-          //  }
-      },
-      created() {
-         ///   alert(this.$route.params.id);
-      },
-      methods: {
-            goHome() {
-                  this.$router.push('/');
-            }
-      }
-}
-</script>
