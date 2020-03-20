@@ -209,9 +209,9 @@ export default {
             },
             updateSoldStatus(carId) {
                   window.location.href = "/not-inplemented";
-                  /*
+                  
                   this.soldDetails.car = carId;
-                  this.soldDetails.sold = true;
+                 /* this.soldDetails.sold = true;
                   this.soldDetails.soldPrice = 15000;
                   
                   axios.put(backEndUrl + `/api/cars/${carId}/summary`, this.soldDetails)
