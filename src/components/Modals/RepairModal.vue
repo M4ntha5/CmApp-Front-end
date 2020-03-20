@@ -12,16 +12,16 @@
                     <b-form-input v-model='insert.name' id="name-input" :state="nameState" required></b-form-input>
                 </b-form-group>
 
-                <b-form-group :state="priceState"  label="Price (€)" label-for="price-input" 
+                <b-form-group :state="priceState" label="Price (€)" label-for="price-input" 
                             invalid-feedback="Price is required and should be more/equal 0">
                     <b-form-input v-model='insert.price' id="price-input" :state="priceState" type="number" min="0" step=".01" required></b-form-input>
                 </b-form-group>
 
                 <b-form-group :state="carState" label="Car" label-for="car-input"  
                             invalid-feedback="You must select one of the cars">
-                    <b-form-select v-model="insert.car" required >
-                         <b-form-select-option
-                         v-for="car in cars" v-bind:key="car.id" :value="car.id">
+                    <b-form-select v-model="insert.car" required :state="carState">
+                         <b-form-select-option 
+                         v-for="car in cars" v-bind:key="car.id" :value="car.id" >
                               {{car.name}}
                          </b-form-select-option>   
                     </b-form-select>
@@ -67,7 +67,7 @@ export default {
           resetModal() {
                this.insert.name = ''
                this.insert.price = ''
-               this.insert.car = this.cars[0].id
+               this.insert.car = ''
                this.priceState = null
                this.nameState = null
                this.carState = null
@@ -104,10 +104,14 @@ export default {
           },
           getCarNames() {
                let vm = this;
-               axios.get(backEndUrl + '/api/user-car-names')
+               axios.get(backEndUrl + "/api/user-car-names")
                .then(function (response) {
-                    vm.cars = response.data;
-                    vm.insert.car = vm.cars[0].id;
+                    console.log(response);
+                    if(response.status == 200)
+                    {
+                         vm.cars = response.data;
+                         vm.insert.car = vm.cars[0].id;
+                    }                
                })
                .catch(function (error) {
                     console.log(error);

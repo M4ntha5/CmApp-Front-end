@@ -11,28 +11,28 @@
                 <b-form-group :state="transportationFeeState" label="Transportation fee" label-for="transportationFee-input" 
                               invalid-feedback="Transportation fee is required and cannot be less than 0">  
                     <b-form-input v-model='insert.transportationFee' :state="transportationFeeState" 
-                         id="transportationFee-input" type="number" min="0" step=".01" required>
+                         id="transportationFee-input" type="number" min="0" step=".01" placeholder="0" required>
                     </b-form-input>
                 </b-form-group>
 
                 <b-form-group :state="transferFeeState"  label="Transfer fee" label-for="transferFee-input" 
                               invalid-feedback="Transfer fee is required and cannot be less than 0">
                     <b-form-input v-model='insert.transferFee' :state="transferFeeState" 
-                         id="transferFee-input" type="number" min="0" step=".01" required>
+                         id="transferFee-input" type="number" min="0" step=".01" placeholder="0" required>
                     </b-form-input>
                 </b-form-group>
 
                 <b-form-group :state="auctionFeeState"  label="Auction fee" label-for="auctionFee-input" 
                               invalid-feedback="Auction fee is required and cannot be less than 0">
                     <b-form-input v-model='insert.auctionFee' :state="auctionFeeState" 
-                         id="auctionFee-input" type="number" min="0" step=".01" required>
+                         id="auctionFee-input" type="number" min="0" step=".01" placeholder="0" required>
                     </b-form-input>
                 </b-form-group>
 
-                <b-form-group :state="customsState"  label="Customs" label-for="customs-input" 
+                <b-form-group :state="customsState" label="Customs" label-for="customs-input" 
                             invalid-feedback="Customs is required and cannot be less than 0">
                     <b-form-input v-model='insert.customs' :state="customsState" 
-                         id="customs-input" type="number" min="0" step=".01" required>
+                         id="customs-input" type="number" min="0" step=".01" placeholder="0" required>
                     </b-form-input>
                 </b-form-group>
           
@@ -66,6 +66,9 @@ export default {
                alertFlag: false,
           }
      },
+     mounted() {
+          this.fetchCarShipping();
+     },
      methods: {
           checkFormValidity() {
             const valid = this.$refs.form.checkValidity()
@@ -76,10 +79,10 @@ export default {
             return valid
           },
           resetModal() {
-               this.insert.customs = ''
-               this.insert.auctionFee = ''
-               this.insert.transferFee = ''
-               this.insert.transportationFee = ''
+               //this.insert.customs = ''
+               //this.insert.auctionFee = ''
+               //this.insert.transferFee = ''
+               //this.insert.transportationFee = ''
                this.insert.car = this.$route.params.id
 
                this.transportationFeeState = null
@@ -101,21 +104,53 @@ export default {
                else
                {
                     let vm = this;
-                    vm.alertFlag = true;
-                    axios.post(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert)
-                    .then(function (response) {
-                         if(response.status == 200)
-                         {
-                              // Hide the modal manually
-                              vm.$nextTick(() => {
-                                   vm.$bvModal.hide('shipping-modal')
-                              })
-                         }
-                    })
-                    .catch(function (error) {
-                         console.log(error);
-                    });          
+                    if(!vm.insert._id)
+                    {
+                         vm.alertFlag = true;
+                         axios.post(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert)
+                         .then(function (response) {
+                              if(response.status == 200)
+                              {
+                                   // Hide the modal manually
+                                   vm.$nextTick(() => {
+                                        vm.$bvModal.hide('shipping-modal')
+                                   })
+                              }
+                         })
+                         .catch(function (error) {
+                              console.log(error);
+                         });  
+                    }
+                    else
+                    {
+                         vm.alertFlag = true;
+                         axios.put(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert)
+                         .then(function (response) {
+                              if(response.status == 200)
+                              {
+                                   // Hide the modal manually
+                                   vm.$nextTick(() => {
+                                        vm.$bvModal.hide('shipping-modal')
+                                   })
+                              }
+                         })
+                         .catch(function (error) {
+                              console.log(error);
+                         });
+                    }        
                }
+          },
+          fetchCarShipping() {
+               var vm = this;
+               axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`)
+               .then(function (response) {                      
+                    if(response.status == 200)
+                         vm.insert = response.data;
+                    console.log(vm.insert);
+               })
+               .catch(function (error) {
+                    console.log(error);
+               });
           },
      }
 }

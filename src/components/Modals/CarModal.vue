@@ -28,7 +28,7 @@
 
                 <b-form-group :state="priceState"  label="Price" label-for="price-input" 
                             invalid-feedback="Price is required and should be more/equal 0">
-                    <b-form-input v-model='insert.price' id="price-input" :state="priceState" type="number" min="0" step=".01" required></b-form-input>
+                    <b-form-input v-model='insert.boughtPrice' id="price-input" :state="priceState" type="number" min="0" step=".01" required></b-form-input>
                 </b-form-group>
 
                 <b-form-group label="Choose images" label-for="image-input">
@@ -48,8 +48,8 @@ export default {
         return {
             insert: {
                 vin: '',
-                price: '',
-                Base64images: [],
+                boughtPrice: '',
+                base64images: [],
                 make: 'BMW'
             },           
             priceState: null,
@@ -68,7 +68,7 @@ export default {
         },
         resetModal() {
             this.insert.vin = ''
-            this.insert.price = ''
+            this.insert.boughtPrice = ''
             this.insert.Base64images = []
             this.insert.make = 'BMW'
             this.priceState = null
@@ -90,12 +90,13 @@ export default {
                 this.showAlert();
                 // Push the name to submitted names
                 let vm = this;
-                axios.post(backEndUrl + '/api/cars', vm.insert)
+                axios.post(backEndUrl + "/api/cars", vm.insert)
                     .then(function (response) {             
                         if(response.status == 200)
                         {
                             console.log(response);
-                            this.alertFlag = false;
+                            vm.alertFlag = false;
+                            window.location.href = "/cars";
                             // Hide the modal manually
                             vm.$nextTick(() => {
                                 vm.$bvModal.hide('car-insert-modal')
