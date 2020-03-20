@@ -109,7 +109,7 @@
                     </div>        
                </div>
                <div class="pt-3">
-                    <a @click="updateCar" class="btn btn-primary" style="color:white;float:right;">Submit</a>
+                    <a @click="updateCar()" class="btn btn-primary" style="color:white;float:right;">Submit</a>
                </div>
                
           </form>       
@@ -185,7 +185,7 @@ export default {
      },
      methods: {
           
-          async fetchCar() {
+          fetchCar() {
                var vm = this;
                axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}`)
                .then(function (response) {
@@ -201,7 +201,7 @@ export default {
                     console.log(error);
                });               
           },
-          async updateCar() {
+          updateCar() {
                let vm = this;
                axios.put(backEndUrl + `/api/cars/${this.$route.params.id}`, this.car)
                .then(function (response) {
