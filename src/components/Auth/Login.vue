@@ -72,7 +72,7 @@ export default {
           },
           login() {
                let vm = this;
-               axios.post(backEndUrl + "/api/auth/login", this.form)
+               axios.post(backEndUrl + '/api/auth/login', this.form)
                .then(function (response){
                     if(response.status == 200)
                     {
