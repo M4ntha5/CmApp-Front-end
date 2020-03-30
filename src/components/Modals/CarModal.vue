@@ -23,12 +23,12 @@
                     </b-nav>
                 </div>
                 <b-form-group :state="vinState" label="Vin" label-for="vin-input" invalid-feedback="Vin is required">  
-                    <b-form-input v-model='insert.vin' id="vin-input" :state="vinState" required></b-form-input>
+                    <b-form-input v-model='car.vin' id="vin-input" :state="vinState" required></b-form-input>
                 </b-form-group>
 
                 <b-form-group :state="priceState"  label="Price" label-for="price-input" 
                             invalid-feedback="Price is required and should be more/equal 0">
-                    <b-form-input v-model='insert.boughtPrice' id="price-input" :state="priceState" type="number" min="0" step=".01" required></b-form-input>
+                    <b-form-input v-model='summary.boughtPrice' id="price-input" :state="priceState" type="number" min="0" step=".01" required></b-form-input>
                 </b-form-group>
 
                 <b-form-group label="Choose images" label-for="image-input">
@@ -42,16 +42,19 @@
 
 <script>
 import axios from 'axios'
-const backEndUrl = process.env.VUE_APP_BACK_END_URL;
+const backEndUrl = process.env.VUE_APP_API;
 export default {
     data() {
         return {
-            insert: {
+            car: {
                 vin: '',
-                boughtPrice: '',
                 base64images: [],
                 make: 'BMW'
-            },           
+            },  
+            summary: {
+                boughtPrice: '',
+                car: ''
+            },      
             priceState: null,
             vinState: null,
             alertFlag: false,
@@ -67,10 +70,10 @@ export default {
             return valid
         },
         resetModal() {
-            this.insert.vin = ''
-            this.insert.boughtPrice = ''
-            this.insert.Base64images = []
-            this.insert.make = 'BMW'
+            this.car.vin = ''
+            this.summary.boughtPrice = ''
+            this.car.Base64images = []
+            this.car.make = 'BMW'
             this.priceState = null
             this.vinState = null
         },
@@ -90,23 +93,46 @@ export default {
                 this.showAlert();
                 // Push the name to submitted names
                 let vm = this;
-                axios.post(backEndUrl + "/api/cars", vm.insert)
-                    .then(function (response) {             
-                        if(response.status == 200)
-                        {
-                            console.log(response);
-                            vm.alertFlag = false;
-                            window.location.href = "/cars";
-                            // Hide the modal manually
-                            vm.$nextTick(() => {
-                                vm.$bvModal.hide('car-insert-modal')
-                            })
-                        }              
-                    })
-                    .catch(function (error) {
-                            console.log(error);
-                    });
+                axios.post(backEndUrl + "/api/cars", vm.car, {
+                    headers: {
+                            Authorization: 'Bearer ' + window.$cookies.get('token')
+                    }
+                })
+                .then(function (response) {             
+                    if(response.status == 200)
+                    {
+                        console.log(response);
+                        vm.alertFlag = false;
+                        let insertedId = response.data._id;
+                        vm.insertCarSummary(insertedId);                        
+                    }              
+                })
+                .catch(function (error) {
+                        console.log(error);
+                });
             }
+        },
+        insertCarSummary(carId) {
+            let vm = this;
+            console.log(this.summary);
+            axios.post(backEndUrl + `/api/cars/${carId}/summary`, vm.summary, {
+                headers: {
+                        Authorization: 'Bearer ' + window.$cookies.get('token')
+                }
+            })
+            .then(function (response) {
+                if(response.status == 200)
+                {
+                    window.location.href = "/cars";
+                    // Hide the modal manually
+                    vm.$nextTick(() => {
+                        vm.$bvModal.hide('car-insert-modal')
+                    })
+                }                        
+            })
+            .catch(function (error) {
+                console.log(error);
+            });       
         },
         onFileSelected(e) {
             for(let i=0; i < e.target.files.length; i++)
@@ -114,10 +140,10 @@ export default {
                 var reader = new FileReader();
                 reader.readAsDataURL(e.target.files[i]);
                 reader.onload = (e) => {
-                        this.insert.Base64images[i] = e.target.result;
+                        this.car.Base64images[i] = e.target.result;
                 }                 
             }
-            console.log(this.insert.Base64images);                
+            console.log(this.car.Base64images);                
         }, 
         showAlert(){
             this.alertFlag = true;
@@ -125,12 +151,12 @@ export default {
         bmwClick() {
             this.activeMbItem = false;
             this.activeBmwItem = true;
-            this.insert.make = 'BMW'
+            this.car.make = 'BMW'
         },
         mbClick() {
             this.activeMbItem = true;
             this.activeBmwItem = false;
-            this.insert.make = 'Mercedes-benz'
+            this.car.make = 'Mercedes-benz'
         },
         otherClick() {
             window.location.href= "/not-implemented";

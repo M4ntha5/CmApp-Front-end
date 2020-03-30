@@ -43,7 +43,7 @@
 </template>
 <script>
 import axios from'axios';
-const backEndUrl = process.env.VUE_APP_BACK_END_URL;
+const backEndUrl = process.env.VUE_APP_API;
 export default {
      data(){
           return {
@@ -107,7 +107,11 @@ export default {
                     if(!vm.insert._id)
                     {
                          vm.alertFlag = true;
-                         axios.post(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert)
+                         axios.post(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert, {
+                              headers: {
+                                        Authorization: 'Bearer ' + window.$cookies.get('token')
+                              }
+                         })
                          .then(function (response) {
                               if(response.status == 200)
                               {
@@ -124,7 +128,11 @@ export default {
                     else
                     {
                          vm.alertFlag = true;
-                         axios.put(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert)
+                         axios.put(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert, {
+                              headers: {
+                                        Authorization: 'Bearer ' + window.$cookies.get('token')
+                              }
+                         })
                          .then(function (response) {
                               if(response.status == 200)
                               {
@@ -142,7 +150,11 @@ export default {
           },
           fetchCarShipping() {
                var vm = this;
-               axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`)
+               axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`, {
+                    headers: {
+                         Authorization: 'Bearer ' + window.$cookies.get('token')
+                    }
+               })
                .then(function (response) {                      
                     if(response.status == 200)
                          vm.insert = response.data;

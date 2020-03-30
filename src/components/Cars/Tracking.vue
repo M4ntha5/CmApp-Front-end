@@ -40,14 +40,16 @@
                         <button @click="lookForTracking"  class="btn btn-primary">Check for available tracking info?</button>
                   </center>
             </div>
-            <div class="pt-3" v-else-if="loading">
-                 <center><h1>Loading... please wait</h1></center> 
-            </div>   
+            <div class="pt-3" v-else>        
+                  <center>
+                        <b-spinner label="Loading..."></b-spinner>
+                  </center> 
+            </div>    
       </div>
 </template>
 
 <script>
-const backEndUrl = process.env.VUE_APP_BACK_END_URL;
+const backEndUrl = process.env.VUE_APP_API;
 import VueGallery from 'vue-gallery';
 import axios from 'axios';
 
@@ -78,14 +80,18 @@ export default {
             //      alert("from", from.params.id);
           //  }
       },
-      async created() {
+      created() {
             this.fetchTracking();
       },
 
       methods: {
             fetchTracking() {
                   let vm = this;
-                  axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`)
+                  axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
                   .then(function (response) {
                         if(response.data)
                         {
@@ -102,13 +108,18 @@ export default {
                   })
                   .catch(function (error) {
                         console.log(error);
+                        vm.loading = false;
                   });                                        
             },
             lookForTracking(){
                   if(confirm("Attention! This action could take more then a couple of minutes. Are you sure want to continue?"))
                   {
                         let vm = this;
-                        axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`)
+                        axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`, {
+                              headers: {
+                                    Authorization: 'Bearer ' + window.$cookies.get('token')
+                              }
+                        })
                         .then(function (response) {
                               if(response.data)
                               {
@@ -132,7 +143,11 @@ export default {
             },
             fetchImages() {
                   var vm = this;
-                  axios.post(backEndUrl + "/api/get-images", vm.tracking.auctionImages)
+                  axios.post(backEndUrl + "/api/get-images", vm.tracking.auctionImages, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
                   .then(function (response) {
                         if(response.status == 200)
                               vm.tracking.base64images = response.data;          

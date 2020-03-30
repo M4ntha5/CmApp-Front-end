@@ -1,49 +1,103 @@
 <template>
-     <div class="container pt-5">
-          <center><h1>Register</h1></center>
-          <form @submit="checkForm" @submit.prevent="register">               
-               <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" v-model="email" required >
-               </div>
-               <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" v-model="password" required>
-               </div>
-               <div class="form-group">
-                    <label for="password">Repeat password</label>
-                    <input type="password" id="password2" name="password2" class="form-control" v-model="password2" required>
-               </div>
-
-               <button type="submit" class="btn btn-primary">Register</button>
-          </form>
-    </div>
+     <div>
+          <div v-if="token">
+               {{$router.push("/cars")}}
+          </div>
+          <div class="container pt-4" v-else>
+               <b-alert v-model="dangerAlert" variant="danger" dismissible>{{message}}</b-alert>
+               <b-alert v-model="successAlert" variant="success" dismissible>{{message}}</b-alert>
+               <center class="pt-3">
+                    <h1>Registration</h1>
+               </center>
+               <b-form class="justify-content-center" @submit.stop.prevent="onSubmit" >
+                    <b-form-group label="Email">
+                         <b-form-input id="email-input" name="email-input" type="email" placeholder="example@example.com"
+                              v-model="form.email"
+                              v-validate="{ required: true, email }"
+                              :state="validateState('email-input')" 
+                              aria-describedby="email-input-live-feedback"
+                              data-vv-as="email">
+                         </b-form-input>
+                         <b-form-invalid-feedback id="email-input-live-feedback">{{ veeErrors.first('email-input') }}</b-form-invalid-feedback>
+                    </b-form-group>
+                    <b-form-group label="Password">
+                         <b-form-input id="password1-input" name="password1-input" type="password"
+                              v-model="form.password"
+                              v-validate="{ required: true, min: 3 }"
+                              :state="validateState('password1-input')" 
+                              aria-describedby="password1-input-live-feedback"
+                              data-vv-as="password">
+                         </b-form-input>
+                         <b-form-invalid-feedback id="password1-input-live-feedback">{{ veeErrors.first('password1-input') }}</b-form-invalid-feedback>
+                    </b-form-group>
+                    <b-form-group class=" mb-3" label="Repeat password">
+                         <b-form-input id="password2-input" name="password2-input" type="password" 
+                              v-model="form.password2"
+                              v-validate="{ required: true, min: 3}"
+                              :state="validateState('password2-input')" 
+                              aria-describedby="password2-input-live-feedback"
+                              data-vv-as="password">>
+                         </b-form-input>
+                         <b-form-invalid-feedback id="password2-input-live-feedback">{{ veeErrors.first('password2-input') }}</b-form-invalid-feedback>
+                    </b-form-group>  
+                    <b-button type="submit" variant="primary">Submit</b-button>                          
+               </b-form>
+          </div>
+     </div>
 </template>
 
 <script>
-//import axios from 'axios';
-
+import axios from 'axios';
+const backEndUrl = process.env.VUE_APP_API;
 export default {
      data() {
           return {
-               email: '',
-               password: '',
-               password2: '',
-               errors:''
+               form:{
+                    email: '',
+                    password: '',
+                    password2: '',
+               },
+               email:'',
+               dangerAlert: false,
+               successAlert: false,
+               message: ''
           }
      }, 
+     computed: {
+          token: function () {  
+               return window.$cookies.get('token');  
+          }
+     },
      methods: {
-          checkForm:function(e) 
-          {
-               if(this.email && this.password && this.password2 && this.password == this.password2)
-               {
-                    return this.register();
-               }
-               this.errors = [];
-               e.preventDefault();
+          validateState(ref) {
+               if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
+                    return !this.veeErrors.has(ref);
+               return null;
+          },
+          onSubmit() {
+               this.$validator.validateAll().then(result => {
+                    if (!result)
+                         return;
+
+                    this.register();
+               });
           },
           register() {
-               
+               let vm = this;
+               axios.post(backEndUrl + "/api/auth/register", this.form)
+               .then(function (response){
+                    if(response.status == 200)
+                    {     
+                         vm.message = response.data;
+                         vm.successAlert = !vm.successAlert;           
+                         setTimeout(() => {  vm.$router.push("/login"); }, 1800);            
+                    }
+               })
+               .catch(function (error){
+                    console.log(error);
+                    vm.message = error.response.data;
+                    vm.dangerAlert = !vm.dangerAlert;   
+               })
           }
      }
 }

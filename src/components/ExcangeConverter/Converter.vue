@@ -1,36 +1,49 @@
 <template>
      <div>
           <center class="pt-3"><h1>Here you can convert between most popular world currencies!</h1></center>
-          
-          <form class="container pt-5">
+          <b-form class="container pt-5">
                <div class="row">
-                    <div class="col-sm-5 col-12">
-                         <div class="form-group">
-                              <label for="exampleFormControlInput1">Enter amount</label>
-                              <input type="number" class="form-control" required v-model="data.amount">
-                         </div>
-                         <div class="form-group ">
-                              <label for="exampleInputEmail1">Currency from</label>
-                              <select class="form-control" required v-model='data.from'>
-                                   <option v-for='(rate, key) in rates' :key='key' :value='rate'>{{rate}}</option>
-                              </select>
-                         </div>                    
+                    <div class="col-md-5">
+                         <b-form-group label="Amount">
+                              <b-form-input id="amount-input" placeholder="3000" name="amount-input"
+                                   v-model="data.amount"
+                                   v-validate="{ required: true, decimal:3 }"
+                                   :state="validateState('amount-input')" 
+                                   aria-describedby="amount-input-live-feedback"
+                                   data-vv-as="amount">
+                              </b-form-input>
+                              <b-form-invalid-feedback id="amount-input-live-feedback">{{ veeErrors.first('amount-input') }}</b-form-invalid-feedback>
+                         </b-form-group>
+                         <b-form-group label="Currency from">
+                              <b-form-select id="currency-from-input" name="currency-from-input"
+                                   v-model="data.from"
+                                   :options="rates"
+                                   v-validate="{ required: true }"
+                                   :state="validateState('currency-from-input')"
+                                   aria-describedby="currency-from-input-live-feedback"
+                                   data-vv-as="currency-from" > 
+                              </b-form-select>
+                              <b-form-invalid-feedback id="currency-from-input-live-feedback">{{ veeErrors.first('currency-from-input') }}</b-form-invalid-feedback>
+                         </b-form-group>
                     </div>
-                    <div class="col-sm-2 col-12 pt-5">
-                         <div class="form-group pt-5">
-                         </div> 
-                    </div>
-                    <div class="col-sm-5 col-12">      
-                         <div class="form-group">
-                              <label>Currency to</label>
-                              <select class="form-control" v-model='data.to' required>
-                                   <option v-for='(rate, key) in rates' :key='key' :value='rate'>{{rate}}</option>
-                              </select>
-                         </div>  
-                    </div>                     
+                    <div class="col-md-5">
+                         <b-form-group label="Currency to">
+                              <b-form-select id="currency-to-input" name="currency-to-input"
+                                   v-model="data.to"
+                                   :options="rates"
+                                   v-validate="{ required: true }"
+                                   :state="validateState('currency-to-input')"
+                                   aria-describedby="currency-to-input-live-feedback"
+                                   data-vv-as="currency-to" > 
+                              </b-form-select>
+                              <b-form-invalid-feedback id="currency-to-input-live-feedback">{{ veeErrors.first('currency-to-input') }}</b-form-invalid-feedback>
+                         </b-form-group>
+                    </div>                 
                </div>
-               <button @click.prevent="convert()" type="submit" class="btn btn-primary">Convert</button>
-          </form>
+               <div class="pt-3">
+                    <b-button type="button" class="btn btn-primary" @click.prevent="convert()">Convert</b-button>
+               </div>
+          </b-form>
           <div class="container mb-5">
                <center v-if="result" style="float:right;"><h2>Result: <b>{{result}} {{currTo}}</b></h2></center>
           </div>
@@ -38,7 +51,7 @@
 </template>
 
 <script>
-const backEndUrl = process.env.VUE_APP_BACK_END_URL;
+const backEndUrl = process.env.VUE_APP_API;
 import axios from 'axios';
 
 export default {
@@ -51,7 +64,7 @@ export default {
                     amount: ''
                },
                result: '',
-               currTo: ''
+               currTo: '',
           }
      },
 
@@ -65,10 +78,9 @@ export default {
                axios.get(backEndUrl + "/api/currency")
                .then(function (response) {
                     vm.rates = response.data;
-                    console.log(response.data);
                })
                .catch(function (error){
-                    console.log(error)
+                    console.log(error);
                });
           },
 
@@ -85,10 +97,22 @@ export default {
                     }
                })
                .catch(function (error){
-                    console.log(error)
+                    console.log(error);
+               });
+          },
+          validateState(ref) {
+               if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
+                    return !this.veeErrors.has(ref);
+               return null;
+          },
+          onSubmit() {
+               this.$validator.validateAll().then(result => {
+                    if (!result)
+                         return;
+
+                    this.convert();
                });
           }
-
      }
 }
 </script>
