@@ -158,7 +158,7 @@
                          <b-form-invalid-feedback id="interior-input-live-feedback">{{ veeErrors.first('interior-input') }}</b-form-invalid-feedback>
                     </b-form-group>
                </div>   
-               <div class="row mb-5">
+              <!-- <div class="row mb-5">
                     <div class="card ml-3 mr-3" style="width:70rem; height:23rem;">
                          <div class="row ml-4 mr-4 pt-4 justify-content-between" 
                               v-for="image in car.base64images" v-bind:key="image">              
@@ -168,7 +168,7 @@
                               </div>
                          </div>                       
                     </div>
-               </div>      
+               </div> -->     
                           
           </b-form>
           <div class="pt-3">   
