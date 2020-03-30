@@ -1,45 +1,115 @@
 <template>
-     <div class="container pt-5">
-          <center><h1>Login</h1></center>
-          <form @submit="checkForm" @submit.prevent="login">          
-               <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" v-model="email" required >
-               </div>
-
-               <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" v-model="password" required>
-               </div>
-               <button type="submit" class="btn btn-primary">Login</button>
-          </form>
+     <div>
+          <div v-if="token">
+               {{$router.push("/cars")}}
+          </div>
+          <div class="container pt-5" v-else>
+               <b-alert v-model="dangerAlert" variant="danger" dismissible>{{message}}</b-alert>
+               <b-alert v-model="successAlert" variant="success" dismissible>{{message}}</b-alert>
+               <center><h1>Login</h1></center>
+               <b-form class="justify-content-center" @submit.prevent="onSubmit" >
+                    <b-form-group label="Email">
+                         <b-form-input id="email-input" name="email-input" type="email" placeholder="example@example.com"
+                              v-model="form.email"
+                              v-validate="{ required: true, email }"
+                              :state="validateState('email-input')" 
+                              aria-describedby="email-input-live-feedback"
+                              data-vv-as="email">
+                         </b-form-input>
+                         <b-form-invalid-feedback id="email-input-live-feedback">{{ veeErrors.first('email-input') }}</b-form-invalid-feedback>
+                    </b-form-group>
+                    <b-form-group label="Password">
+                         <b-form-input id="password1-input" name="password1-input" type="password"
+                              v-model="form.password"
+                              v-validate="{ required: true, min: 3 }"
+                              :state="validateState('password1-input')" 
+                              aria-describedby="password1-input-live-feedback"
+                              data-vv-as="password">
+                         </b-form-input>
+                         <b-form-invalid-feedback id="password1-input-live-feedback">{{ veeErrors.first('password1-input') }}</b-form-invalid-feedback>
+                    </b-form-group>
+                    <b-button type="submit" variant="primary">Submit</b-button>                          
+               </b-form>
+     </div>
     </div>
 </template>
 
 <script>
-//import axios from 'axios';
+import axios from 'axios';
+const backEndUrl = process.env.VUE_APP_API;
 
 export default {
      data() {
           return {
-               email: '',
-               password: '',
-               errors: []
+               form: {
+                    email: '',
+                    password: '',
+               },
+               email:'' ,
+               dangerAlert: false,
+               successAlert: false,
+               message: ''    
           }
      }, 
+     computed: {
+          token: function () {  
+               return window.$cookies.get('token');  
+          }
+     },
      methods: {
-          checkForm:function(e) 
-          {
-               if(this.email && this.password)
-               {
-                    return this.login();
-               }
-               this.errors = [];     
-               e.preventDefault();
+          validateState(ref) {
+               if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
+                    return !this.veeErrors.has(ref);
+               return null;
+          },
+          onSubmit() {
+               this.$validator.validateAll().then(result => {
+                    if (!result)
+                         return;
+
+                    this.login();
+               });
           },
           login() {
-               
-          }
+               let vm = this;
+               axios.post(backEndUrl + "/api/auth/login", this.form)
+               .then(function (response){
+                    if(response.status == 200)
+                    {
+                         let token = response.data;   
+                         //decode role from token
+                         let jwtData = token.split('.')[1];
+                         let decodedJwtJsonData = window.atob(jwtData);
+                         let role = decodedJwtJsonData.split(',')[0].split('"')[3];
+                         let email = decodedJwtJsonData.split(',')[2].split('"')[3];
+
+                         window.$cookies.set('token', token, '1h', true);
+                         window.$cookies.set('user-email', email, '1h', true);
+                         window.$cookies.set('role', role, '1h', true);
+
+                         if(role == "user")
+                         {
+                              vm.message = "Successfully loged in user";
+                              vm.successAlert = true;
+                              window.location.href = "/cars";
+                         }
+                         else if(role == "admin")
+                         {
+                              vm.message = "Successfully loged in admin";
+                              vm.successAlert = true;
+                              window.location.href = "/admin";
+                         }
+                              
+                    }
+               })
+               .catch(function (error){
+                    console.log(error);
+                    vm.message = error.response.data;
+                    vm.dangerAlert = true;
+               })
+          },
+
+
      }
 }
 </script>

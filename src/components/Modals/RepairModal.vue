@@ -4,7 +4,9 @@
         @show="resetModal"
         @ok="handleOk"
         @close="resetModal">
-        <b-alert v-model="alertFlag" dismissible>Inserting please wait...</b-alert>
+
+          
+          <b-alert v-model="failedAlert" variant="danger" dismissible>{{alertMessage}}</b-alert>
 
             <form ref="form" @submit.stop.prevent="handleSubmit">
 
@@ -33,7 +35,7 @@
 
 <script>
 import axios from'axios';
-const backEndUrl = process.env.VUE_APP_BACK_END_URL;
+const backEndUrl = process.env.VUE_APP_API;
 export default {
      data(){
           return {
@@ -50,21 +52,21 @@ export default {
                nameState: null,
                priceState: null,
                carState: null,
-               alertFlag: false,
+               successFlag: false,
+               failedAlert: false,
+               alertMessage: ''
           }
-     },
-     created() {
-          this.getCarNames();
      },
      methods: {
           checkFormValidity() {
-            const valid = this.$refs.form.checkValidity()
-            this.nameState = this.$refs.form[0].checkValidity()
-            this.priceState = this.$refs.form[1].checkValidity()
-            this.carState = this.$refs.form[2].checkValidity()
-            return valid
+               const valid = this.$refs.form.checkValidity()
+               this.nameState = this.$refs.form[0].checkValidity()
+               this.priceState = this.$refs.form[1].checkValidity()
+               this.carState = this.$refs.form[2].checkValidity()
+               return valid
           },
           resetModal() {
+               this.getCarNames();
                this.insert.name = ''
                this.insert.price = ''
                this.insert.car = ''
@@ -86,8 +88,16 @@ export default {
                else
                {
                     let vm = this;
-                    vm.alertFlag = true;
-                    axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, vm.insert)
+                    let repairs = [];
+                    repairs.push(vm.insert);
+
+                    console.log(repairs);
+                    vm.successFlag = true;
+                    axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, repairs, {
+                         headers: {
+                                   Authorization: 'Bearer ' + window.$cookies.get('token')
+                         }
+                    })
                     .then(function (response) {
                          if(response.status == 200)
                          {
@@ -104,7 +114,11 @@ export default {
           },
           getCarNames() {
                let vm = this;
-               axios.get(backEndUrl + "/api/user-car-names")
+               axios.get(backEndUrl + "/api/user-car-names", {
+                    headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                    }
+               })
                .then(function (response) {
                     console.log(response);
                     if(response.status == 200)
@@ -113,7 +127,11 @@ export default {
                          vm.insert.car = vm.cars[0].id;
                     }                
                })
-               .catch(function (error) {
+               .catch(function (error) {    
+                               
+                    vm.alertMessage = error.response.data;
+                    vm.failedAlert = true;
+                    console.log(vm.alertMessage)  
                     console.log(error);
                });
           }
