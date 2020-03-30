@@ -88,8 +88,12 @@ export default {
                else
                {
                     let vm = this;
+                    let repairs = [];
+                    repairs.push(vm.insert);
+
+                    console.log(repairs);
                     vm.successFlag = true;
-                    axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, vm.insert, {
+                    axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, repairs, {
                          headers: {
                                    Authorization: 'Bearer ' + window.$cookies.get('token')
                          }
