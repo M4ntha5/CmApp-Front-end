@@ -14,14 +14,14 @@
             <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal" @ok="fetchCars()" @close="fetchCars()"/>
 
             <div class="row">
-                  <div class="pt-5 col-4" v-for="(car) in cars" v-bind:key="car._id">                
+                  <div class="pt-5 col-4" v-for="(car, index) in cars" v-bind:key="car.id">                
                         <div class="card" style="width: 20rem; height: 30rem;">
-                              <a v-bind:href="'/cars/'+ car._id">                                                         
+                              <a v-bind:href="'/cars/'+ car.id">                                                         
                                     <img :src='car.mainImgUrl' class="card-img-top img-thumbnail img-responsive" alt="Responsive image">
                               </a>
                               <div class="pt-3 card-body">
                                     <div class="row">
-                                          <a v-bind:href="'/cars/'+ car._id">  
+                                          <a v-bind:href="'/cars/'+ car.id">  
                                                 <h2>{{car.make}} {{car.model}}</h2>
                                           </a>
                                     </div>
@@ -37,7 +37,7 @@
                                     </div>            
                               </div>
                               <div v-if="!car.summary.sold">
-                                    <button v-b-modal.sold-modal @click="openSoldModal(car._id, index)" type="button" class="btn btn-warning">Sold?</button>
+                                    <button v-b-modal.sold-modal @click="openSoldModal(car.id, index)" type="button" class="btn btn-warning">Sold?</button>
                               </div> 
                         </div> 
                                     
@@ -112,7 +112,7 @@ export default {
                   failedAlert: false,
                   cars: [],
                   car: {
-                        _id: '',
+                        id: '',
                         make:'',
                         model:'',
                         vin:'',
@@ -197,7 +197,7 @@ export default {
                               vm.cars = response.data;
                               vm.loading = false;
                               //setting repair value to dafault - first of a list
-                              vm.insertRepair.car = vm.cars[0]._id;
+                              vm.insertRepair.car = vm.cars[0].id;
                               
                               vm.fetchCarsSummary();
                         }                       

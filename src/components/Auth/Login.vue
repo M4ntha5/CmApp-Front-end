@@ -81,10 +81,10 @@ export default {
                          let jwtData = token.split('.')[1];
                          let decodedJwtJsonData = window.atob(jwtData);
                          let role = decodedJwtJsonData.split(',')[0].split('"')[3];
-                         let name = decodedJwtJsonData.split(',')[2].split('"')[3];
+                         let email = decodedJwtJsonData.split(',')[2].split('"')[3];
 
                          window.$cookies.set('token', token, '1h', true);
-                         window.$cookies.set('user-name', name, '1h', true);
+                         window.$cookies.set('user-email', email, '1h', true);
                          window.$cookies.set('role', role, '1h', true);
 
                          if(role == "user")

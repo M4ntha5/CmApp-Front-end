@@ -157,7 +157,7 @@
                               
                               <div v-else>
                                     <center>
-                                          <h2 class="pt-3">No shipping info yet</h2>
+                                          <h2 class="pt-3">No repairs yet</h2>
                                     </center>
                               </div>
                         </b-collapse>                  

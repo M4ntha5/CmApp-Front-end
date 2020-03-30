@@ -3,7 +3,7 @@
      <div class="container" v-if="!loading">
           <center class="pt-4"><h1>{{make}} {{model}}</h1></center>
 
-          <b-form class="pt-4" @submit.stop.prevent="onSubmit" v-if="!loading">
+          <b-form class="pt-4" v-if="!loading">
                <div class="form-row">
                     <b-form-group class="col-md-4 mb-3" label="Make">
                          <b-form-input id="make-input" name="make-input" placeholder="BMW"
@@ -211,8 +211,8 @@
                                    </b-form-input>
                                    <b-form-invalid-feedback id="name-input-live-feedback">{{ veeErrors.first('name-input') }}</b-form-invalid-feedback>
                               </b-form-group>
-                              <div class="col-md-2 mb-3">
-                                   <b-button class="ml-4" size="sm" @click="addRow()">
+                              <div class="col-md-2 mb-3 ml-4">
+                                   <b-button class="ml-2" size="sm" @click="addRow()">
                                         Add
                                    </b-button> 
                               </div>                           
@@ -240,8 +240,8 @@
 
                     <b-form>
                          <div class="form-row">
-                              <b-form-group class="col-md-3 mb-3 mr-4">
-                                   <b-form-input id="repair-name-input" placeholder="Kapotas" name="repair-name-input"
+                              <b-form-group class="col-md-3 mb-3 mr-5">
+                                   <b-form-input id="repair-name-input" placeholder="name" name="repair-name-input"
                                         v-model="repairName"
                                         v-validate="{ required: true }"
                                         :state="validateState('repair-name-input')" 
@@ -251,7 +251,7 @@
                                    <b-form-invalid-feedback id="repair-name-input-live-feedback">{{ veeErrors.first('repair-name-input') }}</b-form-invalid-feedback>
                               </b-form-group>
                               <b-form-group class="col-md-2 mb-3 ml-5 mr-5">
-                                   <b-form-input id="price-input" placeholder="150" name="price-input" type="number" step=".01"
+                                   <b-form-input id="price-input" placeholder="price" name="price-input" type="number" step=".01"
                                         v-model="repairPrice"
                                         v-validate="{ required: true, min_value:1 }"
                                         :state="validateState('price-input')" 
@@ -260,8 +260,8 @@
                                    </b-form-input>
                                    <b-form-invalid-feedback id="price-input-live-feedback">{{ veeErrors.first('price-input') }}</b-form-invalid-feedback>
                               </b-form-group>
-                              <div class="col-md-2 mb-3 ml-5">
-                                   <b-button class="ml-5" size="sm" @click="addRepairRow()">
+                              <div class="col-sm-2 mb-3 well">
+                                   <b-button class="mr-5" style="float:right;" size="sm" @click="addRepairRow()">
                                         Add
                                    </b-button> 
                               </div>
@@ -270,7 +270,7 @@
                </b-collapse>
           </div>
           <div class="pt-3">
-               <b-button type="submit" variant="primary">Submit</b-button>
+               <b-button type="submit" @click.prevent="onSubmit()" variant="primary">Submit</b-button>
           </div>
      </div>   
      <div class="pt-3" v-else>        
@@ -399,13 +399,27 @@ export default {
                     return !this.veeErrors.has(ref);
                return null;
           },
-          onSubmit() {
-               this.$validator.validateAll().then(result => {
+          async onSubmit() {
+               /*this.$validator.validateAll().then(result => {
                     if (!result)
-                         return;
+                         return;*/
 
-                    this.updateCar();
-               });
+               const results = Promise.all([
+                    this.$validator.validate('make-input'),this.$validator.validate('model-input'),
+                    this.$validator.validate('series-input'),this.$validator.validate('date-input'),
+                    this.$validator.validate('body-input'),this.$validator.validate('steering-input'),
+                    this.$validator.validate('drive-input'),this.$validator.validate('transmission-input'),
+                    this.$validator.validate('engine-input'),this.$validator.validate('displacement-input'),
+                    this.$validator.validate('power-input'),this.$validator.validate('color-input'),
+                    this.$validator.validate('interior-input')
+               ]);
+
+               const areValid = (await results).every(isValid => isValid);  
+               console.log(areValid);
+
+               if(areValid)
+                    this.updateAll();
+               
           },
           deleteEquipmentRow (ind) {
                this.car.equipment.splice(ind, 1);
@@ -476,6 +490,39 @@ export default {
                     console.log(error);
                });
           },
+
+          deleteAllCarRepairs(){
+               let vm = this;
+               axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/delete-repairs`, {
+                    headers: {
+                         Authorization: 'Bearer ' + window.$cookies.get('token')
+                    }
+               })
+               .then(function (response) {
+                    if(response.status == 200)
+                         vm.insertMultipleRepairs();
+               })
+               .catch(function (error) {
+                    console.log(error);
+               })
+          },
+          insertMultipleRepairs(){
+               let vm = this;
+               axios.post(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, vm.repairs, {
+                    headers: {
+                         Authorization: 'Bearer ' + window.$cookies.get('token')
+                    }
+               })
+               .catch(function (error) {
+                    console.log(error);
+               })
+          },
+          updateAll(){
+               this.updateCar();
+               this.deleteAllCarRepairs();
+               console.log(this.car);
+               console.log(this.repairs);
+          }
      }
 }
 </script>

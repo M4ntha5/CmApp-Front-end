@@ -43,7 +43,7 @@
                                           id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" 
                                           aria-expanded="false"
                                           >
-                                               {{name}}
+                                               {{email}}
                                           </a>
 
                                           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
@@ -80,8 +80,8 @@ export default {
             role: function() {
                   return window.$cookies.get('role');
             },
-            name: function() {
-                  return window.$cookies.get('user-name');
+            email: function() {
+                  return window.$cookies.get('user-email');
             }
       },
       methods: {
@@ -94,6 +94,7 @@ export default {
             logout(){
                   window.$cookies.remove('role');
                   window.$cookies.remove('token');
+                  window.$cookies.remove('user-email');
                   window.location.href = "/";
             },
       }
