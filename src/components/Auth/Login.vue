@@ -72,7 +72,7 @@ export default {
           },
           login() {
                let vm = this;
-               axios.post(backEndUrl + "/api/auth/login", this.form)
+               axios.post(backEndUrl + '/api/auth/login', this.form)
                .then(function (response){
                     if(response.status == 200)
                     {
@@ -98,8 +98,7 @@ export default {
                               vm.message = "Successfully loged in admin";
                               vm.successAlert = true;
                               window.location.href = "/admin";
-                         }
-                              
+                         }                          
                     }
                })
                .catch(function (error){
@@ -108,8 +107,6 @@ export default {
                     vm.dangerAlert = true;
                })
           },
-
-
      }
 }
 </script>

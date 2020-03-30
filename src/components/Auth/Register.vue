@@ -84,7 +84,7 @@ export default {
           },
           register() {
                let vm = this;
-               axios.post(backEndUrl + "/api/auth/register", this.form)
+               axios.post(backEndUrl + '/api/auth/register', this.form)
                .then(function (response){
                     if(response.status == 200)
                     {     
