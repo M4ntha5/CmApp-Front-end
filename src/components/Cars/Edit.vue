@@ -6,7 +6,7 @@
           <b-form class="pt-4" v-if="!loading">
                <div class="form-row">
                     <b-form-group class="col-md-4 mb-3" label="Make">
-                         <b-form-input id="make-input" name="make-input" placeholder="BMW"
+                         <b-form-input disabled id="make-input" name="make-input" placeholder="BMW"
                               v-model="car.make"     
                               v-validate="{ required: true }"
                               :state="validateState('make-input')" 

@@ -115,7 +115,7 @@ export default {
                   if(confirm("Attention! This action could take more then a couple of minutes. Are you sure want to continue?"))
                   {
                         let vm = this;
-                        axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`, {
+                        axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`,{}, {
                               headers: {
                                     Authorization: 'Bearer ' + window.$cookies.get('token')
                               }
