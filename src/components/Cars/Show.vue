@@ -17,7 +17,7 @@
                                     <a @click.prevent="editCar(car._id)" class="dropdown-item" href="">
                                           Edit
                                     </a>
-                                    <a @click.prevent="deleteCar()" class="dropdown-item" href="">
+                                    <a @click.prevent="deleteAction()" class="dropdown-item" href="">
                                           Delete
                                     </a>
                                     <a v-b-modal.shipping-modal class="dropdown-item" href=""
@@ -405,6 +405,13 @@ export default {
                   this.fetchCarSummary();
                   this.fetchCarShipping();
             },
+            deleteAction(){
+                  this.deleteCar();
+                  this.deleteCarSummary();
+                  this.deleteCarTracking();
+                  this.deleteCarRepairs();
+                  this.deleteCarShipping();
+            },
             deleteCar(){
                   var vm = this;
                   axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}`, {
@@ -418,6 +425,50 @@ export default {
                               vm.alertMessage = "Car successfully deleted";
                               vm.alertFlag = true;
                               vm.$router.push("/cars");
+                        }
+                  })
+                  .catch(function (error){
+                        console.log(error);
+                  })
+            },
+            deleteCarSummary(){
+                  var vm = this;
+                  axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/summary`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .catch(function (error){
+                        console.log(error);
+                  })
+            },
+            deleteCarTracking(){
+                  var vm = this;
+                  axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/tracking`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .catch(function (error){
+                        console.log(error);
+                  })
+            },
+            deleteCarShipping(){
+                  var vm = this;
+                  axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .catch(function (error){
+                        console.log(error);
+                  })
+            },
+            deleteCarRepairs(){
+                  var vm = this;
+                  axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
                         }
                   })
                   .catch(function (error){

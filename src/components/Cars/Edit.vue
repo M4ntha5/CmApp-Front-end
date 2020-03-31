@@ -46,7 +46,7 @@
                     <b-form-group class="col-md-6 mb-3" label="Manufacture date">
                          <b-form-input id="date-input" type="date" name="date-input"
                               v-model="car.manufactureDate"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: true, date_format: 'dd/MM/yyyy' }"
                               :state="validateState('date-input')" 
                               aria-describedby="date-input-live-feedback"
                               data-vv-as="date">
@@ -230,12 +230,12 @@
                     Repairs
                </b-button>  
                <b-collapse id="repair-collapse" v-model="repairsVisible" class="mt-2" >
-                    <b-table :items="repairs" responsive :fields="repairFields">                      
+                    <b-table :items="repairs" responsive :fields="repairFields">
                          <template v-slot:cell(action)="row">
                               <b-button size="sm" @click="deleteRepairRow(row.index)" class="mr-2">
                                    Delete
                               </b-button>
-                         </template>                             
+                         </template> 
                     </b-table>       
 
                     <b-form>
