@@ -98,8 +98,7 @@ export default {
                               vm.message = "Successfully loged in admin";
                               vm.successAlert = true;
                               window.location.href = "/admin";
-                         }
-                              
+                         }                          
                     }
                })
                .catch(function (error){
@@ -108,8 +107,6 @@ export default {
                     vm.dangerAlert = true;
                })
           },
-
-
      }
 }
 </script>

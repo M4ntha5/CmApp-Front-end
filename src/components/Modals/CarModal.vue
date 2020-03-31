@@ -159,7 +159,8 @@ export default {
             this.car.make = 'Mercedes-benz'
         },
         otherClick() {
-            window.location.href= "/not-implemented";
+            //window.location.href= "/other-insert";s
+            window.location.href= "/404";
         }
   }
 }
