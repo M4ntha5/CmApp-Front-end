@@ -4,7 +4,7 @@
             <b-alert v-model="successAlert" variant="success" dismissible>{{alertMessage}}</b-alert>
             <b-alert v-model="failedAlert" variant="danger" dismissible>{{alertMessage}}</b-alert>
 
-            <button v-b-modal.car-insert-modal class="btn btn-primary"
+            <button v-b-modal.car-insert-modal class="btn btn-primary ml-3"
             @click="showBmwModal"
             @close="fetchCars()"
             @ok="fetchCars()">
@@ -13,36 +13,33 @@
             <!-- bmw modal-->
             <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal" @ok="fetchCars()" @close="fetchCars()"/>
 
-            <div class="row">
-                  <div class="pt-5 col-4" v-for="(car, index) in cars" v-bind:key="car.id">                
-                        <div class="card" style="width: 20rem; height: 30rem;">
-                              <a v-bind:href="'/cars/'+ car.id">                                                         
-                                    <img :src='car.mainImgUrl' class="card-img-top img-thumbnail img-responsive" alt="Responsive image">
-                              </a>
-                              <div class="pt-3 card-body">
-                                    <div class="row">
-                                          <a v-bind:href="'/cars/'+ car.id">  
-                                                <h2>{{car.make}} {{car.model}}</h2>
-                                          </a>
-                                    </div>
-                                    <div class="row">           
-                                          <h4>Already paid: {{car.summary.total}} €</h4>
-                                    </div>
-                                    <div class="row">
-                                          <div v-if="car.summary.sold">
-                                                <h1 style="color:red;font-weight: bold;">SOLD</h1>
+            <div class="pt-4">
+                  <b-card-group deck>
+                        <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4">                              
+                              <b-card :title="car.make + ' ' + car.model" :img-src='car.mainImgUrl'                         
+                                    img-alt="Image" img-top class="">
+                                    <b-card-text>                                          
+                                          <h4>Already paid: {{car.summary.total}} {{currency}}</h4>
+                                          <template v-if="car.summary.sold">
+                                                <h1 style="color:red;font-weight:bold;">SOLD</h1>
                                                 <h2 v-if="car.summary.profit < 0" style="color:red;font-weight:bold;">Profit: {{car.summary.profit}} €</h2>
-                                                <h2 v-else style="color:green;font-weight:bold;">Profit: {{car.summary.profit}} €</h2>
-                                          </div>
-                                    </div>            
-                              </div>
-                              <div v-if="!car.summary.sold">
-                                    <button v-b-modal.sold-modal @click="openSoldModal(car.id, index)" type="button" class="btn btn-warning">Sold?</button>
-                              </div> 
-                        </div> 
-                                    
-                  </div>
-            </div> 
+                                                <h2 v-else style="color:green;font-weight:bold;">Profit: {{car.summary.profit}} {{currency}}</h2>
+                                          </template>
+                                    </b-card-text>
+                                    <template v-slot:footer>
+                                          <button v-b-modal.sold-modal 
+                                                @click="openSoldModal(car.id, index)" 
+                                                type="button" class="btn btn-warning"
+                                                v-if="!car.summary.sold">
+                                                Sold?
+                                          </button>
+                                          <small v-else>{{car.summary.soldWithin}}</small>
+                                    </template>
+                                    <b-link class="stretched-link" :href="'/cars/' + car.id"></b-link>
+                              </b-card>                                               
+                        </b-col>
+                  </b-card-group>
+            </div>
       </div>
       <div class="pt-3" v-else>
             <center>
@@ -76,30 +73,8 @@
 
 <script>
 
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(function() 
-{
-     'use strict';
-     window.addEventListener('load', function() 
-     {
-          // Fetch all the forms we want to apply custom Bootstrap validation styles to
-          var forms = document.getElementsByClassName('needs-validation');
-          // Loop over them and prevent submission
-          Array.prototype.filter.call(forms, function(form) 
-          {
-               form.addEventListener('submit', function(event) 
-               {
-                    if (form.checkValidity() === false)
-                    {
-                         event.preventDefault();
-                         event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-               }, false);
-          });
-     }, false);
-})();
 
+import getSymbolFromCurrency from 'currency-symbol-map'
 import bmwModal from '../Modals/CarModal.vue';
 import axios from 'axios';
 
@@ -110,6 +85,7 @@ export default {
                   alertMessage:'',
                   successAlert: false,
                   failedAlert: false,
+                  currency: getSymbolFromCurrency(window.$cookies.get('currency')),
                   cars: [],
                   car: {
                         id: '',
@@ -133,9 +109,11 @@ export default {
                         summary: {
                               boughtPrice:'',
                               soldPrice:'',
+                              createdAt: '',
                               total: '',
                               sold: '',
-                              profit: 0
+                              profit: 0,
+                              soldWithin: ''
                         },
                   },
                   insertCar: {
@@ -157,6 +135,7 @@ export default {
                         sold: '',
                         index: '',
                         soldPriceState: null,
+                        createdAt: ''
                   }                
             }           
       },
@@ -195,12 +174,22 @@ export default {
                         if(response.status == 200)
                         {
                               vm.cars = response.data;
-                              vm.loading = false;
+                              vm.loading = false;                            
                               //setting repair value to dafault - first of a list
-                              vm.insertRepair.car = vm.cars[0].id;
+                              if(vm.cars.length > 0)
+                                    vm.insertRepair.car = vm.cars[0].id;
                               
                               vm.fetchCarsSummary();
-                        }                       
+                        }
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }                              
                   })
                   .catch(function (error) {
                         vm.loading = false;
@@ -225,8 +214,18 @@ export default {
                                     vm.cars[i].summary = response.data;
                                     vm.cars[i].summary.profit = 
                                           vm.cars[i].summary.soldPrice -
-                                          vm.cars[i].summary.total; 
+                                          vm.cars[i].summary.total;
+                                    
                               }
+                              if(response.status == 401) 
+                              {
+                                    vm.$cookies.remove('token');
+                                    vm.$cookies.remove('user-email');
+                                    vm.$cookies.remove('role');
+                                    vm.$cookies.remove('user');
+                                    vm.$cookies.remove('currency');
+                                    vm.$router.push('/');
+                              }  
                                     
                         })
                         .catch(function (error) {
@@ -249,8 +248,17 @@ export default {
                               vm.cars[index].summary = response.data;
                               vm.cars[index].summary.profit = 
                                     vm.cars[index].summary.soldPrice -
-                                    vm.cars[index].summary.total; 
-                        }                        
+                                    vm.cars[index].summary.total;
+                        } 
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }                       
                   })
                   .catch(function (error) {
                         vm.alertMessage = error.response.data;
@@ -283,6 +291,15 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                               vm.fetchCarSummary(index, carId);
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
                   })
                   .catch(function (error) {
                         vm.alertMessage = error.response.data;
@@ -314,7 +331,8 @@ export default {
                   else
                   {
                         this.soldDetails.sold = true;
-                        console.log(this.soldDetails);
+                        this.soldDetails.createdAt = this.cars[this.soldDetails.index].summary.createdAt;
+
                         var vm = this;
                         axios.put(backEndUrl + `/api/cars/${vm.soldDetails.car}/summary`, this.soldDetails, {
                               headers: {
@@ -328,7 +346,16 @@ export default {
                                     vm.$nextTick(() => {
                                           vm.$bvModal.hide('sold-modal')
                                     })
-                              }                   
+                              }
+                              if(response.status == 401) 
+                              {
+                                    vm.$cookies.remove('token');
+                                    vm.$cookies.remove('user-email');
+                                    vm.$cookies.remove('role');
+                                    vm.$cookies.remove('user');
+                                    vm.$cookies.remove('currency');
+                                    vm.$router.push('/');
+                              }               
                         })
                         .catch(function (error){
                               vm.alertMessage = error.response.data;
@@ -341,7 +368,6 @@ export default {
                   this.soldDetails.car = carId;
                   this.soldDetails.index = index;
             }
-
       }
 }
 </script>

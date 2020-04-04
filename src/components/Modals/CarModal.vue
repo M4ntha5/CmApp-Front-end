@@ -2,10 +2,9 @@
     <div>
         <b-modal id="car-insert-modal" ref="modal" title="Insert new car"
         @show="resetModal"
-        @ok="handleOk"
+        @ok.prevent="handleSubmit"
         @close="resetModal">
-        <b-alert v-model="alertFlag" dismissible>Fetching data please wait...</b-alert>
-
+        <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
             <form ref="form" @submit.stop.prevent="handleSubmit">
                 <div class="mb-4">
                     <b-nav tabs>
@@ -22,25 +21,70 @@
                         </b-nav-item>
                     </b-nav>
                 </div>
-                <b-form-group :state="vinState" label="Vin" label-for="vin-input" invalid-feedback="Vin is required">  
-                    <b-form-input v-model='car.vin' id="vin-input" :state="vinState" required></b-form-input>
+                <b-form-group label="Vin">
+                    <b-form-input id="vin-input" placeholder="WBA1E2C34JVD56789" name="vin-input"
+                        v-model="car.vin"
+                        v-validate="{ required: true, length:'17'}"
+                        :state="validateState('vin-input')" 
+                        aria-describedby="vin-input-live-feedback"
+                        data-vv-as="vin">
+                    </b-form-input>
+                    <b-form-invalid-feedback id="vin-input-live-feedback">
+                        Vin is required and length must be numeric exactly 17 symbols 
+                    </b-form-invalid-feedback>
                 </b-form-group>
-
-                <b-form-group :state="priceState"  label="Price" label-for="price-input" 
-                            invalid-feedback="Price is required and should be more/equal 0">
-                    <b-form-input v-model='summary.boughtPrice' id="price-input" :state="priceState" type="number" min="0" step=".01" required></b-form-input>
+                <b-row>
+                    <b-col cols="8">
+                        <b-form-group label="Price">
+                            <b-form-input id="price-input" placeholder="9000" name="price-input"
+                                v-model="summary.boughtPrice"
+                                v-validate="{ required: true, decimal:'2' }"
+                                :state="validateState('price-input')" 
+                                aria-describedby="price-input-live-feedback"
+                                data-vv-as="price">
+                            </b-form-input>
+                            <b-form-invalid-feedback id="price-input-live-feedback">
+                                {{ veeErrors.first('price-input') }}
+                            </b-form-invalid-feedback>
+                        </b-form-group>
+                    </b-col>
+                    <b-col cols="4">
+                        <b-form-group label="Currency">
+                            <b-form-select id="currency-input" name="currency-input"
+                                v-model="summary.selectedCurrency"
+                                :options="rates"
+                                v-validate="{ required: true }"
+                                :state="validateState('currency-input')"
+                                aria-describedby="currency-input-live-feedback"
+                                data-vv-as="currency" > 
+                            </b-form-select>
+                            <b-form-invalid-feedback id="currency-input-live-feedback">
+                                {{ veeErrors.first('currency-input') }}
+                            </b-form-invalid-feedback>
+                        </b-form-group>
+                    </b-col>
+                </b-row>          
+                <b-form-group label="Images">
+                    <b-form-file id="image-input" name="image-input" multiple @change="onFileSelected"
+                        accept=".jpg, .png, .gif"
+                        v-validate="{ required: false, image:'' }"
+                        placeholder="Choose an image or drop it here..."
+                        drop-placeholder="Drop image here..."
+                        :state="validateState('image-input')" 
+                        aria-describedby="image-input-live-feedback"
+                        data-vv-as="image">
+                    </b-form-file>
+                    <b-form-invalid-feedback id="image-input-live-feedback">
+                        {{ veeErrors.first('image-input') }}
+                    </b-form-invalid-feedback>
                 </b-form-group>
-
-                <b-form-group label="Choose images" label-for="image-input">
-                    <input  type="file" multiple @change="onFileSelected" id="image-input"/>       
-                </b-form-group>
-
             </form>
         </b-modal>
     </div>
 </template>
 
 <script>
+
 import axios from 'axios'
 const backEndUrl = process.env.VUE_APP_API;
 export default {
@@ -53,21 +97,34 @@ export default {
             },  
             summary: {
                 boughtPrice: '',
-                car: ''
-            },      
+                car: '',
+                selectedCurrency: '',
+                baseCurrency: window.$cookies.get('currency'),
+            },   
+            rates: [],   
             priceState: null,
             vinState: null,
             alertFlag: false,
+            alertMessage: '',
+            dangerAlert: false,
             activeBmwItem: true,
             activeMbItem: false,
         }
     },
+    mounted() {
+        this.getCurrencies();
+    },
     methods: {
-        checkFormValidity() {
-            const valid = this.$refs.form.checkValidity()
-            this.vinState = this.$refs.form[0].checkValidity()
-            this.priceState = this.$refs.form[1].checkValidity()
-            return valid
+        getCurrencies() {
+            let vm = this;
+            axios.get(backEndUrl + "/api/currency")
+            .then(function (response) {
+                vm.rates = response.data;
+                vm.summary.selectedCurrency = 'EUR';
+            })
+            .catch(function (error){
+                console.log(error);
+            });
         },
         resetModal() {
             this.car.vin = ''
@@ -77,44 +134,54 @@ export default {
             this.priceState = null
             this.vinState = null
         },
-        handleOk(bvModalEvt) {
-            // Prevent modal from closing
-            bvModalEvt.preventDefault()
-            // Trigger submit handler
-            this.handleSubmit()
-        },
         handleSubmit() {
-            // Exit when the form isn't valid
-            if (!this.checkFormValidity()) {
-                return
-            }
-            else
-            {
-                this.showAlert();
-                // Push the name to submitted names
-                let vm = this;
-                axios.post(backEndUrl + "/api/cars", vm.car, {
-                    headers: {
-                            Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
-                })
-                .then(function (response) {             
-                    if(response.status == 200)
-                    {
-                        console.log(response);
-                        vm.alertFlag = false;
-                        let insertedId = response.data._id;
-                        vm.insertCarSummary(insertedId);                        
-                    }              
-                })
-                .catch(function (error) {
-                        console.log(error);
-                });
-            }
+            this.$validator.validateAll().then(result => {
+                if (!result)
+                    return;
+
+                this.insertCar();
+            });  
+        },
+        insertCar(){
+            let vm = this;
+            vm.dangerAlert = false;
+            vm.alertMessage = "Please wait while we fill your car data";
+            vm.alertFlag = true;
+            axios.post(backEndUrl + "/api/cars", vm.car, {
+                headers: {
+                        Authorization: 'Bearer ' + window.$cookies.get('token')
+                }
+            })
+            .then(function (response) {             
+                if(response.status == 200)
+                {
+                    vm.dangerAlert = false;
+                    vm.alertMessage = "Car inserted successfully"
+                    vm.alertFlag = true;
+                    let insertedId = response.data._id;
+                    vm.insertCarSummary(insertedId);                        
+                } 
+                else if(response.status == 401) 
+                {
+                    vm.$cookies.remove('token');
+                    vm.$cookies.remove('user-email');
+                    vm.$cookies.remove('role');
+                    vm.$cookies.remove('user');
+                    vm.$cookies.remove('currency');
+                    vm.$router.push('/');
+                }              
+            })
+            .catch(function (error) {
+                    vm.alertMessage = "Car not found. Check if provided VIN number is for " + vm.car.make;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
+                    console.log(error);
+            });
         },
         insertCarSummary(carId) {
             let vm = this;
             console.log(this.summary);
+            vm.summary.car
             axios.post(backEndUrl + `/api/cars/${carId}/summary`, vm.summary, {
                 headers: {
                         Authorization: 'Bearer ' + window.$cookies.get('token')
@@ -128,6 +195,15 @@ export default {
                     vm.$nextTick(() => {
                         vm.$bvModal.hide('car-insert-modal')
                     })
+                } 
+                else if(response.status == 401) 
+                {
+                    vm.$cookies.remove('token');
+                    vm.$cookies.remove('user-email');
+                    vm.$cookies.remove('role');
+                    vm.$cookies.remove('user');
+                    vm.$cookies.remove('currency');
+                    vm.$router.push('/');
                 }                        
             })
             .catch(function (error) {
@@ -144,9 +220,6 @@ export default {
                 }                 
             }
             console.log(this.car.Base64images);                
-        }, 
-        showAlert(){
-            this.alertFlag = true;
         },
         bmwClick() {
             this.activeMbItem = false;
@@ -160,8 +233,12 @@ export default {
         },
         otherClick() {
             window.location.href= "/other-insert";
-            //window.location.href= "/404";
-        }
+        },
+        validateState(ref) {
+            if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
+                return !this.veeErrors.has(ref);
+            return null;
+        },
   }
 }
 </script>

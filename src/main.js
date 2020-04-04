@@ -69,7 +69,7 @@ const routes = [
     { path: '/converter', component: Converter },
     { path: '/about', component: About },
     { path: '/other-insert', component: InsertOther},
-    { path: '/user', component: UserEdit},
+    { path: '/users/:id/edit', component: UserEdit},
     { path: '/404', component: NotFound },
     { path: '*', redirect: '/404' },  
 

@@ -14,18 +14,21 @@
                          aria-describedby="name-input-live-feedback"
                          data-vv-as="name">
                     </b-form-input>
-                    <b-form-invalid-feedback id="name-input-live-feedback">{{ veeErrors.first('name-input') }}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback id="name-input-live-feedback">
+                         {{ veeErrors.first('name-input') }}
+                    </b-form-invalid-feedback>
                </b-form-group>
-
-               <b-form-group label="Price (€)">
-                    <b-form-input id="price-input" name="price-input" placeholder="500"
+               <b-form-group :label="'Price (' + baseCurrency + ')'">
+                    <b-form-input id="price-input" name="price-input" placeholder="New engine"
                          v-model="insert.price"
-                         v-validate="{ required: true, decimal: 2 }"
+                         v-validate="{ required: true, decimal:'2' }"
                          :state="validateState('price-input')" 
                          aria-describedby="price-input-live-feedback"
                          data-vv-as="price">
                     </b-form-input>
-                    <b-form-invalid-feedback id="price-input-live-feedback">{{ veeErrors.first('price-input') }}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback id="price-input-live-feedback">
+                         {{ veeErrors.first('price-input') }}
+                    </b-form-invalid-feedback>
                </b-form-group>
                <b-form-group label="Car">
                     <b-form-select id="car-input" name="car-input" 
@@ -36,7 +39,9 @@
                          aria-describedby="car-input-live-feedback"
                          data-vv-as="car">
                     </b-form-select>
-                    <b-form-invalid-feedback id="car-input-live-feedback">{{ veeErrors.first('car-input') }}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback id="car-input-live-feedback">
+                         {{ veeErrors.first('car-input') }}
+                    </b-form-invalid-feedback>
                </b-form-group>
           </b-form>
         </b-modal>
@@ -44,16 +49,19 @@
 </template>
 
 <script>
+import getSymbolFromCurrency from 'currency-symbol-map';
 import axios from 'axios';
 const backEndUrl = process.env.VUE_APP_API;
 export default {
      data(){
           return {
+               baseCurrency: getSymbolFromCurrency(window.$cookies.get('currency')),
                insert: {
                     name: '',
                     price: '',
-                    car: ''
+                    car: '',                    
                },
+               rates: [],
                cars: [],
                failedAlert: false,
                alertMessage: ''
@@ -75,7 +83,6 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
                     this.insertRepair();
                })          
           },
@@ -85,9 +92,7 @@ export default {
                repairs.push(vm.insert);
              
                axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, repairs, {
-                    headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
                     if(response.status == 200)
@@ -98,6 +103,15 @@ export default {
                               vm.$bvModal.hide('repair-insert-modal')
                          })
                     }
+                    else if(response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/');
+                    } 
                })
                .catch(function (error) {
                     vm.failedAlert = false;
@@ -107,19 +121,25 @@ export default {
           getCarNames() {
                let vm = this;
                axios.get(backEndUrl + "/api/user-car-names", {
-                    headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
                     if(response.status == 200)
                     {
                          vm.cars = response.data;
                          vm.insert.car = vm.cars[0].value;
+                    } 
+                    else if(response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/');
                     }                
                })
-               .catch(function (error) {    
-                               
+               .catch(function (error) {                     
                     vm.alertMessage = error.response.data;
                     vm.failedAlert = true;
                     console.log(error);

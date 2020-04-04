@@ -3,23 +3,36 @@
           <div v-if="token">
                {{$router.push("/cars")}}
           </div>
-          <div class="container pt-4" v-else>
+          <div class="container w-50 pt-4" v-else>
                <b-alert v-model="dangerAlert" variant="danger" dismissible>{{message}}</b-alert>
                <b-alert v-model="successAlert" variant="success" dismissible>{{message}}</b-alert>
                <center class="pt-3">
                     <h1>Registration</h1>
                </center>
-               <b-form class="justify-content-center" @submit.stop.prevent="onSubmit" >
-                    <b-form-group label="Email">
-                         <b-form-input id="email-input" name="email-input" type="email" placeholder="example@example.com"
-                              v-model="form.email"
-                              v-validate="{ required: true, email }"
-                              :state="validateState('email-input')" 
-                              aria-describedby="email-input-live-feedback"
-                              data-vv-as="email">
-                         </b-form-input>
-                         <b-form-invalid-feedback id="email-input-live-feedback">{{ veeErrors.first('email-input') }}</b-form-invalid-feedback>
-                    </b-form-group>
+               <b-form class="justify-content-center" @submit.stop.prevent="onSubmit">
+                    <div class="row">  
+                         <b-form-group label="Email" class="col-sm-8">
+                              <b-form-input id="email-input" name="email-input" placeholder="example@example.com"
+                                   v-model="form.email"
+                                   v-validate="{ required: true, email: true }"
+                                   :state="validateState('email-input')" 
+                                   aria-describedby="email-input-live-feedback"
+                                   data-vv-as="email">
+                              </b-form-input>
+                              <b-form-invalid-feedback id="email-input-live-feedback">{{ veeErrors.first('email-input') }}</b-form-invalid-feedback>
+                         </b-form-group>
+                         <b-form-group label="Pick your currency" class="col-sm-4">
+                              <b-form-select id="currency-input" name="currency-input"
+                                   v-model="form.currency"
+                                   :options="rates"
+                                   v-validate="{ required: true }"
+                                   :state="validateState('currency-input')"
+                                   aria-describedby="currency-input-live-feedback"
+                                   data-vv-as="currency" > 
+                              </b-form-select>
+                              <b-form-invalid-feedback id="currency-input-live-feedback">{{ veeErrors.first('currency-input') }}</b-form-invalid-feedback>
+                         </b-form-group>
+                    </div>
                     <b-form-group label="Password">
                          <b-form-input id="password1-input" name="password1-input" type="password"
                               v-model="form.password"
@@ -40,7 +53,7 @@
                          </b-form-input>
                          <b-form-invalid-feedback id="password2-input-live-feedback">{{ veeErrors.first('password2-input') }}</b-form-invalid-feedback>
                     </b-form-group>  
-                    <b-button type="submit" variant="primary">Submit</b-button>                          
+                    <b-button type="submit" variant="primary">Register</b-button>                          
                </b-form>
           </div>
      </div>
@@ -56,7 +69,9 @@ export default {
                     email: '',
                     password: '',
                     password2: '',
+                    currency: ''
                },
+               rates: [],
                email:'',
                dangerAlert: false,
                successAlert: false,
@@ -68,7 +83,21 @@ export default {
                return window.$cookies.get('token');  
           }
      },
+     created() {
+        this.getCurrencies();  
+     },
      methods: {
+          getCurrencies() {
+               let vm = this;
+               axios.get(backEndUrl + "/api/currency")
+               .then(function (response) {
+                    vm.rates = response.data;
+                    vm.form.currency = 'EUR';
+               })
+               .catch(function (error){
+                    console.log(error);
+               });
+          },
           validateState(ref) {
                if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
                     return !this.veeErrors.has(ref);
@@ -90,7 +119,7 @@ export default {
                     {     
                          vm.message = response.data;
                          vm.successAlert = !vm.successAlert;           
-                         setTimeout(() => {  vm.$router.push("/login"); }, 1800);            
+                         vm.login();           
                     }
                })
                .catch(function (error){
@@ -98,7 +127,48 @@ export default {
                     vm.message = error.response.data;
                     vm.dangerAlert = !vm.dangerAlert;   
                })
-          }
+          },
+          login() {
+               let vm = this;
+               axios.post(backEndUrl + '/api/auth/login', this.form)
+               .then(function (response){
+                    if(response.status == 200)
+                    {
+                         let token = response.data;   
+                         //decode role from token
+                         let jwtData = token.split('.')[1];
+                         let decodedJwtJsonData = window.atob(jwtData);
+                         let role = decodedJwtJsonData.split(',')[0].split('"')[3];
+                         let email = decodedJwtJsonData.split(',')[2].split('"')[3];
+                         let user = decodedJwtJsonData.split(',')[1].split('"')[3];
+                         let currency = decodedJwtJsonData.split(',')[3].split('"')[3];
+
+                         window.$cookies.set('token', token, '1h', true);
+                         window.$cookies.set('user-email', email, '1h', true);
+                         window.$cookies.set('role', role, '1h', true);
+                         window.$cookies.set('user', user, '1h', true);
+                         window.$cookies.set('currency', currency, '1h', true);
+
+                         if(role == "user")
+                         {
+                              vm.message = "Successfully loged in user";
+                              vm.successAlert = true;
+                              window.location.href = "/cars";
+                         }
+                         else if(role == "admin")
+                         {
+                              vm.message = "Successfully loged in admin";
+                              vm.successAlert = true;
+                              window.location.href = "/admin";
+                         }                          
+                    }
+               })
+               .catch(function (error){
+                    console.log(error);
+                    vm.message = error.response.data;
+                    vm.dangerAlert = true;
+               })
+          },
      }
 }
 </script>
