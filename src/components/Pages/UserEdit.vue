@@ -58,7 +58,7 @@
                          </b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group class="col-md-5" label="Born date">
-                         <b-form-input id="bornDate-input" name="bornDate-input" type="date"
+                         <b-form-input name="bornDate-input" type="date"
                               v-model="user.bornDate"     
                               v-validate="{ required: false }"
                               :state="validateState('bornDate-input')" 
@@ -71,7 +71,17 @@
                     </b-form-group>
                     
                     <b-form-group class="col-md-5" label="Country">
-                         <b-form-select v-model="user.country" :options="countries"></b-form-select>
+                         <b-form-select name="country-input"
+                              v-model="user.country" 
+                              :options="countries"
+                              v-validate="{ required: false }"
+                              :state="validateState('country-input')" 
+                              aria-describedby="country-input-live-feedback"
+                              data-vv-as="country">
+                         </b-form-select>
+                         <b-form-invalid-feedback id="country-input-live-feedback">
+                              {{ veeErrors.first('country-input') }}
+                         </b-form-invalid-feedback>
                     </b-form-group>
 
                </div>
@@ -101,7 +111,7 @@ export default {
                     email: '',
                     sex: '',
                     bornDate: '',
-                    country: ''
+                    country: 'Lithuania'
                },
                sexOptions: ['Men', 'Women'],
                countries: []
@@ -129,7 +139,6 @@ export default {
                     {
                          vm.user = response.data;
                          vm.loading = false;
-                         console.log(vm.user);
                     }
                     else if(response.status == 401)
                     {
@@ -159,9 +168,8 @@ export default {
                })
                .then( function (response){
                     if(response.status == 204)
-                    {
                          vm.$router.push('/cars');
-                    }
+
                     else if(response.status == 401)
                     {
                          vm.$cokkies.remove('token');
@@ -181,10 +189,8 @@ export default {
                })
                .then(function (response){
                     if(response.status == 200)
-                    {
                          vm.countries = response.data;
-                         vm.user.country = 'Lithuania';
-                    }
+
                     else if(response.status == 204)
                     {
                          vm.$cokkies.remove('token');

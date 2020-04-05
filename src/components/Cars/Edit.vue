@@ -161,11 +161,11 @@
                </div>
                <b-form-group label="Images" class="ml-3">
                     <div id="drop-area" class="row pt-2">
-                         <b-form-file id="fileElem" multiple class="col-sm-4 mt-4"               
+                         <b-form-file multiple class="col-sm-4 mt-4"               
                               @change="onFileSelected">
                          </b-form-file>
                          <div class="col-sm-4 mt-3" v-for="(image, index) in car.base64images" v-bind:key="index">              
-                              <img class="card-img-top mb-3 pt-3" :src="image">
+                              <img class="card-img-top mb-3 pt-3" responsive-image :src="image">
                               <b-button pill variant="danger" 
                                    style="position:absolute;right:0%;top:0%;"
                                    @click.prevent="removeImageFromList(index)">
@@ -641,13 +641,13 @@ export default {
      #drop-area {
           border: 2px dashed #ccc;
           border-radius: 20px;
-          width: 1100px;
+          max-width: 1100px;
           height: 320px;
           font-family: sans-serif;
           overflow:hidden;
           overflow-y:scroll;
      }
-     #fileElem {
-          display: none;
+     [class*="col-"] {
+          width: 100%;
      }
 </style>
