@@ -3,7 +3,7 @@
           <div v-if="token">
                {{$router.push("/cars")}}
           </div>
-          <div class="container pt-5 w-50" v-else>
+          <div class="container pt-5 w-75" v-else>
                <b-alert v-model="dangerAlert" variant="danger" dismissible>{{message}}</b-alert>
                <b-alert v-model="successAlert" variant="success" dismissible>{{message}}</b-alert>
                <center><h1>Login</h1></center>
@@ -84,11 +84,11 @@ export default {
                          let user = decodedJwtJsonData.split(',')[1].split('"')[3];
                          let currency = decodedJwtJsonData.split(',')[3].split('"')[3];
 
-                         window.$cookies.set('token', token, '1h', true);
-                         window.$cookies.set('user-email', email, '1h', true);
-                         window.$cookies.set('role', role, '1h', true);
-                         window.$cookies.set('user', user, '1h', true);
-                         window.$cookies.set('currency', currency, '1h', true);
+                         window.$cookies.set('token', token, '1h');
+                         window.$cookies.set('user-email', email, '1h');
+                         window.$cookies.set('role', role, '1h');
+                         window.$cookies.set('user', user, '1h');
+                         window.$cookies.set('currency', currency, '1h');
 
                          if(role == "user")
                          {
