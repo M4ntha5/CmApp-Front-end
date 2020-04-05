@@ -46,7 +46,7 @@
                     <b-form-group class=" mb-3" label="Repeat password">
                          <b-form-input id="password2-input" name="password2-input" type="password" 
                               v-model="form.password2"
-                              v-validate="{ required: true, min:8, is:'password1'}"
+                              v-validate="{ required: true, min:8}"
                               :state="validateState('password2-input')" 
                               aria-describedby="password2-input-live-feedback"
                               data-vv-as="password">>
