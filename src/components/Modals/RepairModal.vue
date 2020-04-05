@@ -19,7 +19,7 @@
                     </b-form-invalid-feedback>
                </b-form-group>
                <b-form-group :label="'Price (' + baseCurrency + ')'">
-                    <b-form-input id="price-input" name="price-input" placeholder="New engine"
+                    <b-form-input id="price-input" name="price-input" placeholder="500"
                          v-model="insert.price"
                          v-validate="{ required: true, decimal:'2' }"
                          :state="validateState('price-input')" 
