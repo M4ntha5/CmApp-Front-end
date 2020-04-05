@@ -65,9 +65,9 @@
                     </b-col>
                 </b-row>          
                 <b-form-group label="Images">
-                    <b-form-file id="image-input" name="image-input" multiple @change="onFileSelected"
-                        accept=".jpg, .png, .gif"
-                        v-validate="{ required: false, image:'' }"
+                    <b-form-file name="image-input" multiple @change="onFileSelected"
+                        
+                        v-validate="{ required: false, image: true }"
                         placeholder="Choose an image or drop it here..."
                         drop-placeholder="Drop image here..."
                         :state="validateState('image-input')" 

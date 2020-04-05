@@ -278,6 +278,7 @@ export default {
                   equipmentVisible: false,
                   repairsVisible: false,
                   shippingVisible: false,
+                  myImgs: []
             }
             
       },
@@ -291,8 +292,8 @@ export default {
             //      alert("from", from.params.id);
           //  }
       },
-      async created() {
-            this.fetchCar();
+      created() {        
+            this.fetchCar();           
             this.fetchCarSummary();
             this.fetchCarRepairs();
             this.fetchCarShipping();
@@ -313,7 +314,8 @@ export default {
                               vm.car = response.data;  
                               //trimming unnecessary dat ending           
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
-                              vm.fetchImages();
+                              //vm.fetchImages();
+                              vm.getImagesRecursive();
                         }
                         if(response.status == 401) 
                         {
@@ -437,7 +439,7 @@ export default {
             closeShippingModal(){
                   this.isShippingModalVisible = false;
             },
-            fetchImages() {
+           /* fetchImages() {
                   var vm = this;
                   axios.post(backEndUrl + "/api/get-images", vm.car.images, {
                         headers: {
@@ -460,7 +462,7 @@ export default {
                   .catch(function (error) {
                         console.log(error);
                   });
-            },
+            },*/
             fetchOther()
             {
                   this.fetchCarSummary();
@@ -547,7 +549,45 @@ export default {
             },
             formatPrice(value) {
                   return new Intl.NumberFormat('lt-LT').format(value);
+            },
+            getImage(vm, image){       
+                  axios.post(backEndUrl + "/api/get-images", image, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)
+                        {
+                             vm.car.base64images.push(response.data); 
+                             
+                        }
+                              
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }    
+                  })
+                  .catch(function (error) {
+                        console.log(error);
+                  });
+            },
+            getImagesRecursive(){
+                  let n = this.car.images.length;
+                  console.log(n)
+                  for(let i =0;i<n;i++)
+                  {
+                        console.log(i);
+                        this.getImage(this, this.car.images[i]);
+                  }
+                        
             }
+
       }
 }
 </script>

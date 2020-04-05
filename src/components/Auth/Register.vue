@@ -36,7 +36,7 @@
                     <b-form-group label="Password">
                          <b-form-input id="password1-input" name="password1-input" type="password"
                               v-model="form.password"
-                              v-validate="{ required: true, min: 3 }"
+                              v-validate="{ required: true, min:8}"
                               :state="validateState('password1-input')" 
                               aria-describedby="password1-input-live-feedback"
                               data-vv-as="password">
@@ -46,12 +46,14 @@
                     <b-form-group class=" mb-3" label="Repeat password">
                          <b-form-input id="password2-input" name="password2-input" type="password" 
                               v-model="form.password2"
-                              v-validate="{ required: true, min: 3}"
+                              v-validate="{ required: true, min:8, is:'password'}"
                               :state="validateState('password2-input')" 
                               aria-describedby="password2-input-live-feedback"
                               data-vv-as="password">>
                          </b-form-input>
-                         <b-form-invalid-feedback id="password2-input-live-feedback">{{ veeErrors.first('password2-input') }}</b-form-invalid-feedback>
+                         <b-form-invalid-feedback id="password2-input-live-feedback">
+                              {{ veeErrors.first('password2-input') }}
+                         </b-form-invalid-feedback>
                     </b-form-group>  
                     <b-button type="submit" variant="primary">Register</b-button>                          
                </b-form>

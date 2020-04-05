@@ -158,19 +158,22 @@
                          </b-form-input>
                          <b-form-invalid-feedback id="interior-input-live-feedback">{{ veeErrors.first('interior-input') }}</b-form-invalid-feedback>
                     </b-form-group>
-               </div>   
-              <!-- <div class="row mb-5">
-                    <div class="card ml-3 mr-3" style="width:70rem; height:23rem;">
-                         <div class="row ml-4 mr-4 pt-4 justify-content-between" 
-                              v-for="image in car.base64images" v-bind:key="image">              
-                              <div class="card col-md-2 pt-3">
-                                   <img class="card-img-top mb-3"
-                                        :src="image">
-                              </div>
-                         </div>                       
+               </div>
+               <b-form-group label="Images" class="ml-3">
+                    <div id="drop-area" class="row pt-2">
+                         <b-form-file id="fileElem" multiple class="col-sm-4 mt-4"               
+                              @change="onFileSelected">
+                         </b-form-file>
+                         <div class="col-sm-4 mt-3" v-for="(image, index) in car.base64images" v-bind:key="index">              
+                              <img class="card-img-top mb-3 pt-3" :src="image">
+                              <b-button pill variant="danger" 
+                                   style="position:absolute;right:0%;top:0%;"
+                                   @click.prevent="removeImageFromList(index)">
+                                   X
+                              </b-button>
+                         </div>
                     </div>
-               </div> -->     
-                          
+               </b-form-group>      
           </b-form>
           <div class="pt-3">   
                <b-button
@@ -340,12 +343,11 @@ export default {
                loading: true,
                equipmentVisible: false,
                repairsVisible: false,
-               shippingVisible: false
-
+               shippingVisible: false,
           }
      }, 
      created() {      
-          this.fetchCar();
+          this.fetchCar();        
           this.fetchCarRepairs();
      },
      methods: {        
@@ -360,7 +362,8 @@ export default {
                     if(response.status == 200)
                     {
                          vm.car = response.data;  
-                         vm.fetchImages();                       
+                         vm.getImagesRecursive();
+                         //vm.fetchImages();                       
                          //trimming unnecessary dat ending           
                          vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                          vm.loading = false;
@@ -503,7 +506,7 @@ export default {
                     this.$validator.reset('repair-name-input');
                }
           },
-          fetchImages() {
+          /*fetchImages() {
                var vm = this;
                axios.post(backEndUrl + "/api/get-images", vm.car.images, {
                     headers: {
@@ -514,7 +517,9 @@ export default {
                     if(response.status == 200)
                     {
                          vm.car.base64images = response.data;
-                         vm.length = parseInt(vm.car.base64images.length/4, 10);
+                         vm.alertMessage = "Your images ready for update";
+                         vm.warningAlert = false;
+                         vm.alertFlag = true;
                     }
                     if(response.status == 401) 
                     {
@@ -530,8 +535,42 @@ export default {
                .catch(function (error) {
                     console.log(error);
                });
+          },*/
+          getImage(vm, image){       
+               axios.post(backEndUrl + "/api/get-images", image, {
+                    headers: {
+                         Authorization: 'Bearer ' + window.$cookies.get('token')
+                    }
+               })
+               .then(function (response) {
+                    if(response.status == 200)
+                    {
+                         vm.car.base64images.push(response.data);        
+                    }        
+                    if(response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/');
+                    }    
+               })
+               .catch(function (error) {
+                    console.log(error);
+               });
           },
-
+          getImagesRecursive(){
+               let n = this.car.images.length;
+               console.log(n)
+               for(let i =0;i<n;i++)
+               {
+                    console.log(i);
+                    this.getImage(this, this.car.images[i]);
+               }
+                    
+          },
           deleteAllCarRepairs(){
                let vm = this;
                axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/delete-repairs`, {
@@ -580,8 +619,35 @@ export default {
           },
           updateAll(){
                this.updateCar();
-               this.deleteAllCarRepairs();
-          }
+               //this.deleteAllCarRepairs();
+          },
+          removeImageFromList(index){         
+               this.car.base64images.splice(index, 1);
+          },
+          onFileSelected(e) {
+               for(let i=0; i < e.target.files.length; i++)
+               {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(e.target.files[i]);
+                    reader.onload = (e) => {
+                         this.car.base64images.push(e.target.result);
+                    }                 
+               }             
+          },
      }
 }
 </script>
+<style scoped>
+     #drop-area {
+          border: 2px dashed #ccc;
+          border-radius: 20px;
+          width: 1100px;
+          height: 320px;
+          font-family: sans-serif;
+          overflow:hidden;
+          overflow-y:scroll;
+     }
+     #fileElem {
+          display: none;
+     }
+</style>

@@ -211,7 +211,7 @@
                          <b-form-group class="col-md-6 mb-3" id="images-group-1" label="Images">
                                <b-form-file name="images-input"
                                    v-model="car.base64images"
-                                   v-validate="{ image:'' }"
+                                   v-validate="{ image:'', mimes: 'image/jpeg, image/png, image/gif' }"
                                    :state="validateState('images-input')" 
                                    aria-describedby="images-input-live-feedback"
                                    data-vv-as="images"
