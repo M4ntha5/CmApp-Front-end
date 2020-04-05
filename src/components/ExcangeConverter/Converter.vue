@@ -1,7 +1,7 @@
 <template>
      <div>
           <center class="pt-3"><h1>Here you can convert between most popular world currencies!</h1></center>
-          <b-form class="container pt-5">
+          <b-form class="container pt-5" @submit.prevent="onSubmit">
                <div class="row">
                     <div class="col-md-5">
                          <b-form-group label="Amount">
@@ -41,7 +41,7 @@
                     </div>                 
                </div>
                <div class="pt-3">
-                    <b-button type="button" class="btn btn-primary" @click.prevent="convert()">Convert</b-button>
+                    <b-button type="submit" class="btn btn-primary">Convert</b-button>
                </div>
           </b-form>
           <div class="container mb-5">
@@ -59,8 +59,8 @@ export default {
           return{
                rates: [],
                data: {
-                    from: 'EUR',
-                    to: 'USD',
+                    from: '',
+                    to: '',
                     amount: ''
                },
                result: '',
@@ -78,6 +78,8 @@ export default {
                axios.get(backEndUrl + "/api/currency")
                .then(function (response) {
                     vm.rates = response.data;
+                    vm.data.from = 'USD';
+                    vm.data.to = 'EUR';
                })
                .catch(function (error){
                     console.log(error);
@@ -91,8 +93,8 @@ export default {
                .then(function (response) {
                     if(response.data)
                     {
-                         vm.data.to = 'USD';
-                         vm.data.from = 'EUR';
+                         //vm.data.to = 'USD';
+                         //vm.data.from = 'EUR';
                          vm.result = response.data;
                     }
                })

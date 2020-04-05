@@ -2,139 +2,149 @@
      <div>
         <b-modal id="repair-insert-modal" ref="modal" title="Insert new repair"
         @show="resetModal"
-        @ok="handleOk"
-        @close="resetModal">
-
-          
-          <b-alert v-model="failedAlert" variant="danger" dismissible>{{alertMessage}}</b-alert>
-
-            <form ref="form" @submit.stop.prevent="handleSubmit">
-
-                <b-form-group :state="nameState" label="Name" label-for="name-input" invalid-feedback="Name is required">  
-                    <b-form-input v-model='insert.name' id="name-input" :state="nameState" required></b-form-input>
-                </b-form-group>
-
-                <b-form-group :state="priceState" label="Price (€)" label-for="price-input" 
-                            invalid-feedback="Price is required and should be more/equal 0">
-                    <b-form-input v-model='insert.price' id="price-input" :state="priceState" type="number" min="0" step=".01" required></b-form-input>
-                </b-form-group>
-
-                <b-form-group :state="carState" label="Car" label-for="car-input"  
-                            invalid-feedback="You must select one of the cars">
-                    <b-form-select v-model="insert.car" required :state="carState">
-                         <b-form-select-option 
-                         v-for="car in cars" v-bind:key="car.id" :value="car.id" >
-                              {{car.name}}
-                         </b-form-select-option>   
+        @ok.prevent="onSubmit"
+        @close="resetModal">  
+          <b-alert v-model="failedAlert" :variant="!failedAlert ? 'danger': 'succes'" dismissible>{{alertMessage}}</b-alert>
+          <b-form ref="form" @submit.stop.prevent="onSubmit">            
+               <b-form-group label="Name">
+                    <b-form-input id="name-input" placeholder="New engine" name="name-input" 
+                         v-model="insert.name"
+                         v-validate="{ required: true }"
+                         :state="validateState('name-input')" 
+                         aria-describedby="name-input-live-feedback"
+                         data-vv-as="name">
+                    </b-form-input>
+                    <b-form-invalid-feedback id="name-input-live-feedback">
+                         {{ veeErrors.first('name-input') }}
+                    </b-form-invalid-feedback>
+               </b-form-group>
+               <b-form-group :label="'Price (' + baseCurrency + ')'">
+                    <b-form-input id="price-input" name="price-input" placeholder="New engine"
+                         v-model="insert.price"
+                         v-validate="{ required: true, decimal:'2' }"
+                         :state="validateState('price-input')" 
+                         aria-describedby="price-input-live-feedback"
+                         data-vv-as="price">
+                    </b-form-input>
+                    <b-form-invalid-feedback id="price-input-live-feedback">
+                         {{ veeErrors.first('price-input') }}
+                    </b-form-invalid-feedback>
+               </b-form-group>
+               <b-form-group label="Car">
+                    <b-form-select id="car-input" name="car-input" 
+                         v-model="insert.car"
+                         :options="cars"
+                         v-validate="{ required: true }"
+                         :state="validateState('car-input')" 
+                         aria-describedby="car-input-live-feedback"
+                         data-vv-as="car">
                     </b-form-select>
-                </b-form-group>
-            </form>
+                    <b-form-invalid-feedback id="car-input-live-feedback">
+                         {{ veeErrors.first('car-input') }}
+                    </b-form-invalid-feedback>
+               </b-form-group>
+          </b-form>
         </b-modal>
     </div>
 </template>
 
 <script>
-import axios from'axios';
+import getSymbolFromCurrency from 'currency-symbol-map';
+import axios from 'axios';
 const backEndUrl = process.env.VUE_APP_API;
 export default {
      data(){
           return {
+               baseCurrency: getSymbolFromCurrency(window.$cookies.get('currency')),
                insert: {
                     name: '',
                     price: '',
-                    car: ''
+                    car: '',                    
                },
+               rates: [],
                cars: [],
-               car: {
-                    id: '',
-                    name: ''
-               },
-               nameState: null,
-               priceState: null,
-               carState: null,
-               successFlag: false,
                failedAlert: false,
                alertMessage: ''
           }
      },
      methods: {
-          checkFormValidity() {
-               const valid = this.$refs.form.checkValidity()
-               this.nameState = this.$refs.form[0].checkValidity()
-               this.priceState = this.$refs.form[1].checkValidity()
-               this.carState = this.$refs.form[2].checkValidity()
-               return valid
-          },
           resetModal() {
                this.getCarNames();
                this.insert.name = ''
                this.insert.price = ''
                this.insert.car = ''
-               this.priceState = null
-               this.nameState = null
-               this.carState = null
           },
-          handleOk(bvModalEvt) {
-               // Prevent modal from closing
-               bvModalEvt.preventDefault()
-               // Trigger submit handler
-               this.handleSubmit()
+          validateState(ref) {
+               if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
+                    return !this.veeErrors.has(ref);
+               return null;
           },
-          handleSubmit() {
-               // Exit when the form isn't valid
-               if (!this.checkFormValidity()) {
-                    return
-               }
-               else
-               {
-                    let vm = this;
-                    let repairs = [];
-                    repairs.push(vm.insert);
-
-                    console.log(repairs);
-                    vm.successFlag = true;
-                    axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, repairs, {
-                         headers: {
-                                   Authorization: 'Bearer ' + window.$cookies.get('token')
-                         }
-                    })
-                    .then(function (response) {
-                         if(response.status == 200)
-                         {
-                              // Hide the modal manually
-                              vm.$nextTick(() => {
-                                   vm.$bvModal.hide('repair-insert-modal')
-                              })
-                         }
-                    })
-                    .catch(function (error) {
-                         console.log(error);
-                    });          
-               }
+          onSubmit() {
+               this.$validator.validateAll().then(result => {
+                    if (!result)
+                         return;
+                    this.insertRepair();
+               })          
+          },
+          insertRepair() {
+               let vm = this;
+               let repairs = [];
+               repairs.push(vm.insert);
+             
+               axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, repairs, {
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+               })
+               .then(function (response) {
+                    if(response.status == 200)
+                    {
+                         vm.failedAlert = true;
+                         // Hide the modal manually
+                         vm.$nextTick(() => {
+                              vm.$bvModal.hide('repair-insert-modal')
+                         })
+                    }
+                    else if(response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/');
+                    } 
+               })
+               .catch(function (error) {
+                    vm.failedAlert = false;
+                    console.log(error);
+               }); 
           },
           getCarNames() {
                let vm = this;
                axios.get(backEndUrl + "/api/user-car-names", {
-                    headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
-                    console.log(response);
                     if(response.status == 200)
                     {
                          vm.cars = response.data;
-                         vm.insert.car = vm.cars[0].id;
+                         vm.insert.car = vm.cars[0].value;
+                    } 
+                    else if(response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/');
                     }                
                })
-               .catch(function (error) {    
-                               
+               .catch(function (error) {                     
                     vm.alertMessage = error.response.data;
                     vm.failedAlert = true;
-                    console.log(vm.alertMessage)  
                     console.log(error);
                });
-          }
+          },
      }
 }
 </script>

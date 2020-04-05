@@ -39,37 +39,50 @@ const routes = [
     { path: '/cars', component: Cars,
       beforeEnter: (to, from, next) => {
           let jwt = window.$cookies.get('token');
-          if(jwt == null || jwt.length < 5) next("/login")
+          if(jwt == null || jwt.length < 10) next("/login")
           else next()
         } 
     },
     { path: '/cars/:id', component: ShowCar,
       beforeEnter: (to, from, next) => {
           let jwt = window.$cookies.get('token');
-          if(jwt == null || jwt.length < 5) next("/login")
+          if(jwt == null || jwt.length < 10) next("/login")
           else next()
       }  
     },
     { path: '/cars/:id/tracking', component: Tracking,
       beforeEnter: (to, from, next) => {
           let jwt = window.$cookies.get('token');
-          if(jwt == null || jwt.length < 5) next("/login")
+          if(jwt == null || jwt.length < 10) next("/login")
           else next()
       }  
     },
     { path: '/cars/:id/edit', component: Edit,
       beforeEnter: (to, from, next) => {
           let jwt = window.$cookies.get('token');
-          if(jwt == null || jwt.length < 5) next("/login")
+          if(jwt == null || jwt.length < 10) next("/login")
           else next()
       }  
     },
+    { path: '/other-insert', component: InsertOther,
+      beforeEnter: (to, from, next) => {
+        let jwt = window.$cookies.get('token');
+        if(jwt == null || jwt.length < 10) next("/login")
+        else next()
+      }
+    },
+    { path: '/users/:id/edit', component: UserEdit,
+      beforeEnter: (to, from, next) => {
+        let jwt = window.$cookies.get('token');
+        if(jwt == null || jwt.length < 10) next("/login")
+        else next()
+      }
+    },
+
     { path: '/login', component: Login },
     { path: '/register', component: Register },
     { path: '/converter', component: Converter },
-    { path: '/about', component: About },
-    { path: '/other-insert', component: InsertOther},
-    { path: '/user', component: UserEdit},
+    { path: '/about', component: About }, 
     { path: '/404', component: NotFound },
     { path: '*', redirect: '/404' },  
 

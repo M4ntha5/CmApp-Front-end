@@ -47,7 +47,7 @@
                                           </a>
 
                                           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                                                <a class="dropdown-item" href="/not-implemented">Profile</a>
+                                                <a class="dropdown-item" :href="'/users/'+ user + '/edit'">Profile</a>
                                                 <a class="dropdown-item" @click.prevent="logout()" href="">Log out</a>
                                           </div>
                                     </div>
@@ -82,6 +82,9 @@ export default {
             },
             email: function() {
                   return window.$cookies.get('user-email');
+            },
+            user: function() {
+                  return window.$cookies.get('user');
             }
       },
       methods: {
@@ -95,6 +98,7 @@ export default {
                   window.$cookies.remove('role');
                   window.$cookies.remove('token');
                   window.$cookies.remove('user-email');
+                  window.$cookies.remove('user');
                   window.location.href = "/";
             },
       }

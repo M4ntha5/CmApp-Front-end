@@ -1,50 +1,52 @@
 <template>
       <div class="container pt-5">
-            <b-alert v-model="alertFlag" variant="warning" dismissible>{{alertMessage}}</b-alert>
-            <div v-if="!loading && !empty">
-                  <div class="row mb-3 pt-5" >
-                        <div class="img-fluid col-sm-4 col-12">              
-                              <gallery :images="tracking.base64images" :index="index" @close="index = null"></gallery>
-                              <div class="image" 
-                                    @click="index = 0"
-                                    :style="{ backgroundImage: 'url(' + tracking.base64images[0] + ')', width:'350px', height:'300px' }"
-                              /> 
-                              <!--  <div v-for="(carImage, imageIndex) in car.base64images" :key="imageIndex">
-                                    <img class="img-thumbnail" height="400px" width="400px" alt="Responsive image" :src='carImage'>
-                              </div>--> 
-                        </div>
-
-                        <div class="col-sm-8 col-12">
-                              <table class="table table-responsive">
-                                    <tr>
-                                          <th>Container number</th>
-                                          <td>{{tracking.containerNumber}}</td>
-                                    </tr>
-                                    <tr>
-                                          <th>Booking number</th>
-                                          <td>{{tracking.bookingNumber}}</td>
-                                    </tr>
-                                    <tr>
-                                          <th>Url to full tracking info</th>
-                                          <td><a :href='tracking.url' target="_blank">Click here</a></td>
-                                    </tr>
-                              </table>
-                        </div>
+            <b-alert class="row" v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>          
+            <b-button class="row mb-4 ml-2" id="tracking-button-info" @click="handleTracking()">
+                  Look for tracking
+            </b-button>      
+            <div class="row pt-4" v-if="!loading && !empty">                    
+                  <div class="img-fluid col-sm-6">              
+                        <gallery :images="tracking.base64images" :index="index" @close="index = null"></gallery>
+                        <div class="image" 
+                              @click="index = 0"
+                              :style="{ backgroundImage: 'url(' + tracking.base64images[0] + ')', width:'350px', height:'300px' }"
+                        />
                   </div>
+                  <div class="col-sm-6">
+                        <table class="table table-responsive-sm">
+                              <tr>
+                                    <th>Container number</th>
+                                    <td>{{tracking.containerNumber}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Booking number</th>
+                                    <td>{{tracking.bookingNumber}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Url to full tracking info</th>
+                                    <td><a :href='tracking.url' target="_blank">Click here</a></td>
+                              </tr>
+                        </table>
+                  </div>
+                                 
             </div>
-            <div class="pt-3" v-else-if="empty && !loading">
-                  <center>
-                        <h1>There is no tracking data yet</h1>
-                  </center>
-                  <center class="pt-3">
-                        <button @click="lookForTracking"  class="btn btn-primary">Check for available tracking info?</button>
-                  </center>
-            </div>
-            <div class="pt-3" v-else>        
+            <div class="pt-3" v-if="loading">        
                   <center>
                         <b-spinner label="Loading..."></b-spinner>
                   </center> 
-            </div>    
+            </div>
+            <center v-if="empty && !loading">
+                  <h2>No tracking info yet</h2>
+            </center>
+
+            <b-popover target="tracking-button-info" triggers="hover" placement="top">
+                  <template v-slot:title>Info</template>
+                  <p>
+                        Gets or updates tracking data like: container and booking number,
+                        as well as URL for deeper information about your car tracking.<br>
+                        Also it downloads all available images.
+                  </p>              
+            </b-popover>              
       </div>
 </template>
 
@@ -68,7 +70,8 @@ export default {
                   loading: true,
                   empty: true,
                   alertFlag: false,
-                  alertMessage: ''
+                  alertMessage: '',
+                  dangerAlert: false
             }       
       },
       components: {
@@ -88,69 +91,127 @@ export default {
             fetchTracking() {
                   let vm = this;
                   axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
-                        if(response.data)
+                        if(response.status == 200)
                         {
                               vm.tracking = response.data;
                               vm.fetchImages();
-                              vm.loading = false;
-                              vm.empty = false;             
+                              if(vm.tracking.containerNumber != '')
+                                    vm.empty = false;
+                              vm.loading = false;           
                         }
-                        else
+                        else if(response.status == 401) 
                         {
-                              vm.loading = false;
-                              vm.empty = true;
-                        }                             
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }                            
                   })
                   .catch(function (error) {
                         console.log(error);
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
                         vm.loading = false;
                   });                                        
             },
             lookForTracking(){
-                  if(confirm("Attention! This action could take more then a couple of minutes. Are you sure want to continue?"))
-                  {
-                        let vm = this;
-                        axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`,{}, {
-                              headers: {
-                                    Authorization: 'Bearer ' + window.$cookies.get('token')
-                              }
-                        })
-                        .then(function (response) {
-                              if(response.data)
-                              {
-                                    vm.tracking = response.data;
-                                    vm.loading = false;
-                                    vm.empty = false;
-                              }
-                              else
-                              {
-                                    vm.loading = false;
-                                    vm.empty = true;
-                              }
-                                    
-                        })
-                        .catch(function (error) {
-                              vm.alertMessage = error.response.data;
-                              vm.alertFlag = true;
-                              console.log(error);
-                        }); 
-                  }
-            },
-            fetchImages() {
-                  var vm = this;
-                  axios.post(backEndUrl + "/api/get-images", vm.tracking.auctionImages, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                  let vm = this;
+                  axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`,{}, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                              vm.tracking.base64images = response.data;          
+                        {
+                              vm.tracking = response.data;                                  
+                              vm.dangerAlert = false;
+                              vm.alertMessage = "Tracking data updated sccessfully. Downloading images...";
+                              vm.alertFlag =true;
+                        }
+                        else if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
+                  })
+                  .catch(function (error) {
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        console.log(error);
+                  }); 
+            },
+            lookForTrackingImages(){
+                  let vm = this;
+                  axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking-images`, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)
+                        {
+                              vm.tracking.base64images = response.data;                                  
+                              vm.dangerAlert = false;
+                              vm.alertMessage = "Images successfully updated";
+                              vm.alertFlag =true;
+                             // vm.loading = false;
+                        }
+                        else if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
+                  })
+                  .catch(function (error) {
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        console.log(error);
+                  }); 
+            },
+            handleTracking(){
+                  this.lookForTracking();
+                  this.lookForTrackingImages();            
+            },
+            fetchImages() {
+                  var vm = this;
+                  if(vm.tracking.containerNumber == '')
+                        return;
+                  vm.alertMessage = "Please wait while we get all images ready for you";
+                  vm.dangerAlert = false;
+                  vm.alertFlag = true;
+                  axios.post(backEndUrl + "/api/get-images", vm.tracking.auctionImages, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)
+                        {
+                              vm.tracking.base64images = response.data;
+                              vm.alertMessage = "All images ready to use, enjoy :)";
+                              vm.dangerAlert = false;
+                              vm.alertFlag = true;
+                        }                      
+                        else if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }           
                   })
                   .catch(function (error) {
                         console.log(error);
@@ -160,17 +221,17 @@ export default {
 }
 </script>
 <style scoped>
-  .image {
-    float: left;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    border: 1px solid #ebebeb;
-    margin: 5px;
-  }
-  .divider{
-    width:5px;
-    height:auto;
-    display:inline-block;
+.image {
+      float: left;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      border: 1px solid #ebebeb;
+      margin: 5px;
 }
+.divider{
+      width:5px;
+      height:auto;
+      display:inline-block;
+}     
 </style> 

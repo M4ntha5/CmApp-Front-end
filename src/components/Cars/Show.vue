@@ -7,29 +7,44 @@
                         <div class="col-lg-8 col-12">
                               <h1>{{car.make}} {{car.model}}</h1>
                         </div>
-                        <div class="dropdown col-lg-4 col-12">
-                              <button class="btn btn-info dropdown-toggle" type="button" 
-                              id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" 
-                              aria-expanded="false" style="float:right;">
-                                    Actions
-                              </button>
-                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a @click.prevent="editCar(car._id)" class="dropdown-item" href="">
-                                          Edit
+                        <div class="col-lg-4 col-12">
+                              <div class="row" style="float:right;">
+                                    <a class="btn btn-secondary" target="_blank" v-if="car.make == 'BMW'"
+                                    :href="'https://www.bmwautodalys.lt/en/catalog/selectVehicleByVin/INDEX/'+car.vin"
+                                    >
+                                          To dealer
+                                    </a> 
+                                    <a class="btn btn-secondary" target="_blank" 
+                                          v-else-if="car.make == 'Mercedes-benz'"
+                                          :href="'http://mbepc.net/en/vin/'+car.vin"
+                                    >
+                                          To dealer
                                     </a>
-                                    <a @click.prevent="deleteCar()" class="dropdown-item" href="">
-                                          Delete
-                                    </a>
-                                    <a v-b-modal.shipping-modal class="dropdown-item" href=""
-                                          @click.prevent="showShippingModal">
-                                          Add/edit shipping info
-                                    </a>
-                                    <a @click.prevent="openTracking(car._id)" class="dropdown-item" href="">
-                                          Tracking info
-                                    </a>                       
+                                    <div class="col">
+                                          <button class="btn btn-info dropdown-toggle" type="button" 
+                                          id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" 
+                                          aria-expanded="false" >
+                                                Actions
+                                          </button>
+                                          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a @click.prevent="editCar(car._id)" class="dropdown-item" href="">
+                                                      Edit
+                                                </a>
+                                                <a @click.prevent="deleteAction()" class="dropdown-item" href="">
+                                                      Delete
+                                                </a>
+                                                <a v-b-modal.shipping-modal class="dropdown-item" href=""
+                                                      @click.prevent="showShippingModal">
+                                                      Add/edit shipping info
+                                                </a>
+                                                <a @click.prevent="openTracking(car._id)" class="dropdown-item" href="">
+                                                      Tracking info
+                                                </a>                       
+                                          </div>
+                                          <!--shipping modal-->
+                                          <shippingModal v-show="isShippingModalVisible" @click="closeShippingModal"/>
+                                    </div>
                               </div>
-                               <!--shipping modal-->
-                              <shippingModal v-show="isShippingModalVisible" @click="closeShippingModal"/>
                         </div>
                   </div>
                   <div class="row mb-3 pt-5">
@@ -42,13 +57,12 @@
                         </div>
                         <div class="col-sm-6 col-12">    
                               <div class="mb-2">
-                                    <center><h2>Summary</h2></center>
-                                     
+                                    <center><h2>Summary</h2></center>               
                               </div>
-                              <table class="table pt-3">
+                              <table class="table pt-3 table-responsive-sm">
                                     <tr>
-                                          <th>Bought Price (€)</th>
-                                          <td>{{formatPrice(summary.boughtPrice)}}</td>
+                                          <th>Bought Price</th>
+                                          <td>{{formatPrice(summary.boughtPrice)}} {{currency}}</td>
                                     </tr>
                                     <tr v-if="summary.sold">
                                           <th>Sold?</th>
@@ -63,25 +77,25 @@
                                           <td>{{summary.soldDate}}</td>
                                     </tr>
                                     <tr v-if="summary.sold">
-                                          <th>Sold Price (€)</th>
-                                          <td>{{formatPrice(summary.soldPrice)}}</td>
+                                          <th>Sold Price</th>
+                                          <td>{{formatPrice(summary.soldPrice)}} {{currency}}</td>
                                     </tr>                                                                                        
                                     
                                     <tr v-if="summary.sold">
-                                          <th>Profit (€)</th>
-                                          <td v-if="summary.profit < 0" style="color:red;font-weight:bold;">{{formatPrice(summary.profit)}}</td>
-                                          <td v-else style="color:green;font-weight:bold;">{{formatPrice(summary.profit)}}</td>
+                                          <th>Profit </th>
+                                          <td v-if="summary.profit < 0" style="color:red;font-weight:bold;">{{formatPrice(summary.profit)}} {{currency}}</td>
+                                          <td v-else style="color:green;font-weight:bold;">{{formatPrice(summary.profit)}} {{currency}}</td>
                                     </tr>
                                     <tr>
-                                          <th>Total spent (€)</th>
-                                          <td>{{formatPrice(summary.total)}}</td>
+                                          <th>Total spent</th>
+                                          <td>{{formatPrice(summary.total)}} {{currency}}</td>
                                     </tr>                                                        
                               </table>
                         </div>
                         
                   </div>
                   <div class="row pt-5">
-                        <table class="table">
+                        <table class="table table-striped table-responsive-sm">
                               <tr>
                                     <th>Vin</th>
                                     <td>{{car.vin}}</td>
@@ -104,7 +118,8 @@
                               </tr>
                               <tr>
                                     <th>Engine / power</th>
-                                    <td>{{car.engine}} ({{car.displacement}} l)  {{car.power}}</td>
+                                    <td v-if="car.displacement != 0">{{car.engine}} ({{car.displacement}} l.)  {{car.power}}</td>
+                                    <td v-else>{{car.engine}} {{car.power}}</td>
                               </tr>
                               <tr>
                                     <th>Driven wheels</th>
@@ -137,7 +152,7 @@
                               Equipment
                         </b-button> 
                         <b-collapse id="equipment-collapse" v-model="equipmentVisible" class="mt-2" >
-                              <b-table :items="car.equipment" responsive>                                                 </b-table>
+                              <b-table striped  :items="car.equipment" responsive>                                                 </b-table>
                         </b-collapse>
                   </div>
                   <div class="pt-3">   
@@ -151,8 +166,8 @@
                         </b-button> 
                         <b-collapse id="repairs-collapse" v-model="repairsVisible" class="mt-2" >
                               <div v-if="repairs.length != 0"> 
-                                    <b-table :items="repairs" responsive :fields="fields"/> 
-                                    <h2 class="pt-3">Repairs total: {{repairs[0].total}}€</h2> 
+                                    <b-table striped  :items="repairs" responsive :fields="fields"/> 
+                                    <h2 class="pt-3">Repairs total: {{repairs[0].total}} {{currency}}</h2> 
                               </div>
                               
                               <div v-else>
@@ -173,8 +188,8 @@
                         </b-button> 
                         <b-collapse id="shipping-collapse" v-model="shippingVisible" class="mt-2">
                               <div v-if="shipping.total > 0">
-                                    <b-table :items="shippingItems" responsive /> 
-                                    <h2 class="pt-3">Shipping total: {{shipping.total}} €</h2>   
+                                    <b-table striped :items="shippingItems" responsive /> 
+                                    <h2 class="pt-3">Shipping total: {{shipping.total}} {{currency}}</h2>   
                               </div>
                               <div v-else>
                                     <center>
@@ -197,7 +212,7 @@
 </template>
 
 <script>
-
+import getSymbolFromCurrency from 'currency-symbol-map'
 import VueGallery from 'vue-gallery';
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
@@ -208,6 +223,7 @@ export default {
             return {
                   fields: ['name', 'price'],
                   shippingItems: [],
+                  currency: getSymbolFromCurrency(window.$cookies.get('currency')),
                   car: {
                         _id: '',
                         make:'',
@@ -262,6 +278,7 @@ export default {
                   equipmentVisible: false,
                   repairsVisible: false,
                   shippingVisible: false,
+                  myImgs: []
             }
             
       },
@@ -275,8 +292,8 @@ export default {
             //      alert("from", from.params.id);
           //  }
       },
-      async created() {
-            this.fetchCar();
+      created() {        
+            this.fetchCar();           
             this.fetchCarSummary();
             this.fetchCarRepairs();
             this.fetchCarShipping();
@@ -297,8 +314,18 @@ export default {
                               vm.car = response.data;  
                               //trimming unnecessary dat ending           
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
-                              vm.fetchImages();
+                              //vm.fetchImages();
+                              vm.getImagesRecursive();
                         }
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
                   })
                   .catch(function (error) {
                         console.log(error);
@@ -315,6 +342,15 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                               vm.repairs = response.data;
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
                   })
                   .catch(function (error) {
                         console.log(error);
@@ -343,6 +379,15 @@ export default {
                                     "Customs": vm.shipping.customs
                               }];
                         }
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
                               
                   })
                   .catch(function (error) {
@@ -365,6 +410,15 @@ export default {
                                     vm.summary.profit = vm.summary.soldPrice - vm.summary.total;
                                     vm.summary.soldDate = vm.summary.soldDate.substring(0, 10);
                               }
+                              if(response.status == 401) 
+                              {
+                                    vm.$cookies.remove('token');
+                                    vm.$cookies.remove('user-email');
+                                    vm.$cookies.remove('role');
+                                    vm.$cookies.remove('user');
+                                    vm.$cookies.remove('currency');
+                                    vm.$router.push('/');
+                              } 
                         }
                   })
                   .catch(function (error) {
@@ -385,7 +439,7 @@ export default {
             closeShippingModal(){
                   this.isShippingModalVisible = false;
             },
-            fetchImages() {
+           /* fetchImages() {
                   var vm = this;
                   axios.post(backEndUrl + "/api/get-images", vm.car.images, {
                         headers: {
@@ -395,15 +449,31 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                               vm.car.base64images = response.data;
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }    
                   })
                   .catch(function (error) {
                         console.log(error);
                   });
-            },
+            },*/
             fetchOther()
             {
                   this.fetchCarSummary();
                   this.fetchCarShipping();
+            },
+            deleteAction(){
+                  this.deleteCar();
+                  this.deleteCarSummary();
+                  this.deleteCarTracking();
+                  this.deleteCarRepairs();
+                  this.deleteCarShipping();
             },
             deleteCar(){
                   var vm = this;
@@ -419,6 +489,59 @@ export default {
                               vm.alertFlag = true;
                               vm.$router.push("/cars");
                         }
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
+                  })
+                  .catch(function (error){
+                        console.log(error);
+                  })
+            },
+            deleteCarSummary(){
+                  var vm = this;
+                  axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/summary`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .catch(function (error){
+                        console.log(error);
+                  })
+            },
+            deleteCarTracking(){
+                  var vm = this;
+                  axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/tracking`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .catch(function (error){
+                        console.log(error);
+                  })
+            },
+            deleteCarShipping(){
+                  var vm = this;
+                  axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .catch(function (error){
+                        console.log(error);
+                  })
+            },
+            deleteCarRepairs(){
+                  var vm = this;
+                  axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
                   })
                   .catch(function (error){
                         console.log(error);
@@ -426,7 +549,45 @@ export default {
             },
             formatPrice(value) {
                   return new Intl.NumberFormat('lt-LT').format(value);
+            },
+            getImage(vm, image){       
+                  axios.post(backEndUrl + "/api/get-images", image, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)
+                        {
+                             vm.car.base64images.push(response.data); 
+                             
+                        }
+                              
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }    
+                  })
+                  .catch(function (error) {
+                        console.log(error);
+                  });
+            },
+            getImagesRecursive(){
+                  let n = this.car.images.length;
+                  console.log(n)
+                  for(let i =0;i<n;i++)
+                  {
+                        console.log(i);
+                        this.getImage(this, this.car.images[i]);
+                  }
+                        
             }
+
       }
 }
 </script>

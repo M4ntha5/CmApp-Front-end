@@ -1,10 +1,9 @@
 <template>
 <div>
       <div class="container pt-5" v-if="!loading">
-            <b-alert v-model="successAlert" variant="success" dismissible>{{alertMessage}}</b-alert>
-            <b-alert v-model="failedAlert" variant="danger" dismissible>{{alertMessage}}</b-alert>
+            <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
 
-            <button v-b-modal.car-insert-modal class="btn btn-primary"
+            <button v-b-modal.car-insert-modal class="btn btn-primary ml-3"
             @click="showBmwModal"
             @close="fetchCars()"
             @ok="fetchCars()">
@@ -13,36 +12,38 @@
             <!-- bmw modal-->
             <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal" @ok="fetchCars()" @close="fetchCars()"/>
 
-            <div class="row">
-                  <div class="pt-5 col-4" v-for="(car, index) in cars" v-bind:key="car.id">                
-                        <div class="card" style="width: 20rem; height: 30rem;">
-                              <a v-bind:href="'/cars/'+ car.id">                                                         
-                                    <img :src='car.mainImgUrl' class="card-img-top img-thumbnail img-responsive" alt="Responsive image">
-                              </a>
-                              <div class="pt-3 card-body">
-                                    <div class="row">
-                                          <a v-bind:href="'/cars/'+ car.id">  
-                                                <h2>{{car.make}} {{car.model}}</h2>
-                                          </a>
-                                    </div>
-                                    <div class="row">           
-                                          <h4>Already paid: {{car.summary.total}} €</h4>
-                                    </div>
-                                    <div class="row">
-                                          <div v-if="car.summary.sold">
-                                                <h1 style="color:red;font-weight: bold;">SOLD</h1>
-                                                <h2 v-if="car.summary.profit < 0" style="color:red;font-weight:bold;">Profit: {{car.summary.profit}} €</h2>
-                                                <h2 v-else style="color:green;font-weight:bold;">Profit: {{car.summary.profit}} €</h2>
-                                          </div>
-                                    </div>            
-                              </div>
-                              <div v-if="!car.summary.sold">
-                                    <button v-b-modal.sold-modal @click="openSoldModal(car.id, index)" type="button" class="btn btn-warning">Sold?</button>
-                              </div> 
-                        </div> 
+            <div class="pt-4">
+                  <b-card-group deck>
+                        <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4">                              
+                              <b-card no-body>
+                                    <b-link :to="'/cars/' + car.id">
+                                          <b-card-img img-alt="Image" img-top :src='car.mainImgUrl'></b-card-img>
+                                          <b-card-body class="pl-3">            
+                                                <b-card-title>{{car.make}} {{car.model}}</b-card-title>
+                                          </b-card-body>
+                                    </b-link>
+                                    <b-card-text class="pl-3">                                          
+                                          <h4>Already paid: {{car.summary.total}} {{currency}}</h4>
+                                          <template v-if="car.summary.sold">
+                                                <h2 style="color:red;font-weight:bold;">SOLD</h2>
+                                                <h2 v-if="car.summary.profit < 0" style="color:red;">Profit: {{car.summary.profit}} {{currency}}</h2>
+                                                <h2 v-else style="color:green;">Profit: {{car.summary.profit}} {{currency}}</h2>
+                                          </template>
+                                    </b-card-text>
                                     
-                  </div>
-            </div> 
+                                    <template v-slot:footer>
+                                          <button v-b-modal.sold-modal 
+                                                @click="openSoldModal(car.id, index)" 
+                                                type="button" class="btn btn-warning"
+                                                v-if="!car.summary.sold">
+                                                Sold?
+                                          </button>
+                                          <small v-else>{{car.summary.soldWithin}}</small>
+                                    </template>
+                              </b-card>                                               
+                        </b-col>
+                  </b-card-group>
+            </div>
       </div>
       <div class="pt-3" v-else>
             <center>
@@ -51,22 +52,24 @@
       </div> 
 
       <b-modal id="sold-modal" ref="modal" title="Sold data"
-        @show="resetModal"
-        @ok="handleOk"
-        @close="resetModal">
+      @show="resetModal"
+      @ok.prevent="handleSubmit()"
+      @close="resetModal">
+            <b-form ref="form" @submit.stop.prevent="handleSubmit()">
+                  <b-form-group :label="'Sold price (' + currency + ')'">
+                        <b-form-input placeholder="15000" name="soldPrice-input"
+                              v-model="soldDetails.soldPrice"
+                              v-validate="{ required: true, decimal:'2' }"
+                              :state="validateState('soldPrice-input')" 
+                              aria-describedby="soldPrice-input-live-feedback"
+                              data-vv-as="sold price">
+                        </b-form-input>
+                        <b-form-invalid-feedback id="soldPrice-input-live-feedback">
+                              {{ veeErrors.first('soldPrice-input') }}
+                        </b-form-invalid-feedback>
+                  </b-form-group>     
 
-        <b-alert v-model="successAlert" dismissible>Inserting please wait...</b-alert>
-
-            <form ref="form" @submit.stop.prevent="handleSubmit">
-
-                <b-form-group :state="soldDetails.soldPriceState" label="Sold price" label-for="price-input" 
-                              invalid-feedback="Price is required and cannot be less than 0">  
-                    <b-form-input v-model='soldDetails.soldPrice' :state="soldDetails.soldPriceState" 
-                         id="price-input" type="number" min="0" step=".01" placeholder="10000" required>
-                    </b-form-input>
-                </b-form-group>     
-
-            </form>
+            </b-form>
         </b-modal>
 
 
@@ -76,30 +79,8 @@
 
 <script>
 
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(function() 
-{
-     'use strict';
-     window.addEventListener('load', function() 
-     {
-          // Fetch all the forms we want to apply custom Bootstrap validation styles to
-          var forms = document.getElementsByClassName('needs-validation');
-          // Loop over them and prevent submission
-          Array.prototype.filter.call(forms, function(form) 
-          {
-               form.addEventListener('submit', function(event) 
-               {
-                    if (form.checkValidity() === false)
-                    {
-                         event.preventDefault();
-                         event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-               }, false);
-          });
-     }, false);
-})();
 
+import getSymbolFromCurrency from 'currency-symbol-map'
 import bmwModal from '../Modals/CarModal.vue';
 import axios from 'axios';
 
@@ -108,8 +89,9 @@ export default {
       data() {
             return {
                   alertMessage:'',
-                  successAlert: false,
-                  failedAlert: false,
+                  alertFlag: false,
+                  dangerAlert: false,
+                  currency: getSymbolFromCurrency(window.$cookies.get('currency')),
                   cars: [],
                   car: {
                         id: '',
@@ -133,9 +115,11 @@ export default {
                         summary: {
                               boughtPrice:'',
                               soldPrice:'',
+                              createdAt: '',
                               total: '',
                               sold: '',
-                              profit: 0
+                              profit: 0,
+                              soldWithin: ''
                         },
                   },
                   insertCar: {
@@ -156,8 +140,8 @@ export default {
                         car: '',
                         sold: '',
                         index: '',
-                        soldPriceState: null,
-                  }                
+                        createdAt: ''
+                  }            
             }           
       },
 
@@ -195,23 +179,33 @@ export default {
                         if(response.status == 200)
                         {
                               vm.cars = response.data;
-                              vm.loading = false;
+                              vm.loading = false;                            
                               //setting repair value to dafault - first of a list
-                              vm.insertRepair.car = vm.cars[0].id;
+                              if(vm.cars.length > 0)
+                                    vm.insertRepair.car = vm.cars[0].id;
                               
                               vm.fetchCarsSummary();
-                        }                       
+                        }
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }                              
                   })
                   .catch(function (error) {
                         vm.loading = false;
                         vm.alertMessage = error.response.data;
-                        vm.failedAlert = true;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
                         console.log(error);
                   });
             },
             fetchCarsSummary() {
                   let vm = this;
-                  console.log(vm.cars);
                   for(let i =0; i< vm.cars.length;i++)
                   {
                         axios.get(backEndUrl + `/api/cars/${vm.cars[i].id}/summary`, {
@@ -225,13 +219,24 @@ export default {
                                     vm.cars[i].summary = response.data;
                                     vm.cars[i].summary.profit = 
                                           vm.cars[i].summary.soldPrice -
-                                          vm.cars[i].summary.total; 
+                                          vm.cars[i].summary.total;
+                                    vm.cars[i].summary.profit = 
+                                          Number.parseFloat(vm.cars[i].summary.profit).toFixed(0);             
                               }
-                                    
+                              if(response.status == 401) 
+                              {
+                                    vm.$cookies.remove('token');
+                                    vm.$cookies.remove('user-email');
+                                    vm.$cookies.remove('role');
+                                    vm.$cookies.remove('user');
+                                    vm.$cookies.remove('currency');
+                                    vm.$router.push('/');
+                              }                                
                         })
                         .catch(function (error) {
                               vm.alertMessage = error.response.data;
-                              vm.failedAlert = true;
+                              vm.dangerAlert = true;
+                              vm.alertFlag = true;
                               console.log(error);
                         });           
                   }      
@@ -249,18 +254,26 @@ export default {
                               vm.cars[index].summary = response.data;
                               vm.cars[index].summary.profit = 
                                     vm.cars[index].summary.soldPrice -
-                                    vm.cars[index].summary.total; 
-                        }                        
+                                    vm.cars[index].summary.total;
+                              vm.cars[index].summary.profit = 
+                                    Number.parseFloat(vm.cars[index].summary.profit).toFixed(0);
+                        } 
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }                       
                   })
                   .catch(function (error) {
                         vm.alertMessage = error.response.data;
-                        vm.failedAlert = true;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
                         console.log(error);
                   });       
-            },
-            showAlert(message){
-                  this.successAlert = true;
-                  this.alertMessage = message;
             },
             onFileSelected(e) {
                   for(let i=0; i < e.target.files.length; i++)
@@ -283,65 +296,77 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                               vm.fetchCarSummary(index, carId);
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
                   })
                   .catch(function (error) {
                         vm.alertMessage = error.response.data;
-                        vm.failedAlert = true;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
                         console.log(error);
                   });        
             },
-
             resetModal() {
                   this.soldDetails.soldPrice = '';
-                  this.soldDetails.soldPriceState = null;
-            },
-            checkFormValidity() {
-                  const valid = this.$refs.form.checkValidity();
-                  this.soldDetails.soldPriceState = this.$refs.form[0].checkValidity();
-                  return valid;
-            },
-            handleOk(bvModalEvt) {
-                  // Prevent modal from closing
-                  bvModalEvt.preventDefault()
-                  // Trigger submit handler
-                  this.handleSubmit()
             },
             handleSubmit() {
-                  // Exit when the form isn't valid
-                  if (!this.checkFormValidity()) {
-                        return
-                  }
-                  else
-                  {
-                        this.soldDetails.sold = true;
-                        console.log(this.soldDetails);
-                        var vm = this;
-                        axios.put(backEndUrl + `/api/cars/${vm.soldDetails.car}/summary`, this.soldDetails, {
-                              headers: {
-                                    Authorization: 'Bearer ' + window.$cookies.get('token')
-                              }
-                        })
-                        .then(function (response) {
-                              if(response.status == 204)
-                              {
-                                    vm.fetchCar(vm.soldDetails.car, vm.soldDetails.index);
-                                    vm.$nextTick(() => {
-                                          vm.$bvModal.hide('sold-modal')
-                                    })
-                              }                   
-                        })
-                        .catch(function (error){
-                              vm.alertMessage = error.response.data;
-                              vm.failedAlert = true;
-                              console.log(error);
-                        })                             
-                  }
+                  this.$validator.validateAll().then(result => {
+                        if (!result)
+                              return;
+                        this.insertSoldDetails();
+                  });                                                                
+            },
+            insertSoldDetails() {
+                  this.soldDetails.sold = true;
+                  this.soldDetails.createdAt = this.cars[this.soldDetails.index].summary.createdAt;
+
+                  var vm = this;
+                  axios.put(backEndUrl + `/api/cars/${vm.soldDetails.car}/summary`, this.soldDetails, {
+                        headers: {
+                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                        }
+                  })
+                  .then(function (response) {
+                        if(response.status == 204)
+                        {
+                              vm.fetchCar(vm.soldDetails.car, vm.soldDetails.index);
+                              vm.$nextTick(() => {
+                                    vm.$bvModal.hide('sold-modal')
+                              })
+                        }
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        }               
+                  })
+                  .catch(function (error){
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        console.log(error);
+                  }) 
             },
             openSoldModal(carId, index) {
                   this.soldDetails.car = carId;
                   this.soldDetails.index = index;
+            },
+            validateState(ref) {
+                  if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
+                  return !this.veeErrors.has(ref);
+                  return null;
             }
-
       }
 }
 </script>
