@@ -201,6 +201,9 @@ export default {
                     this.insert.transferFee = '';
                     this.insert.transportationFee = '';
                }
+               this.alertFlag = false;
+               this.alertMessage = '';
+               this.dangerAlert = false
           },
           handleSubmit() {
                this.$validator.validateAll().then(result => {

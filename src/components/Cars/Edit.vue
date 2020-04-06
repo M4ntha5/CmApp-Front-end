@@ -1,13 +1,14 @@
 <template>
 <div>
-     <div class="container" v-if="!loading">
-          <center class="pt-4"><h1>{{make}} {{model}}</h1></center>
+     <div class="container pt-4" v-if="!loading">
+          <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
+          <center ><h1>{{make}} {{model}}</h1></center>
 
           <b-form class="pt-4" v-if="!loading">
                <div class="form-row">
                     <b-form-group class="col-sm-4 mb-3" label="Make">
                          <b-form-input disabled name="make-input" placeholder="BMW"
-                              v-model="car.make"     
+                              v-model="car.make"
                               v-validate="{ required: true }"
                               :state="validateState('make-input')" 
                               aria-describedby="make-input-live-feedback"
@@ -30,7 +31,7 @@
                     <b-form-group class="col-sm-4 mb-3" label="Series">
                          <b-form-input placeholder="F10" name="series-input"  
                               v-model="car.series"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('series-input')" 
                               aria-describedby="series-input-live-feedback"
                               data-vv-as="series">>
@@ -59,7 +60,7 @@
                          <b-form-select name="body-input"
                               v-model="car.bodyType"
                               :options="body"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('body-input')" 
                               aria-describedby="body-input-live-feedback"
                               data-vv-as="transmbodyission">
@@ -70,7 +71,7 @@
                          <b-form-select name="steering-input"
                               v-model="car.steering"
                               :options="steering"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('steering-input')" 
                               aria-describedby="steering-input-live-feedback"
                               data-vv-as="steering">
@@ -82,7 +83,7 @@
                          <b-form-select name="drive-input"
                               v-model="car.drive"
                               :options="drive"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('drive-input')" 
                               aria-describedby="drive-input-live-feedback"
                               data-vv-as="drive">
@@ -93,7 +94,7 @@
                          <b-form-select name="transmission-input"
                               v-model="car.transmission"
                               :options="transmission"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('transmission-input')" 
                               aria-describedby="transmission-input-live-feedback"
                               data-vv-as="transmission">
@@ -105,7 +106,7 @@
                     <b-form-group class="col-sm-4 mb-3" label="Engine">
                          <b-form-input placeholder="N55" name="engine-input"
                               v-model="car.engine"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('engine-input')" 
                               aria-describedby="engine-input-live-feedback"
                               data-vv-as="engine">
@@ -114,9 +115,9 @@
 
                     </b-form-group>
                     <b-form-group class="col-sm-4 mb-3" label="Engine displacement">
-                         <b-form-input type="number" step=".1" placeholder="3.0" name="displacement-input"
+                         <b-form-input placeholder="3.0" name="displacement-input"
                               v-model="car.displacement"
-                              v-validate="{ required: true, min: 0 }"
+                              v-validate="{ required: false, decimal:'2' }"
                               :state="validateState('displacement-input')" 
                               aria-describedby="displacement-input-live-feedback"
                               data-vv-as="displacement">
@@ -127,7 +128,7 @@
                     <b-form-group class="col-sm-4 mb-3" label="Power">
                          <b-form-input placeholder="180kw /245hp" name="power-input"
                               v-model="car.power"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('power-input')" 
                               aria-describedby="power-input-live-feedback"
                               data-vv-as="power">
@@ -140,7 +141,7 @@
                     <b-form-group class="col-sm-6 mb-3" label="Color">
                          <b-form-input placeholder="ALPINWEISS 3 (300)" name="color-input"
                               v-model="car.color"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('color-input')" 
                               aria-describedby="color-input-live-feedback"
                               data-vv-as="color">
@@ -151,7 +152,7 @@
                     <b-form-group class="col-sm-6 mb-3" id="input-group-1" label="Interior">
                          <b-form-input placeholder="Leather/nappa/semi-aniline..." name="interior-input"
                               v-model="car.interior"
-                              v-validate="{ required: true }"
+                              v-validate="{ required: false }"
                               :state="validateState('interior-input')" 
                               aria-describedby="interior-input-live-feedback"
                               data-vv-as="interior">
@@ -344,6 +345,9 @@ export default {
                equipmentVisible: false,
                repairsVisible: false,
                shippingVisible: false,
+               dangerAlert: false,
+               alertMessage: '',
+               alertFlag: false,
           }
      }, 
      created() {      
@@ -354,16 +358,13 @@ export default {
           fetchCar() {
                var vm = this;
                axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}`, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
                     if(response.status == 200)
                     {
                          vm.car = response.data;  
-                         vm.getImagesRecursive();
-                         //vm.fetchImages();                       
+                         vm.getImagesRecursive();                      
                          //trimming unnecessary dat ending           
                          vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                          vm.loading = false;
@@ -382,6 +383,9 @@ export default {
                })
                .catch(function (error) {
                     console.log(error);
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     vm.loading = false;
                });               
           },
@@ -406,6 +410,9 @@ export default {
                     }   
                })
                .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     console.log(error);
                });               
           },
@@ -430,6 +437,9 @@ export default {
                     } 
                })
                .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     console.log(error);
                });     
           },
@@ -450,10 +460,15 @@ export default {
                ]);
 
                const areValid = (await results).every(isValid => isValid);  
-               console.log(areValid);
 
                if(areValid)
+               {
+                    this.alertMessage = "Saving your changes...";
+                    this.dangerAlert = false;
+                    this.alertFlag = true;
                     this.updateAll();
+               }
+                    
                
           },
           deleteEquipmentRow (ind) {
@@ -506,47 +521,15 @@ export default {
                     this.$validator.reset('repair-name-input');
                }
           },
-          /*fetchImages() {
-               var vm = this;
-               axios.post(backEndUrl + "/api/get-images", vm.car.images, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
-               })
-               .then(function (response) {
-                    if(response.status == 200)
-                    {
-                         vm.car.base64images = response.data;
-                         vm.alertMessage = "Your images ready for update";
-                         vm.warningAlert = false;
-                         vm.alertFlag = true;
-                    }
-                    if(response.status == 401) 
-                    {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         vm.$router.push('/');
-                    } 
-                         
-               })
-               .catch(function (error) {
-                    console.log(error);
-               });
-          },*/
           getImage(vm, image){       
-               axios.post(backEndUrl + "/api/get-images", image, {
+               axios.post(backEndUrl + "/api/get-image", image, {
                     headers: {
                          Authorization: 'Bearer ' + window.$cookies.get('token')
                     }
                })
                .then(function (response) {
                     if(response.status == 200)
-                    {
-                         vm.car.base64images.push(response.data);        
-                    }        
+                         vm.car.base64images.push(response.data);               
                     if(response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -558,18 +541,16 @@ export default {
                     }    
                })
                .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     console.log(error);
                });
           },
           getImagesRecursive(){
                let n = this.car.images.length;
-               console.log(n)
                for(let i =0;i<n;i++)
-               {
-                    console.log(i);
-                    this.getImage(this, this.car.images[i]);
-               }
-                    
+                    this.getImage(this, this.car.images[i]);             
           },
           deleteAllCarRepairs(){
                let vm = this;
@@ -592,6 +573,9 @@ export default {
                     } 
                })
                .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     console.log(error);
                })
           },
@@ -614,12 +598,15 @@ export default {
                     } 
                })
                .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     console.log(error);
                })
           },
           updateAll(){
                this.updateCar();
-               //this.deleteAllCarRepairs();
+               this.deleteAllCarRepairs();
           },
           removeImageFromList(index){         
                this.car.base64images.splice(index, 1);
