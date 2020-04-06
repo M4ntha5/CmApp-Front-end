@@ -1,9 +1,14 @@
 <template>
       <div class="container pt-5">
-            <b-alert class="row" v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>          
-            <b-button class="row mb-4 ml-2" id="tracking-button-info" @click="handleTracking()">
-                  Look for tracking
-            </b-button>      
+            <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>          
+            <div class="pt-4 mb-4 ml-2">
+                  <b-button variant="primary" size="lg" @click="goToSelectedCar()">Back</b-button>
+                  <b-button @click="handleTracking()" style="float:right;" class="mr-2">
+                        Look for tracking
+                  </b-button> 
+            </div>
+            <h1 style="text-align:center;">{{selectedCar.make}} {{selectedCar.model}}</h1>
+                 
             <div class="row pt-4" v-if="!loading && !empty">                    
                   <div class="img-fluid col-sm-6">              
                         <gallery :images="tracking.base64images" :index="index" @close="index = null"></gallery>
@@ -66,6 +71,7 @@ export default {
                         url: '',
                         car: ''
                   }, 
+                  selectedCar:{},
                   index: null,
                   loading: true,
                   empty: true,
@@ -85,9 +91,34 @@ export default {
       },
       created() {
             this.fetchTracking();
+            this.fetchCar();
       },
 
       methods: {
+            fetchCar() {
+                  var vm = this;
+                  axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}`, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)
+                        {
+                              vm.selectedCar = response.data;
+                        }
+                        else if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/');
+                        } 
+                  })
+                  .catch(function (error) {
+                        console.log(error);
+                  });        
+            },
             fetchTracking() {
                   let vm = this;
                   axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`, {
@@ -97,7 +128,7 @@ export default {
                         if(response.status == 200)
                         {
                               vm.tracking = response.data;
-                              vm.fetchImages();
+                              vm.getImagesRecursive();
                               if(vm.tracking.containerNumber != '')
                                     vm.empty = false;
                               vm.loading = false;           
@@ -128,7 +159,9 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {
-                              vm.tracking = response.data;                                  
+                              //let tmp = vm.tracking.base64images;
+                              vm.tracking = response.data;
+                              //vm.tracking.base64images = tmp;                            
                               vm.dangerAlert = false;
                               vm.alertMessage = "Tracking data updated sccessfully. Downloading images...";
                               vm.alertFlag =true;
@@ -161,8 +194,7 @@ export default {
                               vm.tracking.base64images = response.data;                                  
                               vm.dangerAlert = false;
                               vm.alertMessage = "Images successfully updated";
-                              vm.alertFlag =true;
-                             // vm.loading = false;
+                              vm.alertFlag = true;
                         }
                         else if(response.status == 401) 
                         {
@@ -182,28 +214,21 @@ export default {
                   }); 
             },
             handleTracking(){
+                  this.dangerAlert = false;
+                  this.alertMessage = "Looking for data please wait... This may take several minutes!!";
+                  this.alertFlag = true;
                   this.lookForTracking();
                   this.lookForTrackingImages();            
             },
-            fetchImages() {
-                  var vm = this;
-                  if(vm.tracking.containerNumber == '')
-                        return;
-                  vm.alertMessage = "Please wait while we get all images ready for you";
-                  vm.dangerAlert = false;
-                  vm.alertFlag = true;
-                  axios.post(backEndUrl + "/api/get-images", vm.tracking.auctionImages, {
+            getImage(vm, image){
+                  axios.post(backEndUrl + "/api/get-image", image, {
                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                        {
-                              vm.tracking.base64images = response.data;
-                              vm.alertMessage = "All images ready to use, enjoy :)";
-                              vm.dangerAlert = false;
-                              vm.alertFlag = true;
-                        }                      
-                        else if(response.status == 401) 
+                             vm.tracking.base64images.push(response.data); 
+                              
+                        if(response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
@@ -211,12 +236,20 @@ export default {
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
                               vm.$router.push('/');
-                        }           
+                        }    
                   })
                   .catch(function (error) {
                         console.log(error);
                   });
             },
+            getImagesRecursive(){
+                  let n = this.tracking.auctionImages.length;
+                  for(let i =0;i<n;i++)
+                        this.getImage(this, this.tracking.auctionImages[i]);              
+            },
+            goToSelectedCar(){
+                  this.$router.push(`/cars/${this.$route.params.id}`);
+            }
       }
 }
 </script>

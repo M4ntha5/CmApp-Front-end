@@ -34,7 +34,7 @@
                          <b-form-group class="col-md-4 mb-3" label="Series">
                               <b-form-input id="series-input" placeholder="F10" name="series-input"  
                                    v-model="car.series"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('series-input')" 
                                    aria-describedby="series-input-live-feedback"
                                    data-vv-as="series">>
@@ -48,7 +48,7 @@
                          <b-form-group class="col-md-6 mb-3" label="Vin">
                               <b-form-input id="vin-input" name="vin-input" placeholder="ABCD1234EFG56789"
                                    v-model="car.vin"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: true, length:'17' }"
                                    :state="validateState('vin-input')" 
                                    aria-describedby="vin-input-live-feedback"
                                    data-vv-as="vin">
@@ -60,7 +60,7 @@
                          <b-form-group class="col-md-6 mb-3" label="Manufacture date">
                               <b-form-input id="date-input" type="date" name="date-input"
                                    v-model="car.manufactureDate"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('date-input')" 
                                    aria-describedby="date-input-live-feedback"
                                    data-vv-as="date">
@@ -75,7 +75,7 @@
                               <b-form-select id="body-input" name="body-input"
                                    v-model="car.bodyType"
                                    :options="body"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('body-input')" 
                                    aria-describedby="body-input-live-feedback"
                                    data-vv-as="body"
@@ -89,7 +89,7 @@
                               <b-form-select id="steering-input" name="steering-input"
                                    v-model="car.steering"
                                    :options="steering"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('steering-input')" 
                                    aria-describedby="steering-input-live-feedback"
                                    data-vv-as="steering"
@@ -103,7 +103,7 @@
                               <b-form-select id="drive-input" name="drive-input"
                                    v-model="car.drive"
                                    :options="drive"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('drive-input')" 
                                    aria-describedby="drive-input-live-feedback"
                                    data-vv-as="drive"
@@ -117,7 +117,7 @@
                               <b-form-select id="transmission-input" name="transmission-input"
                                    v-model="car.transmission"
                                    :options="transmission"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('transmission-input')" 
                                    aria-describedby="transmission-input-live-feedback"
                                    data-vv-as="transmission"
@@ -131,7 +131,7 @@
                          <b-form-group class="col-md-4 mb-3" label="Engine">
                               <b-form-input id="engine-input" placeholder="N55" name="engine-input"
                                    v-model="car.engine"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('engine-input')" 
                                    aria-describedby="engine-input-live-feedback"
                                    data-vv-as="engine">
@@ -144,7 +144,7 @@
                          <b-form-group class="col-md-4 mb-3" label="Engine displacement">
                               <b-form-input step=".1" placeholder="3.0" name="displacement-input"
                                    v-model="car.displacement"
-                                   v-validate="{ required: true, decimal:1 }"
+                                   v-validate="{ required: false, decimal:1 }"
                                    :state="validateState('displacement-input')" 
                                    aria-describedby="displacement-input-live-feedback"
                                    data-vv-as="displacement">
@@ -157,7 +157,7 @@
                          <b-form-group class="col-md-4 mb-3" label="Power">
                               <b-form-input placeholder="180kw /245hp" name="power-input"
                                    v-model="car.power"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('power-input')" 
                                    aria-describedby="power-input-live-feedback"
                                    data-vv-as="power">
@@ -172,7 +172,7 @@
                          <b-form-group class="col-md-6 mb-3" label="Color">
                               <b-form-input placeholder="ALPINWEISS 3 (300)" name="color-input"
                                    v-model="car.color"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('color-input')" 
                                    aria-describedby="color-input-live-feedback"
                                    data-vv-as="color">
@@ -185,7 +185,7 @@
                          <b-form-group class="col-md-6 mb-3" id="input-group-1" label="Interior">
                               <b-form-input placeholder="Leather/nappa/semi-aniline..." name="interior-input"
                                    v-model="car.interior"
-                                   v-validate="{ required: true }"
+                                   v-validate="{ required: false }"
                                    :state="validateState('interior-input')" 
                                    aria-describedby="interior-input-live-feedback"
                                    data-vv-as="interior">
@@ -199,7 +199,7 @@
                          <b-form-group class="col-md-6 mb-3" :label="'Bought price ('+ currency + ')'">
                               <b-form-input placeholder="5000" step=".1" name="price-input"
                                    v-model="summary.boughtPrice"
-                                   v-validate="{ required: true, decimal:1 }"
+                                   v-validate="{ required: true, decimal:2 }"
                                    :state="validateState('price-input')" 
                                    aria-describedby="price-input-live-feedback"
                                    data-vv-as="price">
@@ -211,7 +211,7 @@
                          <b-form-group class="col-md-6 mb-3" id="images-group-1" label="Images">
                                <b-form-file name="images-input"
                                    v-model="car.base64images"
-                                   v-validate="{ image:'', mimes: 'image/jpeg, image/png, image/gif' }"
+                                   v-validate="{ required: false, image:'', mimes: 'image/jpeg, image/png, image/gif' }"
                                    :state="validateState('images-input')" 
                                    aria-describedby="images-input-live-feedback"
                                    data-vv-as="images"
@@ -220,18 +220,7 @@
                                    {{ veeErrors.first('images-input') }}
                               </b-form-invalid-feedback>
                          </b-form-group>
-                    </div> 
-               <!-- <div class="row mb-5">
-                         <div class="card ml-3 mr-3" style="width:70rem; height:23rem;">
-                              <div class="row ml-4 mr-4 pt-4 justify-content-between" 
-                                   v-for="image in car.base64images" v-bind:key="image">              
-                                   <div class="card col-md-2 pt-3">
-                                        <img class="card-img-top mb-3"
-                                             :src="image">
-                                   </div>
-                              </div>                       
-                         </div>
-                    </div> -->   
+                    </div>  
                     <div class="pt-3">   
                          <b-button
                               block variant="secondary"

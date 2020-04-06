@@ -12,17 +12,18 @@
             <!-- bmw modal-->
             <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal" @ok="fetchCars()" @close="fetchCars()"/>
 
-            <div class="pt-4">
+            <div class="pt-3">
                   <b-card-group deck>
-                        <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4">                              
+                        <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 ">                              
                               <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
-                                          <b-card-img img-alt="Image" img-top :src='car.mainImgUrl'></b-card-img>
-                                          <b-card-body class="pl-3">            
+                                          <b-card-img img-alt="Image" img-top :src='car.mainImgUrl'
+                                          style="max-height:238.5px"></b-card-img>
+                                          <b-card-body class="pl-3 d-flex">            
                                                 <b-card-title>{{car.make}} {{car.model}}</b-card-title>
                                           </b-card-body>
                                     </b-link>
-                                    <b-card-text class="pl-3">                                          
+                                    <b-card-text class="pl-3 ">                                          
                                           <h4>Already paid: {{car.summary.total}} {{currency}}</h4>
                                           <template v-if="car.summary.sold">
                                                 <h2 style="color:red;font-weight:bold;">SOLD</h2>
@@ -31,13 +32,13 @@
                                           </template>
                                     </b-card-text>
                                     
-                                    <template v-slot:footer>
-                                          <button v-b-modal.sold-modal 
+                                    <template v-slot:footer class="">
+                                          <b-button v-b-modal.sold-modal  block
                                                 @click="openSoldModal(car.id, index)" 
                                                 type="button" class="btn btn-warning"
                                                 v-if="!car.summary.sold">
                                                 Sold?
-                                          </button>
+                                          </b-button>
                                           <small v-else>{{car.summary.soldWithin}}</small>
                                     </template>
                               </b-card>                                               
@@ -153,9 +154,6 @@ export default {
       },
       created() {
             this.fetchCars();
-            //console.log(window.$cookies.get('token'));
-           // console.log(window.$cookies.get('role'));
-         ///   alert(this.$route.params.id);
       },
       components: {
             bmwModal,

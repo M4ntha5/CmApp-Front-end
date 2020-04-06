@@ -2,12 +2,12 @@
 <div>
       <div class="container pt-5" >  
             <b-alert v-model="alertFlag" variant="success" dismissible>{{alertMessage}}</b-alert>
-            <div v-if="!loading">      
+            <div v-if="!loading">     
                   <div class="row">
-                        <div class="col-lg-8 col-12">
+                        <div class="col-sm-8 col-12">
                               <h1>{{car.make}} {{car.model}}</h1>
                         </div>
-                        <div class="col-lg-4 col-12">
+                        <div class="col-sm-4 col-12">
                               <div class="row" style="float:right;">
                                     <a class="btn btn-secondary" target="_blank" v-if="car.make == 'BMW'"
                                     :href="'https://www.bmwautodalys.lt/en/catalog/selectVehicleByVin/INDEX/'+car.vin"
@@ -47,6 +47,9 @@
                               </div>
                         </div>
                   </div>
+                  <div class="ml-1">
+                        <b-button variant="primary" size="lg" @click="goToCars()">Back to list</b-button>
+                  </div> 
                   <div class="row mb-3 pt-5">
                         <div class="img-fluid col-sm-6 col-12">              
                               <gallery :images="car.base64images" :index="index" @close="index = null"></gallery>
@@ -425,13 +428,11 @@ export default {
                         console.log(error);
                   });           
             },
-            openTracking(id)
-            {
-                  window.location.href = `/cars/${id}/tracking`;    
+            openTracking(id){
+                  this.$router.push(`/cars/${id}/tracking`);    
             },
-            editCar(id)
-            {
-                  window.location.href = `/cars/${id}/edit`;  
+            editCar(id){
+                  this.$router.push(`/cars/${id}/edit`);  
             },
             showShippingModal(){
                   this.isShippingModalVisible = true;
@@ -439,32 +440,7 @@ export default {
             closeShippingModal(){
                   this.isShippingModalVisible = false;
             },
-           /* fetchImages() {
-                  var vm = this;
-                  axios.post(backEndUrl + "/api/get-images", vm.car.images, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
-                  })
-                  .then(function (response) {
-                        if(response.status == 200)
-                              vm.car.base64images = response.data;
-                        if(response.status == 401) 
-                        {
-                              vm.$cookies.remove('token');
-                              vm.$cookies.remove('user-email');
-                              vm.$cookies.remove('role');
-                              vm.$cookies.remove('user');
-                              vm.$cookies.remove('currency');
-                              vm.$router.push('/');
-                        }    
-                  })
-                  .catch(function (error) {
-                        console.log(error);
-                  });
-            },*/
-            fetchOther()
-            {
+            fetchOther(){
                   this.fetchCarSummary();
                   this.fetchCarShipping();
             },
@@ -550,18 +526,15 @@ export default {
             formatPrice(value) {
                   return new Intl.NumberFormat('lt-LT').format(value);
             },
-            getImage(vm, image){       
-                  axios.post(backEndUrl + "/api/get-images", image, {
+            getImage(vm, image){
+                  axios.post(backEndUrl + "/api/get-image", image, {
                         headers: {
                               Authorization: 'Bearer ' + window.$cookies.get('token')
                         }
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                        {
                              vm.car.base64images.push(response.data); 
-                             
-                        }
                               
                         if(response.status == 401) 
                         {
@@ -579,13 +552,11 @@ export default {
             },
             getImagesRecursive(){
                   let n = this.car.images.length;
-                  console.log(n)
                   for(let i =0;i<n;i++)
-                  {
-                        console.log(i);
-                        this.getImage(this, this.car.images[i]);
-                  }
-                        
+                        this.getImage(this, this.car.images[i]);                
+            },
+            goToCars(){
+                  this.$router.push('/cars');
             }
 
       }

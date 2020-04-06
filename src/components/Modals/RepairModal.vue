@@ -1,11 +1,11 @@
 <template>
      <div>
-        <b-modal id="repair-insert-modal" ref="modal" title="Insert new repair"
-        @show="resetModal"
-        @ok.prevent="onSubmit"
-        @close="resetModal">  
-          <b-alert v-model="failedAlert" :variant="!failedAlert ? 'danger': 'succes'" dismissible>{{alertMessage}}</b-alert>
-          <b-form ref="form" @submit.stop.prevent="onSubmit">            
+          <b-modal id="repair-insert-modal" ref="modal" title="Insert new repair"
+          @show="resetModal"
+          @ok.prevent="onSubmit()"
+          @close="resetModal">  
+          <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger': 'success'" dismissible>{{alertMessage}}</b-alert>
+          <b-form ref="form" @submit.stop.prevent="onSubmit()">            
                <b-form-group label="Name">
                     <b-form-input id="name-input" placeholder="New engine" name="name-input" 
                          v-model="insert.name"
@@ -61,9 +61,10 @@ export default {
                     price: '',
                     car: '',                    
                },
-               rates: [],
                cars: [],
-               failedAlert: false,
+               repairs: [],
+               alertFlag: false,
+               dangerAlert: false,
                alertMessage: ''
           }
      },
@@ -73,6 +74,10 @@ export default {
                this.insert.name = ''
                this.insert.price = ''
                this.insert.car = ''
+               this.alertFlag = false;
+               this.alertMessage = '';
+               this.dangerAlert = false
+               this.repairs = [];
           },
           validateState(ref) {
                if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
@@ -87,17 +92,21 @@ export default {
                })          
           },
           insertRepair() {
+               this.alertMessage = "Handling your input...";
+               this.dangerAlert = false;
+               this.alertFlag = true;
                let vm = this;
-               let repairs = [];
-               repairs.push(vm.insert);
+               vm.repairs.push(vm.insert);
              
-               axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, repairs, {
+               axios.post(backEndUrl + `/api/cars/${vm.insert.car}/repairs`, vm.repairs, {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
                     if(response.status == 200)
                     {
-                         vm.failedAlert = true;
+                         vm.alertMessage = "Your repair successfully saved";
+                         vm.dangerAlert = false;
+                         vm.alertFlag = true;
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('repair-insert-modal')
@@ -114,7 +123,9 @@ export default {
                     } 
                })
                .catch(function (error) {
-                    vm.failedAlert = false;
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     console.log(error);
                }); 
           },
@@ -141,7 +152,8 @@ export default {
                })
                .catch(function (error) {                     
                     vm.alertMessage = error.response.data;
-                    vm.failedAlert = true;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     console.log(error);
                });
           },
