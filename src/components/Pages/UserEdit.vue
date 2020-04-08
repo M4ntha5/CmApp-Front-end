@@ -143,7 +143,7 @@ export default {
                     else if(response.status == 401)
                     {
                          vm.$cokkies.remove('token');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     }
                })
                .catch(function (error) {
@@ -173,7 +173,7 @@ export default {
                     else if(response.status == 401)
                     {
                          vm.$cokkies.remove('token');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     }
                })
                .catch(function (error) {
@@ -194,7 +194,7 @@ export default {
                     else if(response.status == 204)
                     {
                          vm.$cokkies.remove('token');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     }
                })
                .catch(function (error){

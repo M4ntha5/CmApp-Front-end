@@ -2,8 +2,14 @@
 <div>
      <div class="container pt-4" v-if="!loading">
           <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
-          <center ><h1>{{make}} {{model}}</h1></center>
-
+          
+          <div class="row pt-3">
+               <div class="col-sm-4">
+                    <b-button  variant="primary" size="lg" @click="goToCar()">Back to car</b-button> 
+               </div>
+               <h1 class="col-sm-8">{{make}} {{model}}</h1>
+          </div> 
+          <center></center>
           <b-form class="pt-4" v-if="!loading">
                <div class="form-row">
                     <b-form-group class="col-sm-4 mb-3" label="Make">
@@ -160,7 +166,7 @@
                          <b-form-invalid-feedback id="interior-input-live-feedback">{{ veeErrors.first('interior-input') }}</b-form-invalid-feedback>
                     </b-form-group>
                </div>
-               <b-form-group label="Images" class="ml-3">
+               <b-form-group label="Your images" class="ml-3">
                     <div id="drop-area" class="row pt-2">
                          <b-form-file multiple class="col-sm-4 mt-4"               
                               @change="onFileSelected">
@@ -174,7 +180,22 @@
                               </b-button>
                          </div>
                     </div>
-               </b-form-group>      
+               </b-form-group>
+               <b-form-group label="Images from tracking" class="ml-3">
+                    <div id="drop-area" class="row pt-2">
+                         <b-form-file multiple class="col-sm-4 mt-4"               
+                              @change="onFileSelected">
+                         </b-form-file>
+                         <div class="col-sm-4 mt-3" v-for="(image, index) in tracking.base64images" v-bind:key="index">              
+                              <img class="card-img-top mb-3 pt-3" responsive-image :src="image">
+                              <b-button pill variant="danger" 
+                                   style="position:absolute;right:0%;top:0%;"
+                                   @click.prevent="removeImageFromList(index)">
+                                   X
+                              </b-button>
+                         </div>
+                    </div>
+               </b-form-group>
           </b-form>
           <div class="pt-3">   
                <b-button
@@ -317,6 +338,7 @@ export default {
                     created_at:'',
                     mainImgUrl:'',
                     equipment: [],
+                    images:[],
                     base64images: [],
                },
                summary: {
@@ -325,12 +347,16 @@ export default {
                     totalShipping: '',
                     sold: '',
                },
+               tracking:{
+                    base64images:[],
+                    auctionImages: []
+               },
                repairs: [],
-               transmission: [{ text: 'Select One', value: null }, 'Automatic', 'Manual'],
-               drive: [{ text: 'Select One', value: null }, 'Front wheel drive', 'Rear wheel drive', 'All wheel drive'],
-               steering: [{ text: 'Select One', value: null }, 'Left Hand Drive', 'Right Hand Drive'],         
+               transmission: [{ text: 'Select One', value: '' }, 'Automatic', 'Manual'],
+               drive: [{ text: 'Select One', value: '' }, 'Front wheel drive', 'Rear wheel drive', 'All wheel drive'],
+               steering: [{ text: 'Select One', value: '' }, 'Left Hand Drive', 'Right Hand Drive'],         
                body: [
-                    { text: 'SELECT ONE', value: null }, 
+                    { text: 'Select One', value: '' }, 
                     'Saloon / Sedan', 'Hatchback',
                     'Coupe', 'Wagon', 'Limousine',
                     'Suv', 'Minivan', 'Pick-up',
@@ -353,6 +379,7 @@ export default {
      created() {      
           this.fetchCar();        
           this.fetchCarRepairs();
+          this.fetchTracking();
      },
      methods: {        
           fetchCar() {
@@ -364,7 +391,10 @@ export default {
                     if(response.status == 200)
                     {
                          vm.car = response.data;  
-                         vm.getImagesRecursive();                      
+                         let n = vm.car.images.length;
+                         let from = vm.car.images;
+                         let to = vm.car.base64images;
+                         vm.getImagesRecursive(n, from, to);                     
                          //trimming unnecessary dat ending           
                          vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                          vm.loading = false;
@@ -378,7 +408,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     } 
                })
                .catch(function (error) {
@@ -388,6 +418,41 @@ export default {
                     vm.alertFlag = true;
                     vm.loading = false;
                });               
+          },
+          fetchTracking() {
+               let vm = this;
+               axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`, {
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+               })
+               .then(function (response) {
+                    if(response.status == 200)
+                    {
+                         vm.tracking = response.data;
+                         let n = vm.tracking.auctionImages.length;
+                         let from = vm.tracking.auctionImages;
+                         let to = vm.tracking.base64images;
+                         vm.getImagesRecursive(n, from, to);
+                         if(vm.tracking.containerNumber != '')
+                                   vm.empty = false;
+                         vm.loading = false;           
+                    }
+                    else if(response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         window.location.href('/');
+                    }                            
+               })
+               .catch(function (error) {
+                    console.log(error);
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
+                    vm.loading = false;
+               });                                        
           },
           fetchCarRepairs() {
                var vm = this;
@@ -406,7 +471,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     }   
                })
                .catch(function (error) {
@@ -433,7 +498,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     } 
                })
                .catch(function (error) {
@@ -521,7 +586,7 @@ export default {
                     this.$validator.reset('repair-name-input');
                }
           },
-          getImage(vm, image){       
+          getImage(image, saveTo){       
                axios.post(backEndUrl + "/api/get-image", image, {
                     headers: {
                          Authorization: 'Bearer ' + window.$cookies.get('token')
@@ -529,28 +594,27 @@ export default {
                })
                .then(function (response) {
                     if(response.status == 200)
-                         vm.car.base64images.push(response.data);               
+                         saveTo.push(response.data);               
                     if(response.status == 401) 
                     {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         this.$cookies.remove('token');
+                         this.$cookies.remove('user-email');
+                         this.$cookies.remove('role');
+                         this.$cookies.remove('user');
+                         this.$cookies.remove('currency');
+                         window.location.href('/');
                     }    
                })
                .catch(function (error) {
-                    vm.alertMessage = error.response.data;
-                    vm.dangerAlert = true;
-                    vm.alertFlag = true;
+                    this.alertMessage = error.response.data;
+                    this.dangerAlert = true;
+                    this.alertFlag = true;
                     console.log(error);
                });
           },
-          getImagesRecursive(){
-               let n = this.car.images.length;
+          getImagesRecursive(n, from, to){
                for(let i =0;i<n;i++)
-                    this.getImage(this, this.car.images[i]);             
+                    this.getImage(from[i], to);             
           },
           deleteAllCarRepairs(){
                let vm = this;
@@ -569,7 +633,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     } 
                })
                .catch(function (error) {
@@ -594,7 +658,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     } 
                })
                .catch(function (error) {
@@ -621,6 +685,9 @@ export default {
                     }                 
                }             
           },
+          goToCar(){
+               this.$router.push(`/cars/${this.$route.params.id}`);
+          }
      }
 }
 </script>

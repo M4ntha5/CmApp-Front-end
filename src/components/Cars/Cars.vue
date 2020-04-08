@@ -181,7 +181,7 @@ export default {
                               //setting repair value to dafault - first of a list
                               if(vm.cars.length > 0)
                                     vm.insertRepair.car = vm.cars[0].id;
-                              
+
                               vm.fetchCarsSummary();
                         }
                         if(response.status == 401) 
@@ -191,7 +191,8 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
+                              
                         }                              
                   })
                   .catch(function (error) {
@@ -228,7 +229,7 @@ export default {
                                     vm.$cookies.remove('role');
                                     vm.$cookies.remove('user');
                                     vm.$cookies.remove('currency');
-                                    vm.$router.push('/');
+                                    window.location.href('/');
                               }                                
                         })
                         .catch(function (error) {
@@ -263,7 +264,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         }                       
                   })
                   .catch(function (error) {
@@ -301,7 +302,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         } 
                   })
                   .catch(function (error) {
@@ -346,7 +347,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         }               
                   })
                   .catch(function (error){

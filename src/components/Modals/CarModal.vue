@@ -128,7 +128,7 @@ export default {
         },
         resetModal() {
             this.car.vin = ''
-            this.summary.boughtPrice = ''
+            this.summary.boughtPrice = '';
             this.car.Base64images = []
             this.car.make = 'BMW'
             this.priceState = null
@@ -168,7 +168,7 @@ export default {
                     vm.$cookies.remove('role');
                     vm.$cookies.remove('user');
                     vm.$cookies.remove('currency');
-                    vm.$router.push('/');
+                    window.location.href('/');
                 }              
             })
             .catch(function (error) {
@@ -203,7 +203,7 @@ export default {
                     vm.$cookies.remove('role');
                     vm.$cookies.remove('user');
                     vm.$cookies.remove('currency');
-                    vm.$router.push('/');
+                    window.location.href('/');
                 }                        
             })
             .catch(function (error) {
