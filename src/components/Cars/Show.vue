@@ -325,7 +325,9 @@ export default {
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                               if(vm.car.images.length != 0)
                               {
-                                    vm.car.base64images = [];
+                                    if(vm.car.base64images[0] == vm.car.mainImgUrl)
+                                          vm.car.base64images = [];
+
                                     let n = vm.car.images.length;
                                     let from = vm.car.images;
                                     let to = vm.car.base64images;
