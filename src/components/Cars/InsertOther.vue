@@ -144,7 +144,7 @@
                          <b-form-group class="col-md-4 mb-3" label="Engine displacement">
                               <b-form-input step=".1" placeholder="3.0" name="displacement-input"
                                    v-model="car.displacement"
-                                   v-validate="{ required: false, decimal:1 }"
+                                   v-validate="{ required: false, decimal:1, min_value: 0 }"
                                    :state="validateState('displacement-input')" 
                                    aria-describedby="displacement-input-live-feedback"
                                    data-vv-as="displacement">
@@ -196,7 +196,7 @@
                          </b-form-group>
                     </div>  
                     <div class="form-row">
-                         <b-form-group class="col-md-6 mb-3" :label="'Bought price ('+ currency + ')'">
+                         <b-form-group class="col-sm-8 mb-3" label="Bought price">
                               <b-form-input placeholder="5000" step=".1" name="price-input"
                                    v-model="summary.boughtPrice"
                                    v-validate="{ required: true, decimal:2 }"
@@ -208,7 +208,22 @@
                                    {{ veeErrors.first('price-input') }}
                               </b-form-invalid-feedback>
                          </b-form-group>
-                         <b-form-group class="col-md-6 mb-3" id="images-group-1" label="Images">
+                         <b-form-group class="col-sm-4 mb-3" label="Bought price currency">
+                            <b-form-select id="currency-input" name="currency-input"
+                                v-model="summary.selectedCurrency"
+                                :options="rates"
+                                v-validate="{ required: true }"
+                                :state="validateState('currency-input')"
+                                aria-describedby="currency-input-live-feedback"
+                                data-vv-as="currency" > 
+                            </b-form-select>
+                            <b-form-invalid-feedback id="currency-input-live-feedback">
+                                {{ veeErrors.first('currency-input') }}
+                            </b-form-invalid-feedback>
+                         </b-form-group>
+                    </div>
+                    <div class="form-row">
+                         <b-form-group class="col-sm-12 mb-3" id="images-group-1" label="Images">
                                <b-form-file name="images-input"
                                    v-model="car.base64images"
                                    v-validate="{ required: false, image:'', mimes: 'image/jpeg, image/png, image/gif' }"
@@ -302,13 +317,13 @@ const backEndUrl = process.env.VUE_APP_API;
                          vin:'',
                          manufactureDate:'',
                          series:'',
-                         bodyType: null,
-                         steering: null,
+                         bodyType: '',
+                         steering: '',
                          engine:'',
                          displacement:'',
                          power:'',
-                         drive: null,
-                         transmission: null,
+                         drive: '',
+                         transmission: '',
                          color:'',
                          interior:'',
                          equipment: [],
@@ -317,19 +332,22 @@ const backEndUrl = process.env.VUE_APP_API;
                     },
                     summary: {
                          boughtPrice: '',
+                         selectedCurrency: '',
+                         baseCurrency: window.$cookies.get('currency'),
                          car: ''
                     },    
                     currency: getSymbolFromCurrency(window.$cookies.get('currency')),
-                    transmission: [{ text: 'Select One', value: null }, 'Automatic', 'Manual'],
-                    drive: [{ text: 'Select One', value: null }, 'Front wheel drive', 'Rear wheel drive', 'All wheel drive (4x4)'],
-                    steering: [{ text: 'Select One', value: null }, 'Left hand drive', 'Right hand drive'],         
+                    transmission: [{ text: 'Select One', value: '' }, 'Automatic', 'Manual'],
+                    drive: [{ text: 'Select One', value: '' }, 'Front wheel drive', 'Rear wheel drive', 'All wheel drive (4x4)'],
+                    steering: [{ text: 'Select One', value: '' }, 'Left hand drive', 'Right hand drive'],         
                     body: [
-                         { text: 'Select One', value: null }, 
+                         { text: 'Select One', value: '' }, 
                          'Saloon / sedan', 'Hatchback',
                          'Coupe', 'Wagon', 'Limousine',
                          'SUV', 'Minivan', 'Pick-up',
                     ],
                     allMakes: [],
+                    rates:[],
                     makeModels: [],
                     loading: true,
                     equipmentCode: '',
@@ -338,9 +356,21 @@ const backEndUrl = process.env.VUE_APP_API;
                }
           },
           mounted(){
+               this.getCurrencies();
                this.getAllMakes();
           },
           methods: {
+               getCurrencies() {
+                    let vm = this;
+                    axios.get(backEndUrl + "/api/currency")
+                    .then(function (response) {
+                         vm.rates = response.data;
+                         vm.summary.selectedCurrency = 'EUR';
+                    })
+                    .catch(function (error){
+                         console.log(error);
+                    });
+               },
                validateState(ref) {
                     if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
                          return !this.veeErrors.has(ref);
@@ -366,6 +396,11 @@ const backEndUrl = process.env.VUE_APP_API;
                },
                insertCar() {
                     let vm = this;
+                    console.log(vm.car);
+                    if(vm.car.displacement == '')
+                         vm.car.displacement = 0;
+                    if(vm.car.manufactureDate == '')
+                         vm.car.manufactureDate = '1900-01-01';
                     axios.post(backEndUrl + "/api/cars", vm.car, {
                          headers: {
                               Authorization: 'Bearer ' + window.$cookies.get('token')
@@ -386,7 +421,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                          }         
                     })
                     .catch(function (error) {
@@ -417,7 +452,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                          }                       
                     })
                     .catch(function (error) {
@@ -444,7 +479,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                          }        
                     })
                     .catch(function (error){
@@ -474,7 +509,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                          }    
                               
                     })

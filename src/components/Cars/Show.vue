@@ -51,7 +51,7 @@
                         <b-button variant="primary" size="lg" @click="goToCars()">Back to list</b-button>
                   </div> 
                   <div class="row mb-3 pt-5">
-                        <div class="img-fluid col-sm-6 col-12">              
+                        <div class="img-fluid col-sm-6 col-12 responsive">              
                               <gallery :images="car.base64images" :index="index" @close="index = null"></gallery>
                               <div class="image img-responsive" 
                                     @click="index = 0"
@@ -62,7 +62,7 @@
                               <div class="mb-2">
                                     <center><h2>Summary</h2></center>               
                               </div>
-                              <table class="table pt-3 table-responsive-sm">
+                              <table class="table pt-3  ">
                                     <tr>
                                           <th>Bought Price</th>
                                           <td>{{formatPrice(summary.boughtPrice)}} {{currency}}</td>
@@ -243,10 +243,11 @@ export default {
                         transmission:'',
                         color:'',
                         interior:'',
-                        created_at:'',
+                        created_at:'',                       
                         images: [],
                         equipment: [],
-                        base64images: [],                     
+                        base64images: [], 
+                        mainImgUrl: '' 
                   },
                   summary: {
                         boughtPrice:'',
@@ -268,6 +269,9 @@ export default {
                         transferFee: '',
                         transportationFee: '', 
                         total: 0
+                  },
+                  tracking:{
+                        auctionImages: []
                   },
                   insertRepair: {
                         name: '',
@@ -296,10 +300,11 @@ export default {
           //  }
       },
       created() {        
-            this.fetchCar();           
-            this.fetchCarSummary();
+            this.fetchCar(); 
+            this.fetchTracking();         
+            this.fetchCarSummary();         
             this.fetchCarRepairs();
-            this.fetchCarShipping();
+            this.fetchCarShipping();                  
       },
 
       methods: {
@@ -312,13 +317,22 @@ export default {
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                        {
+                        {  
+                              vm.car = response.data;
+                              vm.car.base64images[0] = vm.car.mainImgUrl
                               vm.loading = false;
-                              vm.car = response.data;  
-                              //trimming unnecessary dat ending           
+                              //trimming unnecessary date ending           
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
-                              //vm.fetchImages();
-                              vm.getImagesRecursive();
+                              if(vm.car.images.length != 0)
+                              {
+                                    if(vm.car.base64images[0] == vm.car.mainImgUrl)
+                                          vm.car.base64images = [];
+
+                                    let n = vm.car.images.length;
+                                    let from = vm.car.images;
+                                    let to = vm.car.base64images;
+                                    vm.getImagesRecursive(n, from, to); 
+                              }
                         }
                         if(response.status == 401) 
                         {
@@ -327,7 +341,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         } 
                   })
                   .catch(function (error) {
@@ -352,7 +366,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         } 
                   })
                   .catch(function (error) {
@@ -389,7 +403,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         } 
                               
                   })
@@ -420,13 +434,46 @@ export default {
                                     vm.$cookies.remove('role');
                                     vm.$cookies.remove('user');
                                     vm.$cookies.remove('currency');
-                                    vm.$router.push('/');
+                                    window.location.href('/');
                               } 
                         }
                   })
                   .catch(function (error) {
                         console.log(error);
                   });           
+            },
+            fetchTracking() {
+                  let vm = this;
+                  axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)
+                        {           
+                              vm.tracking = response.data;
+                              if(vm.tracking.auctionImages.length != 0)
+                              {
+                                    if(vm.car.base64images[0] == vm.car.mainImgUrl)
+                                          vm.car.base64images = [];
+                                    let n = vm.tracking.auctionImages.length;
+                                    let from = vm.tracking.auctionImages;
+                                    let to = vm.car.base64images;
+                                    vm.getImagesRecursive(n, from, to);
+                              }                                               
+                        }
+                        else if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              window.location.href('/');
+                        }                       
+                  })
+                  .catch(function (error) {
+                        console.log(error);
+                  });
             },
             openTracking(id){
                   this.$router.push(`/cars/${id}/tracking`);    
@@ -472,7 +519,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         } 
                   })
                   .catch(function (error){
@@ -526,7 +573,7 @@ export default {
             formatPrice(value) {
                   return new Intl.NumberFormat('lt-LT').format(value);
             },
-            getImage(vm, image){
+            getImage(image, saveTo){
                   axios.post(backEndUrl + "/api/get-image", image, {
                         headers: {
                               Authorization: 'Bearer ' + window.$cookies.get('token')
@@ -534,26 +581,25 @@ export default {
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                             vm.car.base64images.push(response.data); 
+                             saveTo.push(response.data); 
                               
                         if(response.status == 401) 
                         {
-                              vm.$cookies.remove('token');
-                              vm.$cookies.remove('user-email');
-                              vm.$cookies.remove('role');
-                              vm.$cookies.remove('user');
-                              vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              this.$cookies.remove('token');
+                              this.$cookies.remove('user-email');
+                              this.$cookies.remove('role');
+                              this.$cookies.remove('user');
+                              this.$cookies.remove('currency');
+                              window.location.href('/');
                         }    
                   })
                   .catch(function (error) {
                         console.log(error);
                   });
             },
-            getImagesRecursive(){
-                  let n = this.car.images.length;
+            getImagesRecursive(n, from, to){
                   for(let i =0;i<n;i++)
-                        this.getImage(this, this.car.images[i]);                
+                        this.getImage(from[i], to);             
             },
             goToCars(){
                   this.$router.push('/cars');

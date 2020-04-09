@@ -3,38 +3,127 @@
             <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>          
             <div class="pt-4 mb-4 ml-2">
                   <b-button variant="primary" size="lg" @click="goToSelectedCar()">Back</b-button>
-                  <b-button @click="handleTracking()" style="float:right;" class="mr-2">
+                  <b-button id="tracking-button-info" @click="handleTracking()" style="float:right;" class="mr-2">
                         Look for tracking
                   </b-button> 
             </div>
             <h1 style="text-align:center;">{{selectedCar.make}} {{selectedCar.model}}</h1>
-                 
-            <div class="row pt-4" v-if="!loading && !empty">                    
-                  <div class="img-fluid col-sm-6">              
-                        <gallery :images="tracking.base64images" :index="index" @close="index = null"></gallery>
-                        <div class="image" 
-                              @click="index = 0"
-                              :style="{ backgroundImage: 'url(' + tracking.base64images[0] + ')', width:'350px', height:'300px' }"
-                        />
+
+            <div v-if="!loading && !empty">
+                  <div class="row pt-4" >                    
+                        <div class="img-fluid col-sm-6 col-12">              
+                              <gallery :images="tracking.base64images" :index="index" @close="index = null"></gallery>
+                              <div class="image" 
+                                    @click="index = 0"
+                                    :style="{ backgroundImage: 'url(' + tracking.base64images[0] + ')', width:'350px', height:'300px' }"
+                              />
+                        </div>
+                        <div class="col-sm-6 col-12">
+                              <table class="table table-responsive-sm">
+                                    <tr>
+                                          <th>Shipping line</th>
+                                          <td>{{tracking.shippingLine}}</td>
+                                    </tr>
+                                    <tr>
+                                          <th>Container number</th>
+                                          <td>{{tracking.containerNumber}}</td>
+                                    </tr>
+                                    <tr>
+                                          <th>Booking number</th>
+                                          <td>{{tracking.bookingNumber}}</td>
+                                    </tr>
+                                    <tr>
+                                          <th>Url to full tracking info</th>
+                                          <td><a :href='tracking.url' target="_blank">Click here</a></td>
+                                    </tr>
+                                    <tr>
+                                          <th>Final port</th>
+                                          <td>{{tracking.finalPort}}</td>
+                                    </tr>
+                                    <tr>
+                                          <th>Pick up date</th>
+                                          <td>{{tracking.datePickedUp}}</td>
+                                    </tr>
+                              </table>
+                        </div>                   
                   </div>
-                  <div class="col-sm-6">
-                        <table class="table table-responsive-sm">
+                  <div class="row pt-5">
+                        <table class="table table-striped table-responsive-sm">
                               <tr>
-                                    <th>Container number</th>
-                                    <td>{{tracking.containerNumber}}</td>
+                                    <th>Vin</th>
+                                    <td>{{tracking.vin}}</td>
                               </tr>
                               <tr>
-                                    <th>Booking number</th>
-                                    <td>{{tracking.bookingNumber}}</td>
+                                    <th>Year</th>
+                                    <td>{{tracking.year}}</td>
                               </tr>
                               <tr>
-                                    <th>Url to full tracking info</th>
-                                    <td><a :href='tracking.url' target="_blank">Click here</a></td>
+                                    <th>Make</th>
+                                    <td>{{tracking.make}}</td>
+                              </tr> 
+                              <tr>
+                                    <th>Model</th>
+                                    <td>{{tracking.model}}</td>
                               </tr>
+                              <tr>
+                                    <th>Title</th>
+                                    <td>{{tracking.title}}</td>
+                              </tr>
+                              <tr>
+                                    <th>State</th>
+                                    <td>{{tracking.state}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Status</th>
+                                    <td>{{tracking.status}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Received date</th>
+                                    <td>{{tracking.dateReceived}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Order date</th>
+                                    <td>{{tracking.dateOrdered}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Branch</th>
+                                    <td>{{tracking.branch}}</td>
+                              </tr>                    
+                              <tr>
+                                    <th>Color</th>
+                                    <td>{{tracking.color}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Damage</th>
+                                    <td>{{tracking.damage}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Condition</th>
+                                    <td>{{tracking.condition}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Keys</th>
+                                    <td>{{tracking.keys}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Running</th>
+                                    <td>{{tracking.running}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Wheels</th>
+                                    <td>{{tracking.wheels}}</td>
+                              </tr>
+                              <tr>
+                                    <th>AirBag</th>
+                                    <td>{{tracking.airBag}}</td>
+                              </tr>
+                              <tr>
+                                    <th>Radio</th>
+                                    <td>{{tracking.radio}}</td>
+                              </tr>                     
                         </table>
                   </div>
-                                 
-            </div>
+            </div> 
             <div class="pt-3" v-if="loading">        
                   <center>
                         <b-spinner label="Loading..."></b-spinner>
@@ -64,13 +153,35 @@ export default {
       data() {
             return {               
                   tracking: {
+                        vin: '',
+                        year: '',
+                        make: '',
+                        model: '',
+                        title: '',
+                        state: '',
+                        status: '',
+                        dateReceived: '',
+                        dateOrdered: '',
+                        branch: '',
+                        shippingLine: '',
                         containerNumber: '',
                         bookingNumber: '',
-                        auctionImages: [],
-                        base64images: [],
                         url: '',
+                        finalPort: '',
+                        datePickedUp: '',
+                        color: '',
+                        damage: '',
+                        condition: '',
+                        keys: '',
+                        running: '',
+                        wheels: '',
+                        airBag: '',
+                        radio: '',
+                        auctionImages: [],
+                        base64images: [],                      
                         car: ''
                   }, 
+                  tmpImgs: [],
                   selectedCar:{},
                   index: null,
                   loading: true,
@@ -112,7 +223,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         } 
                   })
                   .catch(function (error) {
@@ -128,6 +239,10 @@ export default {
                         if(response.status == 200)
                         {
                               vm.tracking = response.data;
+                              vm.tracking.dateReceived = vm.tracking.dateReceived.substring(0, 10);
+                              vm.tracking.dateOrdered = vm.tracking.dateOrdered.substring(0, 10);
+                              vm.tracking.datePickedUp = vm.tracking.datePickedUp.substring(0, 10);
+                              
                               vm.getImagesRecursive();
                               if(vm.tracking.containerNumber != '')
                                     vm.empty = false;
@@ -140,7 +255,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         }                            
                   })
                   .catch(function (error) {
@@ -149,7 +264,7 @@ export default {
                         vm.dangerAlert = true;
                         vm.alertFlag = true;
                         vm.loading = false;
-                  });                                        
+                  });
             },
             lookForTracking(){
                   let vm = this;
@@ -159,11 +274,14 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {
-                              //let tmp = vm.tracking.base64images;
                               vm.tracking = response.data;
-                              //vm.tracking.base64images = tmp;                            
+                              if(vm.tracking.containerNumber != '')
+                                    vm.empty = false;
+                              vm.loading = false;  
+
+                              vm.tracking.base64images = vm.tmpImgs;                         
                               vm.dangerAlert = false;
-                              vm.alertMessage = "Tracking data updated sccessfully. Downloading images...";
+                              vm.alertMessage = "Tracking data updated sccessfully.";
                               vm.alertFlag =true;
                         }
                         else if(response.status == 401) 
@@ -173,7 +291,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         } 
                   })
                   .catch(function (error) {
@@ -183,7 +301,7 @@ export default {
                         console.log(error);
                   }); 
             },
-            lookForTrackingImages(){
+            lookForTrackingImagesUrls(){
                   let vm = this;
                   axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking-images`, {
                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
@@ -191,7 +309,10 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {
-                              vm.tracking.base64images = response.data;                                  
+                              vm.tracking.base64images = response.data;   
+                              vm.tmpImgs = response.data;
+                              vm.downloadTrackingImages(response.data);
+                              console.log(vm.tracking.base64images)  ;                             
                               vm.dangerAlert = false;
                               vm.alertMessage = "Images successfully updated";
                               vm.alertFlag = true;
@@ -203,7 +324,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         } 
                   })
                   .catch(function (error) {
@@ -213,12 +334,36 @@ export default {
                         console.log(error);
                   }); 
             },
+            downloadTrackingImages(urls){
+                  let vm = this;
+                  axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking/download-images`, urls, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+                  })
+                  .then(function (response) {
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              window.location.href('/');
+                        }
+                  })
+                  .catch(function (error) {
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        console.log(error);
+                  });
+
+            },
             handleTracking(){
                   this.dangerAlert = false;
                   this.alertMessage = "Looking for data please wait... This may take several minutes!!";
                   this.alertFlag = true;
                   this.lookForTracking();
-                  this.lookForTrackingImages();            
+                  this.lookForTrackingImagesUrls();            
             },
             getImage(vm, image){
                   axios.post(backEndUrl + "/api/get-image", image, {
@@ -235,7 +380,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              vm.$router.push('/');
+                              window.location.href('/');
                         }    
                   })
                   .catch(function (error) {

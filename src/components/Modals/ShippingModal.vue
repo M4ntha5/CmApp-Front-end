@@ -242,7 +242,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     } 
                })
                .catch(function (error) {
@@ -278,7 +278,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     } 
                })
                .catch(function (error) {
@@ -305,7 +305,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         vm.$router.push('/');
+                         window.location.href('/');
                     } 
                })
                .catch(function (error) {
