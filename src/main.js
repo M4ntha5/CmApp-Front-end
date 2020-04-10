@@ -20,6 +20,8 @@ import Converter from './components/ExcangeConverter/Converter.vue';
 import InsertOther from './components/Cars/InsertOther.vue';
 import NotFound from './components/Pages/404.vue';
 import UserEdit from './components/Pages/UserEdit.vue';
+import EmailConfirm from './components/Auth/ConfirmEmail.vue';
+import PasswordReset from './components/Auth/PasswordReset.vue';
 
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
@@ -78,7 +80,8 @@ const routes = [
         else next()
       }
     },
-
+    { path: '/email/confirm/:id', component: EmailConfirm },
+    { path: '/password/reset', component: PasswordReset },
     { path: '/login', component: Login },
     { path: '/register', component: Register },
     { path: '/converter', component: Converter },

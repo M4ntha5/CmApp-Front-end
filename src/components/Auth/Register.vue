@@ -4,8 +4,7 @@
                {{$router.push("/cars")}}
           </div>
           <div class="container w-75pt-4" v-else>
-               <b-alert v-model="dangerAlert" variant="danger" dismissible>{{message}}</b-alert>
-               <b-alert v-model="successAlert" variant="success" dismissible>{{message}}</b-alert>
+               <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
                <center class="pt-3">
                     <h1>Registration</h1>
                </center>
@@ -76,8 +75,8 @@ export default {
                rates: [],
                email:'',
                dangerAlert: false,
-               successAlert: false,
-               message: ''
+               alertFlag: false,
+               alertMessage: ''
           }
      }, 
      computed: {
@@ -119,15 +118,18 @@ export default {
                .then(function (response){
                     if(response.status == 200)
                     {     
-                         vm.message = response.data;
-                         vm.successAlert = !vm.successAlert;           
-                         vm.login();           
+                         vm.alertMessage = response.data;
+                         vm.dangerAlert = false;
+                         vm.alertFlag = true;         
+                         //vm.$router.push('/login');
+                         //vm.login();           
                     }
                })
                .catch(function (error){
                     console.log(error);
-                    vm.message = error.response.data;
-                    vm.dangerAlert = !vm.dangerAlert;   
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true; 
                })
           },
           login() {
