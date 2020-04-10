@@ -28,14 +28,23 @@
                          </b-form-input>
                          <b-form-invalid-feedback id="password1-input-live-feedback">{{ veeErrors.first('password1-input') }}</b-form-invalid-feedback>
                     </b-form-group>
-                    <b-button type="submit" variant="primary">Log in</b-button>                          
+                    <b-row>
+                         <b-button class="ml-3" type="submit" variant="primary">Log in</b-button>
+                              <a v-b-modal.forgot-password-modal href=""
+                                   @click.prevent="showResetModal" class="ml-2"
+                                   @ok="fetchCars()">
+                                   Forgot your password?
+                              </a>
+                         <resetModal v-show="isResetModalVisible"/>
+                    </b-row>                                         
                </b-form>
-     </div>
+          </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+import resetModal from '../Modals/ForgotPassword.vue';
 const backEndUrl = process.env.VUE_APP_API;
 
 export default {
@@ -47,15 +56,22 @@ export default {
                },
                dangerAlert: false,
                successAlert: false,
-               message: ''    
+               message: '',
+               isResetModalVisible: false   
           }
      }, 
+     components:{
+          resetModal
+     },
      computed: {
           token: function () {  
                return window.$cookies.get('token');  
           }
      },
      methods: {
+          showResetModal(){
+               this.isResetModalVisible = true;
+          },
           validateState(ref) {
                if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
                     return !this.veeErrors.has(ref);
