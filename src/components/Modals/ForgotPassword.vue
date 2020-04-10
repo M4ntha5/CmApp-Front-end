@@ -64,9 +64,11 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
                          // Hide the modal manually
-                         vm.$nextTick(() => {
-                              vm.$bvModal.hide('forgot-password-modal')
-                         })
+                         setTimeout(function () {
+                              vm.$nextTick(() => {
+                                   vm.$bvModal.hide('forgot-password-modal')
+                              })
+                         }, 4000);
                     }
                })
                .catch(function (error) {
