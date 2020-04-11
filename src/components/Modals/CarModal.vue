@@ -65,17 +65,16 @@
                     </b-col>
                 </b-row>          
                 <b-form-group label="Images">
-                    <b-form-file name="image-input" multiple @change="onFileSelected"
-                        
-                        v-validate="{ required: false, image: true }"
-                        placeholder="Choose an image or drop it here..."
-                        drop-placeholder="Drop image here..."
-                        :state="validateState('image-input')" 
-                        aria-describedby="image-input-live-feedback"
-                        data-vv-as="image">
+                    <b-form-file name="images-input" multiple 
+                        @change="onFileSelected" 
+                        v-model="example" accept="image/*"
+                        v-validate="{ required: false, image: true }" 
+                        :state="validateState('images-input')"
+                        aria-describedby="images-input-live-feedback"
+                        data-vv-as="images">
                     </b-form-file>
-                    <b-form-invalid-feedback id="image-input-live-feedback">
-                        {{ veeErrors.first('image-input') }}
+                    <b-form-invalid-feedback id="images-input-live-feedback">
+                        {{ veeErrors.first('images-input') }}
                     </b-form-invalid-feedback>
                 </b-form-group>
             </form>
@@ -90,6 +89,7 @@ const backEndUrl = process.env.VUE_APP_API;
 export default {
     data() {
         return {
+            example:null,
             car: {
                 vin: '',
                 base64images: [],
@@ -211,13 +211,19 @@ export default {
             });       
         },
         onFileSelected(e) {
+            console.log(e);            
             for(let i=0; i < e.target.files.length; i++)
             {
-                var reader = new FileReader();
-                reader.readAsDataURL(e.target.files[i]);
-                reader.onload = (e) => {
-                        this.car.Base64images[i] = e.target.result;
-                }                 
+                if(e.target.files[i].name.endsWith(".gif")||e.target.files[i].name.endsWith(".png") ||
+                    e.target.files[i].name.endsWith(".jpg") || e.target.files[i].name.endsWith(".jpeg"))
+                {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(e.target.files[i]);
+                    reader.onload = (e) => {
+                            this.car.Base64images[i] = e.target.result;
+                    }  
+                }
+                               
             }
             console.log(this.car.Base64images);                
         },

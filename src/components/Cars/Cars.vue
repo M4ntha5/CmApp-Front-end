@@ -15,7 +15,7 @@
             <div class="pt-3">
                   <b-card-group deck>
                         <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 ">                              
-                              <b-card no-body>
+                              <b-card no-body >
                                     <b-link :to="'/cars/' + car.id">
                                           <b-card-img img-alt="Image" img-top :src='car.mainImgUrl'
                                           style="max-height:238.5px"></b-card-img>
@@ -43,8 +43,8 @@
                                     </template>
                               </b-card>                                               
                         </b-col>
-                  </b-card-group>
-            </div>
+                  </b-card-group>          
+            </div>           
       </div>
       <div class="pt-3" v-else>
             <center>
@@ -142,7 +142,10 @@ export default {
                         sold: '',
                         index: '',
                         createdAt: ''
-                  }            
+                  },
+                  currentPage: 1,
+                  perPage: 3,
+                  rows: 0
             }           
       },
 
@@ -177,6 +180,7 @@ export default {
                         if(response.status == 200)
                         {
                               vm.cars = response.data;
+                              vm.rows = response.data.length;
                               vm.loading = false;                            
                               //setting repair value to dafault - first of a list
                               if(vm.cars.length > 0)

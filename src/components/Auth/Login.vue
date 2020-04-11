@@ -21,7 +21,7 @@
                     <b-form-group label="Password">
                          <b-form-input id="password1-input" name="password1-input" type="password"
                               v-model="form.password"
-                              v-validate="{ required: true, /*min:8*/ }"
+                              v-validate="{ required: true, min:8 }"
                               :state="validateState('password1-input')" 
                               aria-describedby="password1-input-live-feedback"
                               data-vv-as="password">
@@ -116,7 +116,7 @@ export default {
                          {
                               vm.message = "Successfully loged in admin";
                               vm.successAlert = true;
-                              window.location.href = "/admin";
+                              window.location.href = "/users";
                          }                          
                     }
                })

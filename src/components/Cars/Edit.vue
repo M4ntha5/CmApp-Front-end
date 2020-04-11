@@ -168,25 +168,18 @@
                </div>
                <b-form-group label="Your images" class="ml-3">
                     <div id="drop-area" class="row pt-2">
-                         <b-form-file multiple class="col-sm-4 mt-4"               
-                              @change="onFileSelected">
+                         <b-form-file class="col-sm-4 mt-4" multiple            
+                              @change="onFileSelected" name="images-input" 
+                              v-model="example" accept="image/*"
+                              v-validate="{ required: false, image: true }"
+                              :state="validateState('images-input')" 
+                              aria-describedby="images-input-live-feedback"
+                              data-vv-as="images">
                          </b-form-file>
+                         <b-form-invalid-feedback id="images-input-live-feedback">
+                              {{ veeErrors.first('images-input') }}
+                         </b-form-invalid-feedback>
                          <div class="col-sm-4 mt-3" v-for="(image, index) in car.base64images" v-bind:key="index">              
-                              <img class="card-img-top mb-3 pt-3" responsive-image :src="image">
-                              <b-button pill variant="danger" 
-                                   style="position:absolute;right:0%;top:0%;"
-                                   @click.prevent="removeImageFromList(index)">
-                                   X
-                              </b-button>
-                         </div>
-                    </div>
-               </b-form-group>
-               <b-form-group label="Images from tracking" class="ml-3">
-                    <div id="drop-area" class="row pt-2">
-                         <b-form-file multiple class="col-sm-4 mt-4"               
-                              @change="onFileSelected">
-                         </b-form-file>
-                         <div class="col-sm-4 mt-3" v-for="(image, index) in tracking.base64images" v-bind:key="index">              
                               <img class="card-img-top mb-3 pt-3" responsive-image :src="image">
                               <b-button pill variant="danger" 
                                    style="position:absolute;right:0%;top:0%;"
@@ -315,6 +308,7 @@ const backEndUrl = process.env.VUE_APP_API;
 export default {
      data() {
           return {
+               example: null,
                fields: ['code', 'name', 'action'],
                repairFields: ['name', 'price', 'action'],
                images: [],
@@ -347,10 +341,6 @@ export default {
                     totalShipping: '',
                     sold: '',
                },
-               tracking:{
-                    base64images:[],
-                    auctionImages: []
-               },
                repairs: [],
                transmission: [{ text: 'Select One', value: '' }, 'Automatic', 'Manual'],
                drive: [{ text: 'Select One', value: '' }, 'Front wheel drive', 'Rear wheel drive', 'All wheel drive'],
@@ -379,7 +369,6 @@ export default {
      created() {      
           this.fetchCar();        
           this.fetchCarRepairs();
-          this.fetchTracking();
      },
      methods: {        
           fetchCar() {
@@ -394,7 +383,7 @@ export default {
                          let n = vm.car.images.length;
                          let from = vm.car.images;
                          let to = vm.car.base64images;
-                         vm.getImagesRecursive(n, from, to);                     
+                         vm.getImagesRecursive(n, from, to);
                          //trimming unnecessary dat ending           
                          vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                          vm.loading = false;
@@ -418,41 +407,6 @@ export default {
                     vm.alertFlag = true;
                     vm.loading = false;
                });               
-          },
-          fetchTracking() {
-               let vm = this;
-               axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/tracking`, {
-                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
-               })
-               .then(function (response) {
-                    if(response.status == 200)
-                    {
-                         vm.tracking = response.data;
-                         let n = vm.tracking.auctionImages.length;
-                         let from = vm.tracking.auctionImages;
-                         let to = vm.tracking.base64images;
-                         vm.getImagesRecursive(n, from, to);
-                         if(vm.tracking.containerNumber != '')
-                                   vm.empty = false;
-                         vm.loading = false;           
-                    }
-                    else if(response.status == 401) 
-                    {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         window.location.href('/');
-                    }                            
-               })
-               .catch(function (error) {
-                    console.log(error);
-                    vm.alertMessage = error.response.data;
-                    vm.dangerAlert = true;
-                    vm.alertFlag = true;
-                    vm.loading = false;
-               });                                        
           },
           fetchCarRepairs() {
                var vm = this;
@@ -521,7 +475,7 @@ export default {
                     this.$validator.validate('drive-input'),this.$validator.validate('transmission-input'),
                     this.$validator.validate('engine-input'),this.$validator.validate('displacement-input'),
                     this.$validator.validate('power-input'),this.$validator.validate('color-input'),
-                    this.$validator.validate('interior-input')
+                    this.$validator.validate('interior-input'),this.$validator.validate('images-input'),
                ]);
 
                const areValid = (await results).every(isValid => isValid);  
@@ -532,9 +486,7 @@ export default {
                     this.dangerAlert = false;
                     this.alertFlag = true;
                     this.updateAll();
-               }
-                    
-               
+               }            
           },
           deleteEquipmentRow (ind) {
                this.car.equipment.splice(ind, 1);

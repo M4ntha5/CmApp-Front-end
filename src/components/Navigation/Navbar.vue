@@ -11,7 +11,7 @@
                         <li class="nav-item">
                               <router-link to="/about" class="nav-link">About</router-link>
                         </li>
-                        <template v-if="role == 'user' || role == 'admin'">
+                        <template v-if="role == 'user'">
                               <li class="nav-item">
                                     <router-link to="/cars" class="nav-link">Cars</router-link>
                               </li>  
@@ -20,6 +20,14 @@
                                           Add repair
                                     </a>
                               </li> 
+                        </template>
+                        <template v-if="role == 'admin'">
+                              <li class="nav-item">
+                                    <router-link to="/users" class="nav-link">Users</router-link>
+                              </li>
+                              <li class="nav-item">
+                                    <router-link to="/admin/cars" class="nav-link">Cars</router-link>
+                              </li>
                         </template>
                                                                   
                   </ul>

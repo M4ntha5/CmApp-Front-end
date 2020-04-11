@@ -1,6 +1,6 @@
 <template>
 <div>
-     <div class="container pt-4"  v-if="!loading">
+     <div class="container pt-4" v-if="!loading">
           <center class="mb-4"><h1>Your profile information</h1></center>
           <b-form>
                <div class="form-row">
