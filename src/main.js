@@ -22,6 +22,8 @@ import NotFound from './components/Pages/404.vue';
 import UserEdit from './components/Pages/UserEdit.vue';
 import EmailConfirm from './components/Auth/ConfirmEmail.vue';
 import PasswordReset from './components/Auth/PasswordReset.vue';
+import AllUsers from './components/Admin/Users.vue';
+import AllCars from './components/Admin/AllCars.vue';
 
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
@@ -50,7 +52,7 @@ const routes = [
           let jwt = window.$cookies.get('token');
           if(jwt == null || jwt.length < 10) next("/login")
           else next()
-      }  
+      }
     },
     { path: '/cars/:id/tracking', component: Tracking,
       beforeEnter: (to, from, next) => {
@@ -77,6 +79,22 @@ const routes = [
       beforeEnter: (to, from, next) => {
         let jwt = window.$cookies.get('token');
         if(jwt == null || jwt.length < 10) next("/login")
+        else next()
+      }
+    },
+    { path: '/users', component: AllUsers,
+      beforeEnter: (to, from, next) => {
+        let jwt = window.$cookies.get('token');
+        let role = window.$cookies.get('role');
+        if(jwt == null || jwt.length < 10 || role != 'admin') next("/login")
+        else next()
+      }
+    },
+    { path: '/admin/cars', component: AllCars,
+      beforeEnter: (to, from, next) => {
+        let jwt = window.$cookies.get('token');
+        let role = window.$cookies.get('role');
+        if(jwt == null || jwt.length < 10 || role != 'admin') next("/login")
         else next()
       }
     },

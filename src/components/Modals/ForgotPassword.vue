@@ -5,7 +5,7 @@
           @ok.prevent="onSubmit()"
           @close="resetModal">  
           <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger': 'success'" dismissible>{{alertMessage}}</b-alert>
-          <b-form ref="form" @submit.stop.prevent="onSubmit()">            
+          <b-form ref="form" @submit.stop.prevent="onSubmit()">
                <b-form-group label="Your account email address">
                     <b-form-input id="email-input" name="email-input" placeholder="example@example.com"
                          v-model="form.email"

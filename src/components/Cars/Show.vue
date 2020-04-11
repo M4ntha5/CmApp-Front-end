@@ -49,14 +49,32 @@
                   </div>
                   <div class="ml-1">
                         <b-button variant="primary" size="lg" @click="goToCars()">Back to list</b-button>
+                        <div style="float:right;">
+                              <h5>Show tracking images?</h5>
+                              <toggle-button :value="tracking.showImages" class="ml-5"
+                                    color="#82C7EB" @change="displayImages()"
+                                    :sync="true" :font-size="16" :width="60" :height="25"
+                                    :labels="{checked: 'Yes', unchecked: 'No'}"
+                                    :switch-color="{checked: '#25EF02', unchecked: 'linear-gradient(red, yellow)'}"
+                              />
+                        </div>
                   </div> 
                   <div class="row mb-3 pt-5">
-                        <div class="img-fluid col-sm-6 col-12 responsive">              
-                              <gallery :images="car.base64images" :index="index" @close="index = null"></gallery>
-                              <div class="image img-responsive" 
-                                    @click="index = 0"
-                                    :style="{ backgroundImage: 'url(' + car.base64images[0] + ')', width:'350px', height:'300px' }"
-                              /> 
+                        <div class="img-fluid col-sm-6 col-12 responsive"> 
+                              <template v-if="!tracking.showImages">            
+                                    <gallery :images="car.base64images" :index="index" @close="index = null"></gallery>
+                                    <div class="image img-responsive" 
+                                          @click="index = 0"
+                                          :style="{ backgroundImage: 'url(' + car.base64images[0] + ')', width:'350px', height:'300px' }"
+                                    /> 
+                              </template> 
+                              <template v-if="tracking.showImages">            
+                                    <gallery :images="sharedBase64Images" :index="index" @close="index = null"></gallery>
+                                    <div class="image img-responsive" 
+                                          @click="index = 0"
+                                          :style="{ backgroundImage: 'url(' + sharedBase64Images[0] + ')', width:'350px', height:'300px' }"
+                                    /> 
+                              </template> 
                         </div>
                         <div class="col-sm-6 col-12">    
                               <div class="mb-2">
@@ -216,6 +234,7 @@
 
 <script>
 import getSymbolFromCurrency from 'currency-symbol-map'
+import { ToggleButton } from 'vue-js-toggle-button'
 import VueGallery from 'vue-gallery';
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
@@ -271,7 +290,9 @@ export default {
                         total: 0
                   },
                   tracking:{
-                        auctionImages: []
+                        auctionImages: [],
+                        base64images: [],
+                        showImages: ''
                   },
                   insertRepair: {
                         name: '',
@@ -285,29 +306,60 @@ export default {
                   equipmentVisible: false,
                   repairsVisible: false,
                   shippingVisible: false,
-                  myImgs: []
+                  //sharedBase64Images: []
             }
             
       },
       components: {
             'gallery': VueGallery,
             shippingModal,
+            ToggleButton
       },
-      watch: {
-            //'$route' (to, from) {
-              //    alert("to", to.params.id);
-            //      alert("from", from.params.id);
-          //  }
+      computed: {
+            sharedBase64Images: function () {  
+                  let shared = this.car.base64images.concat(this.tracking.base64images);
+                  return shared;
+            },
+            
+      },
+      beforeRouteLeave (to, from, next) {
+            this.updateShowImagesStatus();
+            
+            next();
       },
       created() {        
             this.fetchCar(); 
-            this.fetchTracking();         
+            this.fetchTracking();   
             this.fetchCarSummary();         
             this.fetchCarRepairs();
-            this.fetchCarShipping();                  
+            this.fetchCarShipping();              
       },
 
       methods: {
+            updateShowImagesStatus(){
+                  let vm = this;
+                  let body = {status: this.tracking.showImages} ;
+                  axios.put(backEndUrl + `/api/cars/${vm.$route.params.id}/tracking/images/status`, body, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
+                  })
+                  .then(function (response) {
+                        if(response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              window.location.href('/');
+                        } 
+                  })
+                  .catch(function (error) {
+                        console.log(error);
+                  });
+            },
+            displayImages(){
+                  this.tracking.showImages = !this.tracking.showImages;
+            },
             fetchCar() {
                   var vm = this;
                   axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}`, {
@@ -319,15 +371,11 @@ export default {
                         if(response.status == 200)
                         {  
                               vm.car = response.data;
-                              vm.car.base64images[0] = vm.car.mainImgUrl
                               vm.loading = false;
                               //trimming unnecessary date ending           
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                               if(vm.car.images.length != 0)
                               {
-                                    if(vm.car.base64images[0] == vm.car.mainImgUrl)
-                                          vm.car.base64images = [];
-
                                     let n = vm.car.images.length;
                                     let from = vm.car.images;
                                     let to = vm.car.base64images;
@@ -450,16 +498,21 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {           
-                              vm.tracking = response.data;
-                              if(vm.tracking.auctionImages.length != 0)
+                              vm.tracking = response.data;                           
+                              if(vm.car.images.length == 0 && !vm.tracking.showImages)
+                                    vm.car.base64images[0] = vm.car.mainImgUrl; 
+                              else if(vm.tracking.auctionImages.length == 0 && vm.car.images.length == 0) 
+                                    vm.car.base64images[0] = vm.car.mainImgUrl;      
+                              else if(vm.tracking.auctionImages.length == 0 && vm.tracking.showImages)
+                                    vm.sharedBase64Images[0] = vm.car.mainImgUrl;                                    
+                              else
                               {
-                                    if(vm.car.base64images[0] == vm.car.mainImgUrl)
-                                          vm.car.base64images = [];
                                     let n = vm.tracking.auctionImages.length;
                                     let from = vm.tracking.auctionImages;
-                                    let to = vm.car.base64images;
+                                    let to = vm.tracking.base64images;
                                     vm.getImagesRecursive(n, from, to);
-                              }                                               
+                              }   
+                                                                        
                         }
                         else if(response.status == 401) 
                         {
@@ -469,7 +522,7 @@ export default {
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
                               window.location.href('/');
-                        }                       
+                        }                
                   })
                   .catch(function (error) {
                         console.log(error);
