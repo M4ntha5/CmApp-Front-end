@@ -1,19 +1,32 @@
 <template>
   <div class="container pt-5">
-      <h1>Cars VIN numbers for testing:</h1>
-      <h3> For BMW (VIN): </h3>
-      <p>WBA7E2C37HG740629</p>
-      <p>wba3n9c56ek245582</p>
-      <p>WBS1J5C56JVD36905</p> 
-      <p>WBS8M9C56J5L00187</p>   
+      <h1>All VIN's provided here will give you full this website functionality:</h1>
+      <div class="row pt-5">
+            <div class="col">
+                  <h1 style="color:blue;">VIN's For BMW:</h1>
+                  <div class="pl-5 pt-2">
+                        <h5>WBA7E2C37HG740629</h5>
+                        <h5>WBS8M9C56J5L00187</h5> 
+                  </div>
+                  
+            </div>
+            <div class="col">
+                  <h1 style="color:purple;">VIN's For Mercedes-benz:</h1>
+                  <h5 class="pl-5 pt-2">WDDLJ7EB1CA031646</h5>
+            </div>
+      </div>
+      <div class="row pl-3 pt-5">
+            <h1>
+                  All tracking data is taken from 
+                  <a href="http://atlanticexpresscorp.com/" target="_blank">Atlantic Express</a>
+            </h1>        
+      </div>
+      <h5>Do not hesitate to visit for more information about shipping services they suggest</h5>
 
-      <h3>For Mercedes-benz (VIN):</h3>
-      <p>WDDLJ7EB1CA031646</p>
+      
 
-      <h2>
-            All tracking data is taken from <a href="http://atlanticexpresscorp.com/" target="_blank">here</a>
-      </h2>
-      <p>Do not hesitate to visit for more information about shipping services they suggest</p>
+      
+      
             
   </div>
 </template>
