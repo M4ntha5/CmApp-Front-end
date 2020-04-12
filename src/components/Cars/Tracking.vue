@@ -275,6 +275,9 @@ export default {
                         if(response.status == 200)
                         {
                               vm.tracking = response.data;
+                              vm.tracking.dateReceived = vm.tracking.dateReceived.substring(0, 10);
+                              vm.tracking.dateOrdered = vm.tracking.dateOrdered.substring(0, 10);
+                              vm.tracking.datePickedUp = vm.tracking.datePickedUp.substring(0, 10);
                               if(vm.tracking.containerNumber != '')
                                     vm.empty = false;
                               vm.loading = false;  
@@ -351,10 +354,10 @@ export default {
                         }
                   })
                   .catch(function (error) {
-                        vm.alertMessage = error.response.data;
+                        vm.alertMessage = "Failed saving tracking images, you may try again later!";
                         vm.dangerAlert = true;
                         vm.alertFlag = true;
-                        console.log(error);
+                        console.log(error.response.data);
                   });
 
             },
