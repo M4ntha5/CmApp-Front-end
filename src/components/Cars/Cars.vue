@@ -4,9 +4,7 @@
             <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
 
             <button v-b-modal.car-insert-modal class="btn btn-primary ml-3"
-            @click="showBmwModal"
-            @close="fetchCars()"
-            @ok="fetchCars()">
+            @click="showBmwModal">
                   Add new car
             </button>
             <!-- bmw modal-->

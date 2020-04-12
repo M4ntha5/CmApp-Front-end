@@ -61,7 +61,7 @@
                   </div> 
                   <div class="row mb-3 pt-5">
                         <div class="img-fluid col-sm-6 col-12 responsive"> 
-                              <template v-if="!tracking.showImages">            
+                              <template v-if="!tracking.showImages & car.base64images.length != 0">            
                                     <gallery :images="car.base64images" :index="index" @close="index = null"></gallery>
                                     <div class="image img-responsive" 
                                           @click="index = 0"
@@ -75,6 +75,13 @@
                                           :style="{ backgroundImage: 'url(' + sharedBase64Images[0] + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
+                              <template v-if="!tracking.showImages && car.base64images.length == 0">            
+                                    <gallery :images="sharedBase64Images" :index="index" @close="index = null"></gallery>
+                                    <div class="image img-responsive" 
+                                          @click="index = 0"
+                                          :style="{ backgroundImage: 'url(' + car.mainImgUrl + ')', width:'350px', height:'300px' }"
+                                    /> 
+                              </template>
                         </div>
                         <div class="col-sm-6 col-12">    
                               <div class="mb-2">
@@ -381,6 +388,7 @@ export default {
                                     let to = vm.car.base64images;
                                     vm.getImagesRecursive(n, from, to); 
                               }
+
                         }
                         if(response.status == 401) 
                         {
@@ -504,7 +512,9 @@ export default {
                               else if(vm.tracking.auctionImages.length == 0 && vm.car.images.length == 0) 
                                     vm.car.base64images[0] = vm.car.mainImgUrl;      
                               else if(vm.tracking.auctionImages.length == 0 && vm.tracking.showImages)
-                                    vm.sharedBase64Images[0] = vm.car.mainImgUrl;                                    
+                                    vm.sharedBase64Images[0] = vm.car.mainImgUrl; 
+                              else if(vm.tracking.auctionImages.length != 0 && vm.car.images.length == 0 && !vm.tracking.showImages)                                   
+                                    vm.car.base64images[0] = vm.car.mainImgUrl;    
                               else
                               {
                                     let n = vm.tracking.auctionImages.length;
