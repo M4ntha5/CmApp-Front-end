@@ -17,7 +17,7 @@
                          </b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group class="col-md-6" label="Last name">
-                         <b-form-input id="surname-input" name="surname-input" placeholder="Kennedy"
+                         <b-form-input id="surname-input" name="surname-input" placeholder="Doe"
                               v-model="user.lastName"     
                               v-validate="{ required: false }"
                               :state="validateState('surname-input')" 

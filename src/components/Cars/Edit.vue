@@ -5,7 +5,7 @@
           
           <div class="row pt-3">
                <div class="col-sm-4">
-                    <b-button  variant="primary" size="lg" @click="goToCar()">Back to car</b-button> 
+                    <b-button variant="primary" @click="goToCar()">Back to car</b-button> 
                </div>
                <h1 class="col-sm-8">{{make}} {{model}}</h1>
           </div> 

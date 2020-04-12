@@ -3,30 +3,32 @@
       <div class="container pt-5" >  
             <b-alert v-model="alertFlag" variant="success" dismissible>{{alertMessage}}</b-alert>
             <div v-if="!loading">     
-                  <div class="row">
-                        <div class="col-sm-8 col-12">
+                  <div class="row mb-2 mt-1">
+                        <div class="col-sm-6 col-12">
                               <h1>{{car.make}} {{car.model}}</h1>
                         </div>
-                        <div class="col-sm-4 col-12">
+                        <div class="col-sm-6 col-12">
                               <div class="row" style="float:right;">
-                                    <a class="btn btn-secondary" target="_blank" v-if="car.make == 'BMW'"
-                                    :href="'https://www.bmwautodalys.lt/en/catalog/selectVehicleByVin/INDEX/'+car.vin"
-                                    >
-                                          To dealer
-                                    </a> 
-                                    <a class="btn btn-secondary" target="_blank" 
-                                          v-else-if="car.make == 'Mercedes-benz'"
-                                          :href="'http://mbepc.net/en/vin/'+car.vin"
-                                    >
-                                          To dealer
-                                    </a>
                                     <div class="col">
-                                          <button class="btn btn-info dropdown-toggle" type="button" 
-                                          id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" 
-                                          aria-expanded="false" >
+                                          <a class="btn btn-secondary" target="_blank" v-if="car.make == 'BMW'"
+                                          :href="'https://www.bmwautodalys.lt/en/catalog/selectVehicleByVin/INDEX/'+car.vin"
+                                          >
+                                                To dealer
+                                          </a> 
+                                          <a class="btn btn-secondary" target="_blank" 
+                                                v-else-if="car.make == 'Mercedes-benz'"
+                                                :href="'http://mbepc.net/en/vin/'+car.vin"
+                                          >
+                                                To dealer
+                                          </a>
+                                    </div>                    
+                                    <div class="col">
+                                          <button class="btn btn-info dropdown-toggle" 
+                                          type="button" id="dropdownMenuButton" data-toggle="dropdown" 
+                                          aria-haspopup="true" aria-expanded="false" >
                                                 Actions
                                           </button>
-                                          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                                                 <a @click.prevent="editCar(car._id)" class="dropdown-item" href="">
                                                       Edit
                                                 </a>
@@ -47,47 +49,52 @@
                               </div>
                         </div>
                   </div>
-                  <div class="ml-1">
-                        <b-button variant="primary" size="lg" @click="goToCars()">Back to list</b-button>
-                        <div style="float:right;">
-                              <h5>Show tracking images?</h5>
-                              <toggle-button :value="tracking.showImages" class="ml-5"
-                                    color="#82C7EB" @change="displayImages()"
-                                    :sync="true" :font-size="16" :width="60" :height="25"
-                                    :labels="{checked: 'Yes', unchecked: 'No'}"
-                                    :switch-color="{checked: '#25EF02', unchecked: 'linear-gradient(red, yellow)'}"
-                              />
+                  <div class="row">
+                        <div class="col">
+                              <b-button variant="primary" @click="goToCars()">Back to list</b-button>
+                        </div>
+                        
+                        <div class="col">
+                              <div style="float:right;">                           
+                                    <h5>Show tracking images?</h5>
+                                    <toggle-button :value="tracking.showImages" class="ml-5"
+                                          color="#82C7EB" @change="displayImages()"
+                                          :sync="true" :font-size="16" :width="60" :height="25"
+                                          :labels="{checked: 'Yes', unchecked: 'No'}"
+                                          :switch-color="{checked: '#25EF02', unchecked: 'linear-gradient(red, yellow)'}"
+                                    />
+                              </div>
                         </div>
                   </div> 
                   <div class="row mb-3 pt-5">
-                        <div class="img-fluid col-sm-6 col-12 responsive"> 
+                        <div class="col responsive"> 
                               <template v-if="!tracking.showImages & car.base64images.length != 0">            
                                     <gallery :images="car.base64images" :index="index" @close="index = null"></gallery>
-                                    <div class="image img-responsive" 
+                                    <div class="image img-fluid" 
                                           @click="index = 0"
                                           :style="{ backgroundImage: 'url(' + car.base64images[0] + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
                               <template v-if="tracking.showImages">            
                                     <gallery :images="sharedBase64Images" :index="index" @close="index = null"></gallery>
-                                    <div class="image img-responsive" 
+                                    <div class="image img-fluid" 
                                           @click="index = 0"
                                           :style="{ backgroundImage: 'url(' + sharedBase64Images[0] + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
                               <template v-if="!tracking.showImages && car.base64images.length == 0">            
                                     <gallery :images="sharedBase64Images" :index="index" @close="index = null"></gallery>
-                                    <div class="image img-responsive" 
+                                    <div class="image img-fluid"
                                           @click="index = 0"
                                           :style="{ backgroundImage: 'url(' + car.mainImgUrl + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template>
                         </div>
-                        <div class="col-sm-6 col-12">    
-                              <div class="mb-2">
-                                    <center><h2>Summary</h2></center>               
+                        <div class="col">    
+                              <div class="">
+                                    <center class="mb-3 mt-1"><h1><b>Summary</b></h1></center>               
                               </div>
-                              <table class="table pt-3  ">
+                              <table class="table">
                                     <tr>
                                           <th>Bought Price</th>
                                           <td>{{formatPrice(summary.boughtPrice)}} {{currency}}</td>
@@ -122,7 +129,7 @@
                         </div>
                         
                   </div>
-                  <div class="row pt-5">
+                  <div class="row pt-5 ml-1">
                         <table class="table table-striped table-responsive-sm">
                               <tr>
                                     <th>Vin</th>
@@ -179,8 +186,8 @@
                               @click="equipmentVisible = !equipmentVisible">
                               Equipment
                         </b-button> 
-                        <b-collapse id="equipment-collapse" v-model="equipmentVisible" class="mt-2" >
-                              <b-table striped  :items="car.equipment" responsive>                                                 </b-table>
+                        <b-collapse id="equipment-collapse" v-model="equipmentVisible" class="mt-2">
+                              <b-table striped :items="car.equipment" responsive>                                                 </b-table>
                         </b-collapse>
                   </div>
                   <div class="pt-3">   
@@ -192,10 +199,10 @@
                               @click="repairsVisible = !repairsVisible, fetchCarRepairs()">
                               Repairs
                         </b-button> 
-                        <b-collapse id="repairs-collapse" v-model="repairsVisible" class="mt-2" >
+                        <b-collapse id="repairs-collapse" v-model="repairsVisible" class="mt-2">
                               <div v-if="repairs.length != 0"> 
                                     <b-table striped  :items="repairs" responsive :fields="fields"/> 
-                                    <h2 class="pt-3">Repairs total: {{repairs[0].total}} {{currency}}</h2> 
+                                    <h2 class="pt-3 ml-1">Repairs total: <b>{{repairs[0].total}} {{currency}}</b></h2> 
                               </div>
                               
                               <div v-else>
@@ -217,7 +224,7 @@
                         <b-collapse id="shipping-collapse" v-model="shippingVisible" class="mt-2">
                               <div v-if="shipping.total > 0">
                                     <b-table striped :items="shippingItems" responsive /> 
-                                    <h2 class="pt-3">Shipping total: {{shipping.total}} {{currency}}</h2>   
+                                    <h2 class="pt-3 ml-1">Shipping total: <b>{{shipping.total}} {{currency}}</b></h2>   
                               </div>
                               <div v-else>
                                     <center>
@@ -671,18 +678,45 @@ export default {
       }
 }
 </script>
-<style scoped>
-  .image {
-    float: left;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    border: 1px solid #ebebeb;
-    margin: 5px;
-  }
-  .divider{
-    width:5px;
-    height:auto;
-    display:inline-block;
-}
-</style> 
+<style>
+      .image {
+            float: left;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            border: 5px solid #ebebeb;          
+      }
+      h1 {
+            font-size: 1.2rem;
+      }
+      h2 {
+            font-size: 1.1rem;
+      }
+
+      @media (min-width: 768px) {
+            h1 {
+                  font-size: 1.3rem;
+            }
+            h2 {
+                  font-size: 1.2rem;
+            }
+      }
+
+      @media (min-width: 991px) {
+            h1 {
+                  font-size: 1.5rem;
+            }
+            h2 {
+                  font-size: 1.4rem;
+            }
+      }
+
+      @media (min-width: 1200px) {
+            h1 {
+                  font-size: 1.7rem;
+            }
+            h2 {
+                  font-size: 1.6rem;
+            }
+      }
+</style>

@@ -12,26 +12,29 @@
 
             <div class="pt-3">
                   <b-card-group deck>
-                        <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 ">                              
-                              <b-card no-body >
+                        <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
+                              <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
-                                          <b-card-img img-alt="Image" img-top :src='car.mainImgUrl'
+                                          <b-card-img img-alt="image img-fluid" img-top :src='car.mainImgUrl'
                                           style="max-height:238.5px"></b-card-img>
-                                          <b-card-body class="pl-3 d-flex">            
+                                          <b-card-body class="pl-3">            
                                                 <b-card-title>{{car.make}} {{car.model}}</b-card-title>
                                           </b-card-body>
                                     </b-link>
-                                    <b-card-text class="pl-3 ">                                          
+                                    <b-card-text class="pl-3" style="flex-grow:1;">                                          
                                           <h4>Already paid: {{car.summary.total}} {{currency}}</h4>
                                           <template v-if="car.summary.sold">
                                                 <h2 style="color:red;font-weight:bold;">SOLD</h2>
-                                                <h2 v-if="car.summary.profit < 0" style="color:red;">Profit: {{car.summary.profit}} {{currency}}</h2>
-                                                <h2 v-else style="color:green;">Profit: {{car.summary.profit}} {{currency}}</h2>
+                                                <h2 v-if="car.summary.profit < 0" style="color:red;">
+                                                      Profit: {{car.summary.profit}} {{currency}}
+                                                </h2>
+                                                <h2 v-else style="color:green;">
+                                                      Profit: {{car.summary.profit}} {{currency}}
+                                                </h2>
                                           </template>
-                                    </b-card-text>
-                                    
-                                    <template v-slot:footer class="">
-                                          <b-button v-b-modal.sold-modal  block
+                                    </b-card-text>         
+                                    <template v-slot:footer>
+                                          <b-button v-b-modal.sold-modal block
                                                 @click="openSoldModal(car.id, index)" 
                                                 type="button" class="btn btn-warning"
                                                 v-if="!car.summary.sold">

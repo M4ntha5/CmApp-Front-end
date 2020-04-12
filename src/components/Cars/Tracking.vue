@@ -2,7 +2,7 @@
       <div class="container pt-5">
             <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>          
             <div class="pt-4 mb-4 ml-2">
-                  <b-button variant="primary" size="lg" @click="goToSelectedCar()">Back</b-button>
+                  <b-button variant="primary" @click="goToSelectedCar()">Back</b-button>
                   <b-button id="tracking-button-info" @click="handleTracking()" style="float:right;" class="mr-2">
                         Look for tracking
                   </b-button> 
@@ -13,12 +13,12 @@
                   <div class="row pt-4" >                    
                         <div class="img-fluid col-sm-6 col-12">              
                               <gallery :images="tracking.base64images" :index="index" @close="index = null"></gallery>
-                              <div class="image" 
+                              <div class="image img-fluid" 
                                     @click="index = 0"
                                     :style="{ backgroundImage: 'url(' + tracking.base64images[0] + ')', width:'350px', height:'300px' }"
                               />
                         </div>
-                        <div class="col-sm-6 col-12">
+                        <div class="col-sm-6 col-12 pt-4">
                               <table class="table table-responsive-sm">
                                     <tr>
                                           <th>Shipping line</th>
@@ -47,8 +47,8 @@
                               </table>
                         </div>                   
                   </div>
-                  <div class="row pt-5">
-                        <table class="table table-striped table-responsive-sm">
+                  <div class="row pt-5 ml-1">
+                        <table class="table table-responsive-sm">
                               <tr>
                                     <th>Vin</th>
                                     <td>{{tracking.vin}}</td>
@@ -407,8 +407,7 @@ export default {
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center center;
-      border: 1px solid #ebebeb;
-      margin: 5px;
+      border: 3px solid #ebebeb;
 }
 .divider{
       width:5px;
