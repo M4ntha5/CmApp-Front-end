@@ -24,7 +24,6 @@
       <h5>Do not hesitate to visit for more information about shipping services they suggest</h5>
 
       
-
       <div class="row pt-5 pl-3">
             <h1>Show tracking images option</h1>           
       </div>
@@ -34,7 +33,6 @@
       <h5  class="row pl-5">If No - shows only user uploaded images</h5>
 
       
-            
   </div>
 </template>
 
