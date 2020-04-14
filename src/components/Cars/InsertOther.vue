@@ -18,7 +18,7 @@
                          </b-form-group>
 
                          <b-form-group class="col-md-4 mb-3" label="Model">
-                              <b-form-select id="model-input" name="model-input"
+                              <b-form-select id="model-input" name="model-input" :disabled="modelsDisabled"
                                    v-model="car.model"
                                    :options="makeModels"
                                    v-validate="{ required: true }"
@@ -312,7 +312,7 @@ const backEndUrl = process.env.VUE_APP_API;
           data() {
                return {
                     car: {
-                         make: 'BMW',
+                         make: null,
                          model: null,
                          vin:'',
                          manufactureDate:'',
@@ -335,7 +335,8 @@ const backEndUrl = process.env.VUE_APP_API;
                          selectedCurrency: '',
                          baseCurrency: window.$cookies.get('currency'),
                          car: ''
-                    },    
+                    },  
+                    modelsDisabled: true,  
                     currency: getSymbolFromCurrency(window.$cookies.get('currency')),
                     transmission: [{ text: 'Select One', value: '' }, 'Automatic', 'Manual'],
                     drive: [{ text: 'Select One', value: '' }, 'Front wheel drive', 'Rear wheel drive', 'All wheel drive (4x4)'],
@@ -469,7 +470,9 @@ const backEndUrl = process.env.VUE_APP_API;
                     .then(function (response){
                          if(response.status == 200)
                          {
-                              vm.allMakes = response.data;
+                              let makes = response.data
+                              let tmp = [{ text: 'Select One', value: null }];
+                              vm.allMakes = tmp.concat(makes);          
                               vm.getAllModelsForMake(vm.car.make);
                          }  
                          if(response.status == 401) 
@@ -489,6 +492,7 @@ const backEndUrl = process.env.VUE_APP_API;
                },
                getAllModelsForMake(make){
                     let vm =this;
+                    vm.modelsDisabled = true;
                     axios.get(backEndUrl + `/api/makes/${make}/models`, {
                          headers: {
                               Authorization: 'Bearer ' + window.$cookies.get('token')
@@ -498,8 +502,10 @@ const backEndUrl = process.env.VUE_APP_API;
                          if(response.status == 200)
                          {
                               let models = response.data;
-                              models.push({ text: 'Select One', value: null });
+                              let tmp = [{ text: 'Select One', value: null }];
+                              models = tmp.concat(models);
                               vm.makeModels = models;
+                              vm.modelsDisabled = false;
                               vm.loading = false;
                          } 
                          if(response.status == 401) 

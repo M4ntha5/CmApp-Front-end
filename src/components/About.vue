@@ -24,10 +24,15 @@
       <h5>Do not hesitate to visit for more information about shipping services they suggest</h5>
 
       
+      <div class="row pt-5 pl-3">
+            <h1>Show tracking images option</h1>           
+      </div>
+      <h4 class="row pl-3">This option lets user to be able to show tracking images </h4>
+     
+      <h5  class="row pt-4 pl-5">If Yes - shows user images combined with images got from fetched tracking</h5>
+      <h5  class="row pl-5">If No - shows only user uploaded images</h5>
 
       
-      
-            
   </div>
 </template>
 

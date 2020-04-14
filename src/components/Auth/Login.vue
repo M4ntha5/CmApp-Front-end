@@ -108,7 +108,7 @@ export default {
 
                          if(role == "user")
                          {
-                              vm.message = "Successfully loged in user";
+                              vm.message = "Successfully loged in";
                               vm.successAlert = true;
                               window.location.href = "/cars";
                          }
