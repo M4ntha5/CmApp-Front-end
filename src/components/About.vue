@@ -24,7 +24,6 @@
       <h5>Do not hesitate to visit for more information about shipping services they suggest</h5>
 
       
-
       <div class="row pt-5 pl-3">
             <h1>Show tracking images option</h1>           
       </div>
@@ -38,6 +37,7 @@
             Having trouble using our site? 
             <a href="mailto:mantas.daunoravicius@ktu.edu" target="_blank" class="btn btn-primary">Email Us</a>
       </h1>
+
   </div>
   
 </template>
