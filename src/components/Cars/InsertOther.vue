@@ -224,9 +224,10 @@
                     </div>
                     <div class="form-row">
                          <b-form-group class="col-sm-12 mb-3" id="images-group-1" label="Images">
-                               <b-form-file name="images-input"
-                                   v-model="car.base64images"
-                                   v-validate="{ required: false, image:'', mimes: 'image/jpeg, image/png, image/gif' }"
+                              <b-form-file name="images-input"
+                                   @change="onFileSelected" 
+                                   v-model="example" accept="image/*"
+                                   v-validate="{ required: false, image: true }" 
                                    :state="validateState('images-input')" 
                                    aria-describedby="images-input-live-feedback"
                                    data-vv-as="images"
@@ -422,7 +423,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href('/login');
                          }         
                     })
                     .catch(function (error) {
@@ -453,7 +454,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href('/login');
                          }                       
                     })
                     .catch(function (error) {
@@ -472,8 +473,8 @@ const backEndUrl = process.env.VUE_APP_API;
                          {
                               let makes = response.data
                               let tmp = [{ text: 'Select One', value: null }];
-                              vm.allMakes = tmp.concat(makes);          
-                              vm.getAllModelsForMake(vm.car.make);
+                              vm.allMakes = tmp.concat(makes);
+                              vm.loading = false;
                          }  
                          if(response.status == 401) 
                          {
@@ -482,7 +483,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href('/login');
                          }        
                     })
                     .catch(function (error){
@@ -515,7 +516,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href('/login');
                          }    
                               
                     })
@@ -549,6 +550,21 @@ const backEndUrl = process.env.VUE_APP_API;
                          this.$validator.reset('code-input');
                          this.$validator.reset('name-input');
                     }
+               },
+               onFileSelected(e) {           
+                    for(let i=0; i < e.target.files.length; i++)
+                    {
+                         if(e.target.files[i].name.endsWith(".gif")||e.target.files[i].name.endsWith(".png") ||
+                              e.target.files[i].name.endsWith(".jpg") || e.target.files[i].name.endsWith(".jpeg"))
+                         {
+                              var reader = new FileReader();
+                              reader.readAsDataURL(e.target.files[i]);
+                              reader.onload = (e) => {
+                                   this.car.Base64images[i] = e.target.result;
+                              }  
+                         }                          
+                    }
+                    console.log(this.car.Base64images);                
                },
           }
      }

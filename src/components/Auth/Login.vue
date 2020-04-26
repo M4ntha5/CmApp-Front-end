@@ -4,8 +4,7 @@
                {{$router.push("/cars")}}
           </div>
           <div class="container pt-5 w-75" v-else>
-               <b-alert v-model="dangerAlert" variant="danger" dismissible>{{message}}</b-alert>
-               <b-alert v-model="successAlert" variant="success" dismissible>{{message}}</b-alert>
+               <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{message}}</b-alert>
                <center><h1>Login</h1></center>
                <b-form class="justify-content-center" @submit.prevent="onSubmit" >
                     <b-form-group label="Email">
@@ -56,6 +55,7 @@ export default {
                },
                dangerAlert: false,
                successAlert: false,
+               alertFlag: false,
                message: '',
                isResetModalVisible: false   
           }
@@ -109,13 +109,15 @@ export default {
                          if(role == "user")
                          {
                               vm.message = "Successfully loged in";
-                              vm.successAlert = true;
+                              vm.dangerAlert = false;
+                              vm.alertFlag = true;
                               window.location.href = "/cars";
                          }
                          else if(role == "admin")
                          {
                               vm.message = "Successfully loged in admin";
-                              vm.successAlert = true;
+                              vm.dangerAlert = false;
+                              vm.alertFlag = true;
                               window.location.href = "/users";
                          }                          
                     }
@@ -124,6 +126,7 @@ export default {
                     console.log(error);
                     vm.message = error.response.data;
                     vm.dangerAlert = true;
+                    vm.alertFlag = true;
                })
           },
      }

@@ -223,7 +223,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error) {
@@ -255,7 +255,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         }                            
                   })
                   .catch(function (error) {
@@ -294,7 +294,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error) {
@@ -327,7 +327,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error) {
@@ -350,7 +350,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         }
                   })
                   .catch(function (error) {
@@ -383,7 +383,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         }    
                   })
                   .catch(function (error) {

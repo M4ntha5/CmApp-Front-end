@@ -34,8 +34,12 @@
       <h5  class="row pl-5">If No - shows only user uploaded images</h5>
 
       
-            
+      <h1 class="pt-5" style="color:red;">
+            Having trouble using our site? 
+            <a href="mailto:mantas.daunoravicius@ktu.edu" target="_blank" class="btn btn-primary">Email Us</a>
+      </h1>
   </div>
+  
 </template>
 
 <script>
