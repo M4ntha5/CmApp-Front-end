@@ -4,7 +4,7 @@
             <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
 
             <button v-b-modal.car-insert-modal class="btn btn-primary ml-3"
-            @click="showBmwModal">
+            @click="showBmwModal" >
                   Add new car
             </button>
             <!-- bmw modal-->
@@ -15,7 +15,7 @@
                         <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
                               <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
-                                          <b-card-img img-alt="image img-fluid" img-top :src='car.mainImgUrl'
+                                          <b-card-img img-alt="image img-fluid" img-top :src='car.mainImageUrl'
                                           style="max-height:238.5px"></b-card-img>
                                           <b-card-body class="pl-3">            
                                                 <b-card-title>{{car.make}} {{car.model}}</b-card-title>
@@ -47,7 +47,7 @@
                   </b-card-group>          
             </div>           
       </div>
-      <div class="pt-3" v-else>
+      <div class="pt-3" v-else>        
             <center>
                   <b-spinner label="Loading..."></b-spinner>
             </center> 
@@ -85,7 +85,6 @@
 import getSymbolFromCurrency from 'currency-symbol-map'
 import bmwModal from '../Modals/CarModal.vue';
 import axios from 'axios';
-
 const backEndUrl = process.env.VUE_APP_API;
 export default {      
       data() {
@@ -112,7 +111,7 @@ export default {
                         color:'',
                         interior:'',
                         created_at:'',
-                        mainImgUrl:'',
+                        mainImageUrl:'',
                         equipment: [],
                         summary: {
                               boughtPrice:'',
@@ -135,7 +134,7 @@ export default {
                         price: '',
                         car: ''
                   },
-                  loading: false,
+                  loading: true,
                   isBmwModalVisible: false,
                   soldDetails: {
                         soldPrice: 0,
@@ -165,6 +164,7 @@ export default {
       methods: {
             showBmwModal(){
                   this.isBmwModalVisible = true;
+                  this.$emit('clicked', this.cars)
             },
             closeBmwModal() {
                   this.isBmwModalVisible = false;
@@ -173,16 +173,15 @@ export default {
             fetchCars() {
                   let vm = this;
                   axios.get(backEndUrl + "/api/cars", {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
                         {
                               vm.cars = response.data;
                               vm.rows = response.data.length;
-                              vm.loading = false;                            
+                              vm.loading = false;                
+                                                         
                               //setting repair value to dafault - first of a list
                               if(vm.cars.length > 0)
                                     vm.insertRepair.car = vm.cars[0].id;
@@ -196,8 +195,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
-                              
+                              window.location.href = '/login';                
                         }                              
                   })
                   .catch(function (error) {
@@ -234,7 +232,7 @@ export default {
                                     vm.$cookies.remove('role');
                                     vm.$cookies.remove('user');
                                     vm.$cookies.remove('currency');
-                                    window.location.href('/');
+                                    window.location.href = '/login';
                               }                                
                         })
                         .catch(function (error) {
@@ -269,7 +267,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         }                       
                   })
                   .catch(function (error) {
@@ -307,7 +305,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error) {
@@ -352,7 +350,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         }               
                   })
                   .catch(function (error){
@@ -370,7 +368,7 @@ export default {
                   if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
                   return !this.veeErrors.has(ref);
                   return null;
-            }
+            },
       }
 }
 </script>

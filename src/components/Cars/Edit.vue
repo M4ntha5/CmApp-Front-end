@@ -347,7 +347,7 @@ export default {
                steering: [{ text: 'Select One', value: '' }, 'Left Hand Drive', 'Right Hand Drive'],         
                body: [
                     { text: 'Select One', value: '' }, 
-                    'Saloon / Sedan', 'Hatchback',
+                    'Saloon', 'Hatchback', 'Sedan',
                     'Coupe', 'Wagon', 'Limousine',
                     'Suv', 'Minivan', 'Pick-up',
                ],
@@ -364,6 +364,7 @@ export default {
                dangerAlert: false,
                alertMessage: '',
                alertFlag: false,
+               equipmentCodes: []
           }
      }, 
      created() {      
@@ -389,6 +390,9 @@ export default {
                          vm.loading = false;
                          vm.make = vm.car.make;
                          vm.model = vm.car.model;
+                         vm.car.equipment.forEach(element => {
+                              vm.equipmentCodes.push(element.code);
+                         });
                     }
                     if(response.status == 401) 
                     {
@@ -397,7 +401,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href('/');
+                         window.location.href = '/login';
                     } 
                })
                .catch(function (error) {
@@ -425,7 +429,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href('/');
+                         window.location.href = '/login';
                     }   
                })
                .catch(function (error) {
@@ -452,7 +456,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href('/');
+                         window.location.href = '/login';
                     } 
                })
                .catch(function (error) {
@@ -506,14 +510,21 @@ export default {
                {
                     let eqname = this.equipmentName;
                     let eqcode = this.equipmentCode.toUpperCase();
-                    this.car.equipment.push({
-                         code: eqcode,
-                         name: eqname
-                    });
-                    this.equipmentName = '';
-                    this.equipmentCode = '';
-                    this.$validator.reset('code-input');
-                    this.$validator.reset('name-input');
+
+                    var alreadyContains = this.equipmentCodes.includes(eqcode);
+                    if(alreadyContains)
+                         window.confirm('Equipment with the same code already exists');
+                    else
+                    {     
+                         this.car.equipment.push({
+                              code: eqcode,
+                              name: eqname
+                         });
+                         this.equipmentName = '';
+                         this.equipmentCode = '';
+                         this.$validator.reset('code-input');
+                         this.$validator.reset('name-input');
+                    }
                }
           },
           async addRepairRow(){
@@ -539,7 +550,7 @@ export default {
                }
           },
           getImage(image, saveTo){       
-               axios.post(backEndUrl + "/api/get-image", image, {
+               axios.post(backEndUrl + "/api/get-image2", image, {
                     headers: {
                          Authorization: 'Bearer ' + window.$cookies.get('token')
                     }
@@ -554,7 +565,7 @@ export default {
                          this.$cookies.remove('role');
                          this.$cookies.remove('user');
                          this.$cookies.remove('currency');
-                         window.location.href('/');
+                         window.location.href = '/login';
                     }    
                })
                .catch(function (error) {
@@ -585,7 +596,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href('/');
+                         window.location.href = '/login';
                     } 
                })
                .catch(function (error) {
@@ -610,7 +621,7 @@ export default {
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href('/');
+                         window.location.href = '/login';
                     } 
                })
                .catch(function (error) {

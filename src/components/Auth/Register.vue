@@ -117,12 +117,10 @@ export default {
                axios.post(backEndUrl + '/api/auth/register', this.form)
                .then(function (response){
                     if(response.status == 200)
-                    {     
+                    {
                          vm.alertMessage = response.data;
                          vm.dangerAlert = false;
-                         vm.alertFlag = true;         
-                         //vm.$router.push('/login');
-                         //vm.login();           
+                         vm.alertFlag = true;     
                     }
                })
                .catch(function (error){
@@ -130,47 +128,6 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true; 
-               })
-          },
-          login() {
-               let vm = this;
-               axios.post(backEndUrl + '/api/auth/login', this.form)
-               .then(function (response){
-                    if(response.status == 200)
-                    {
-                         let token = response.data;   
-                         //decode role from token
-                         let jwtData = token.split('.')[1];
-                         let decodedJwtJsonData = window.atob(jwtData);
-                         let role = decodedJwtJsonData.split(',')[0].split('"')[3];
-                         let email = decodedJwtJsonData.split(',')[2].split('"')[3];
-                         let user = decodedJwtJsonData.split(',')[1].split('"')[3];
-                         let currency = decodedJwtJsonData.split(',')[3].split('"')[3];
-
-                         window.$cookies.set('token', token, '1h');
-                         window.$cookies.set('user-email', email, '1h');
-                         window.$cookies.set('role', role, '1h');
-                         window.$cookies.set('user', user, '1h');
-                         window.$cookies.set('currency', currency, '1h');
-
-                         if(role == "user")
-                         {
-                              vm.message = "Successfully loged in user";
-                              vm.successAlert = true;
-                              window.location.href = "/cars";
-                         }
-                         else if(role == "admin")
-                         {
-                              vm.message = "Successfully loged in admin";
-                              vm.successAlert = true;
-                              window.location.href = "/admin";
-                         }                          
-                    }
-               })
-               .catch(function (error){
-                    console.log(error);
-                    vm.message = error.response.data;
-                    vm.dangerAlert = true;
                })
           },
      }

@@ -2,6 +2,7 @@
 <div>
       <div class="container pt-5" >  
             <b-alert v-model="alertFlag" variant="success" dismissible>{{alertMessage}}</b-alert>
+     
             <div v-if="!loading">     
                   <div class="row mb-2 mt-1">
                         <div class="col-sm-6 col-12">
@@ -68,27 +69,47 @@
                   </div> 
                   <div class="row mb-3 pt-5">
                         <div class="col responsive"> 
-                              <template v-if="!tracking.showImages & car.base64images.length != 0">            
-                                    <gallery :images="car.base64images" :index="index" @close="index = null"></gallery>
+                             <template v-if="!tracking.showImages && car.base64images.length > 0">            
+                                    <gallery :images="carImages"
+                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                                    @close="index = null">
+                                    </gallery>
                                     <div class="image img-fluid" 
                                           @click="index = 0"
-                                          :style="{ backgroundImage: 'url(' + car.base64images[0] + ')', width:'350px', height:'300px' }"
+                                          :style="{ backgroundImage: 'url(' + carImages[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-if="tracking.showImages">            
-                                    <gallery :images="sharedBase64Images" :index="index" @close="index = null"></gallery>
+                              <template v-if="!tracking.showImages && car.base64images.length < 1">            
+                                    <gallery :images="defaultImg"
+                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                                    @close="index = null">
+                                    </gallery>
                                     <div class="image img-fluid" 
                                           @click="index = 0"
-                                          :style="{ backgroundImage: 'url(' + sharedBase64Images[0] + ')', width:'350px', height:'300px' }"
+                                          :style="{ backgroundImage: 'url(' + defaultImg[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-if="!tracking.showImages && car.base64images.length == 0">            
-                                    <gallery :images="sharedBase64Images" :index="index" @close="index = null"></gallery>
+                              <template v-if="tracking.showImages && sharedBase64Images.length > 0">            
+                                    <gallery :images="sharedBase64Images" :index="index" 
+                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                                    @close="index = null">
+                                    </gallery>
+                                    <div class="image img-fluid" 
+                                          @click="index = 0"
+                                          :style="{ backgroundImage: 'url(' + sharedBase64Images[0].href + ')', width:'350px', height:'300px' }"
+                                    /> 
+                              </template> 
+                              <template v-if="tracking.showImages && sharedBase64Images.length < 1">
+                                    <gallery :images="defaultImg" 
+                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                                    @close="index = null">
+                                    </gallery>
                                     <div class="image img-fluid"
                                           @click="index = 0"
-                                          :style="{ backgroundImage: 'url(' + car.mainImgUrl + ')', width:'350px', height:'300px' }"
-                                    /> 
+                                          :style="{ backgroundImage: 'url(' + defaultImg[0].href + ')', width:'350px', height:'300px' }"
+                                    />                            
                               </template>
+
                         </div>
                         <div class="col">    
                               <div class="">
@@ -187,7 +208,14 @@
                               Equipment
                         </b-button> 
                         <b-collapse id="equipment-collapse" v-model="equipmentVisible" class="mt-2">
-                              <b-table striped :items="car.equipment" responsive>                                                 </b-table>
+                              <template v-if="car.equipment.length >0">
+                                    <b-table striped :items="car.equipment" responsive></b-table>
+                              </template> 
+                              <div v-else>
+                                    <center>
+                                          <h2 class="pt-3">No equipment</h2>
+                                    </center>
+                              </div>                                                
                         </b-collapse>
                   </div>
                   <div class="pt-3">   
@@ -235,6 +263,7 @@
                   </div>
                                    
             </div>
+            
             <div class="pt-3" v-else>        
                   <center>
                        <b-spinner label="Loading..."></b-spinner>
@@ -250,10 +279,11 @@
 import getSymbolFromCurrency from 'currency-symbol-map'
 import { ToggleButton } from 'vue-js-toggle-button'
 import VueGallery from 'vue-gallery';
+//import VueGallerySlideshow from 'vue-gallery-slideshow';
+//import VuePreview from 'vue-preview'
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
 const backEndUrl = process.env.VUE_APP_API;
-
 export default { 
       data() {
             return {
@@ -280,7 +310,7 @@ export default {
                         images: [],
                         equipment: [],
                         base64images: [], 
-                        mainImgUrl: '' 
+                        mainImageUrl: '' 
                   },
                   summary: {
                         boughtPrice:'',
@@ -320,25 +350,59 @@ export default {
                   equipmentVisible: false,
                   repairsVisible: false,
                   shippingVisible: false,
-                  //sharedBase64Images: []
+                  defaultImg: []
             }
             
       },
       components: {
-            'gallery': VueGallery,
+            'gallery': VueGallery,//VuePreview,//VueGallerySlideshow,//'gallery': VueGallery,
             shippingModal,
             ToggleButton
       },
       computed: {
-            sharedBase64Images: function () {  
-                  let shared = this.car.base64images.concat(this.tracking.base64images);
-                  return shared;
+            carImages: function() {
+                  let list = [];
+                  let shared = this.car.base64images;
+                  for(let i =1;i<shared.length;i++)
+                  {
+                        let obj = {
+                              href: shared[i],
+                              title: i + '/'+shared.length
+                        }
+                        list.push(obj);
+                  } 
+                  return list;
             },
-            
+            trackingImages: function() {
+                  let list = [];
+                  let shared = this.tracking.base64images;
+                  for(let i =1;i<shared.length;i++)
+                  {
+                        let obj = {
+                              href: shared[i],
+                              title: i + '/'+shared.length
+                        }
+                        list.push(obj);
+                  } 
+                  return list;
+            },
+            sharedBase64Images: function () {   
+                  let list = [];
+                  let shared = this.car.base64images.concat(this.tracking.base64images);
+                  console.log(shared.length);
+                  for(let i =1;i<shared.length;i++)
+                  {
+                        let obj = {
+                              href: shared[i],
+                              title: i + '/'+shared.length
+                        }
+                        list.push(obj);
+                  }
+                  return list;
+            },
       },
       beforeRouteLeave (to, from, next) {
-            this.updateShowImagesStatus();
-            
+            this.updateShowImagesStatus();          
             next();
       },
       created() {        
@@ -346,7 +410,7 @@ export default {
             this.fetchTracking();   
             this.fetchCarSummary();         
             this.fetchCarRepairs();
-            this.fetchCarShipping();              
+            this.fetchCarShipping();         
       },
 
       methods: {
@@ -364,7 +428,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error) {
@@ -384,10 +448,10 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {  
-                              vm.car = response.data;
-                              vm.loading = false;
+                              vm.car = response.data;                         
                               //trimming unnecessary date ending           
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
+                              vm.loading = false;
                               if(vm.car.images.length != 0)
                               {
                                     let n = vm.car.images.length;
@@ -395,7 +459,15 @@ export default {
                                     let to = vm.car.base64images;
                                     vm.getImagesRecursive(n, from, to); 
                               }
-
+                              else      
+                              {
+                                    let obj = {
+                                          href: vm.car.mainImageUrl,
+                                          title: '1/1'
+                                    };
+                                    vm.defaultImg.push(obj);
+                              }                            
+                                    
                         }
                         if(response.status == 401) 
                         {
@@ -404,7 +476,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error) {
@@ -429,7 +501,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error) {
@@ -466,7 +538,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                               
                   })
@@ -497,7 +569,7 @@ export default {
                                     vm.$cookies.remove('role');
                                     vm.$cookies.remove('user');
                                     vm.$cookies.remove('currency');
-                                    window.location.href('/');
+                                    window.location.href = '/login';
                               } 
                         }
                   })
@@ -513,23 +585,15 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {           
-                              vm.tracking = response.data;                           
-                              if(vm.car.images.length == 0 && !vm.tracking.showImages)
-                                    vm.car.base64images[0] = vm.car.mainImgUrl; 
-                              else if(vm.tracking.auctionImages.length == 0 && vm.car.images.length == 0) 
-                                    vm.car.base64images[0] = vm.car.mainImgUrl;      
-                              else if(vm.tracking.auctionImages.length == 0 && vm.tracking.showImages)
-                                    vm.sharedBase64Images[0] = vm.car.mainImgUrl; 
-                              else if(vm.tracking.auctionImages.length != 0 && vm.car.images.length == 0 && !vm.tracking.showImages)                                   
-                                    vm.car.base64images[0] = vm.car.mainImgUrl;    
-                              else
+                              vm.tracking = response.data;
+   
+                              if(vm.tracking.auctionImages.length != 0) 
                               {
                                     let n = vm.tracking.auctionImages.length;
                                     let from = vm.tracking.auctionImages;
                                     let to = vm.tracking.base64images;
                                     vm.getImagesRecursive(n, from, to);
-                              }   
-                                                                        
+                              }                                                                 
                         }
                         else if(response.status == 401) 
                         {
@@ -538,7 +602,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         }                
                   })
                   .catch(function (error) {
@@ -562,6 +626,9 @@ export default {
                   this.fetchCarShipping();
             },
             deleteAction(){
+                  this.alertMessage = "Deleting your car...";
+                  this.alertFlag = true;
+                  this.loading = true;
                   this.deleteCar();
                   this.deleteCarSummary();
                   this.deleteCarTracking();
@@ -571,9 +638,7 @@ export default {
             deleteCar(){
                   var vm = this;
                   axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response){
                         if(response.status == 204)
@@ -589,7 +654,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error){
@@ -645,9 +710,7 @@ export default {
             },
             getImage(image, saveTo){
                   axios.post(backEndUrl + "/api/get-image", image, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
@@ -660,7 +723,7 @@ export default {
                               this.$cookies.remove('role');
                               this.$cookies.remove('user');
                               this.$cookies.remove('currency');
-                              window.location.href('/');
+                              window.location.href = '/login';
                         }    
                   })
                   .catch(function (error) {
@@ -684,7 +747,7 @@ export default {
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
-            border: 5px solid #ebebeb;          
+            border: 5px solid #ebebeb;
       }
       h1 {
             font-size: 1.2rem;

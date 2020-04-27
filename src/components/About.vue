@@ -33,7 +33,13 @@
       <h5  class="row pl-5">If No - shows only user uploaded images</h5>
 
       
+      <h1 class="pt-5" style="color:red;">
+            Having trouble while using page? Email me at: 
+            <a href="mailto:mantas.daunoravicius@ktu.edu" target="_blank">mantas.daunoravicius@ktu.edu</a>
+      </h1>
+
   </div>
+  
 </template>
 
 <script>

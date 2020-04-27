@@ -107,7 +107,7 @@ export default {
                   window.$cookies.remove('token');
                   window.$cookies.remove('user-email');
                   window.$cookies.remove('user');
-                  window.location.href = "/";
+                  window.location.href = "/login";
             },
       }
 }

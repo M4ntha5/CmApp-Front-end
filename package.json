@@ -16,13 +16,20 @@
     "currency-symbol-map": "^4.0.4",
     "express": "^4.17.1",
     "jquery": "^3.4.1",
+    "mdbvue": "^6.7.0",
     "serve-static": "^1.14.1",
     "vee-validate": "^2.2.0",
     "vue": "^2.6.11",
     "vue-cookies": "^1.7.0",
     "vue-gallery": "^2.0.1",
+    "vue-gallery-slideshow": "^1.5.0",
+    "vue-images": "^1.1.0",
     "vue-js-toggle-button": "^1.3.3",
-    "vue-router": "^3.1.5"
+    "vue-litebox": "^1.0.2",
+    "vue-picture-swipe": "^1.2.0",
+    "vue-preview": "^1.1.3",
+    "vue-router": "^3.1.5",
+    "vue-runtime-helpers": "^1.1.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.2.0",

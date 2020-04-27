@@ -111,7 +111,7 @@ export default {
                     email: '',
                     sex: '',
                     bornDate: '',
-                    country: 'Lithuania'
+                    country: ''
                },
                sexOptions: ['Men', 'Women'],
                countries: []
@@ -131,19 +131,25 @@ export default {
                let vm = this;
                axios.get(backEndUrl + `/api/users/${vm.$route.params.id}`, {
                     headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
+                         Authorization: 'Bearer ' + window.$cookies.get('token')
                     }
                })
                .then( function (response){
                     if(response.status == 200)
                     {
                          vm.user = response.data;
+                         if(vm.user.country == "")
+                              vm.user.country = "Lithuania";
                          vm.loading = false;
                     }
-                    else if(response.status == 401)
+                    if(response.status == 401) 
                     {
-                         vm.$cokkies.remove('token');
-                         window.location.href('/');
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         window.location.href = '/login';              
                     }
                })
                .catch(function (error) {
@@ -170,10 +176,14 @@ export default {
                     if(response.status == 204)
                          vm.$router.push('/cars');
 
-                    else if(response.status == 401)
+                    if(response.status == 401) 
                     {
-                         vm.$cokkies.remove('token');
-                         window.location.href('/');
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         window.location.href = '/login';              
                     }
                })
                .catch(function (error) {
@@ -191,17 +201,20 @@ export default {
                     if(response.status == 200)
                          vm.countries = response.data;
 
-                    else if(response.status == 204)
+                    if(response.status == 401) 
                     {
-                         vm.$cokkies.remove('token');
-                         window.location.href('/');
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         window.location.href = '/login';              
                     }
                })
                .catch(function (error){
                     console.log(error);
                })
           }
-     }
-     
+     }  
 }
 </script>

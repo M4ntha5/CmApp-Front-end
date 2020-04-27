@@ -83,7 +83,6 @@
 </template>
 
 <script>
-
 import axios from 'axios'
 const backEndUrl = process.env.VUE_APP_API;
 export default {
@@ -109,12 +108,43 @@ export default {
             dangerAlert: false,
             activeBmwItem: true,
             activeMbItem: false,
+            cars: []
         }
     },
     mounted() {
         this.getCurrencies();
+        this.fetchCars();
     },
     methods: {
+        fetchCars() {
+            let vm = this;
+            axios.get(backEndUrl + "/api/cars", {
+                headers: {
+                        Authorization: 'Bearer ' + window.$cookies.get('token')
+                }
+            })
+            .then(function (response) {
+                if(response.status == 200)
+                {
+                        vm.cars = response.data;
+                }
+                if(response.status == 401) 
+                {
+                        vm.$cookies.remove('token');
+                        vm.$cookies.remove('user-email');
+                        vm.$cookies.remove('role');
+                        vm.$cookies.remove('user');
+                        vm.$cookies.remove('currency');
+                        window.location.href = '/login';              
+                }                              
+            })
+            .catch(function (error) {
+                vm.alertMessage = error.response.data;
+                vm.dangerAlert = true;
+                vm.alertFlag = true;
+                console.log(error);
+            });
+        },
         getCurrencies() {
             let vm = this;
             axios.get(backEndUrl + "/api/currency")
@@ -168,14 +198,17 @@ export default {
                     vm.$cookies.remove('role');
                     vm.$cookies.remove('user');
                     vm.$cookies.remove('currency');
-                    window.location.href('/');
+                    window.location.href = '/login';
                 }              
             })
             .catch(function (error) {
+                if(error.response.data.includes('404'))
                     vm.alertMessage = "Car not found. Check if provided VIN number is for " + vm.car.make;
-                    vm.dangerAlert = true;
-                    vm.alertFlag = true;
-                    console.log(error);
+                else
+                    vm.alertMessage = error.response.data;
+                vm.dangerAlert = true;
+                vm.alertFlag = true;
+                console.log(error);
             });
         },
         insertCarSummary(carId) {
@@ -203,7 +236,7 @@ export default {
                     vm.$cookies.remove('role');
                     vm.$cookies.remove('user');
                     vm.$cookies.remove('currency');
-                    window.location.href('/');
+                    window.location.href = '/login';
                 }                        
             })
             .catch(function (error) {
