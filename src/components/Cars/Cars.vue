@@ -85,7 +85,6 @@
 import getSymbolFromCurrency from 'currency-symbol-map'
 import bmwModal from '../Modals/CarModal.vue';
 import axios from 'axios';
-
 const backEndUrl = process.env.VUE_APP_API;
 export default {      
       data() {
@@ -174,16 +173,15 @@ export default {
             fetchCars() {
                   let vm = this;
                   axios.get(backEndUrl + "/api/cars", {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
                         {
                               vm.cars = response.data;
                               vm.rows = response.data.length;
-                              vm.loading = false;                            
+                              vm.loading = false;                
+                                                         
                               //setting repair value to dafault - first of a list
                               if(vm.cars.length > 0)
                                     vm.insertRepair.car = vm.cars[0].id;
@@ -197,8 +195,7 @@ export default {
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                              
+                              window.location.href = '/login';                
                         }                              
                   })
                   .catch(function (error) {
@@ -371,7 +368,7 @@ export default {
                   if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
                   return !this.veeErrors.has(ref);
                   return null;
-            }
+            },
       }
 }
 </script>

@@ -34,8 +34,8 @@
 
       
       <h1 class="pt-5" style="color:red;">
-            Having trouble using our site? 
-            <a href="mailto:mantas.daunoravicius@ktu.edu" target="_blank" class="btn btn-primary">Email Us</a>
+            Having trouble while using page? Email me at: 
+            <a href="mailto:mantas.daunoravicius@ktu.edu" target="_blank">mantas.daunoravicius@ktu.edu</a>
       </h1>
 
   </div>

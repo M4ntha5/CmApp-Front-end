@@ -69,14 +69,27 @@
                   </div> 
                   <div class="row mb-3 pt-5">
                         <div class="col responsive"> 
-                             <template v-if="!tracking.showImages">            
-                                    <gallery :images="car.base64images" :index="index" @close="index = null"></gallery>
+                             <template v-if="!tracking.showImages && car.base64images.length > 0">            
+                                    <gallery :images="carImages"
+                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                                    @close="index = null">
+                                    </gallery>
                                     <div class="image img-fluid" 
                                           @click="index = 0"
-                                          :style="{ backgroundImage: 'url(' + car.base64images[0] + ')', width:'350px', height:'300px' }"
+                                          :style="{ backgroundImage: 'url(' + carImages[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-if="tracking.showImages && sharedBase64Images != 0">            
+                              <template v-if="!tracking.showImages && car.base64images.length < 1">            
+                                    <gallery :images="defaultImg"
+                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                                    @close="index = null">
+                                    </gallery>
+                                    <div class="image img-fluid" 
+                                          @click="index = 0"
+                                          :style="{ backgroundImage: 'url(' + defaultImg[0].href + ')', width:'350px', height:'300px' }"
+                                    /> 
+                              </template> 
+                              <template v-if="tracking.showImages && sharedBase64Images.length > 0">            
                                     <gallery :images="sharedBase64Images" :index="index" 
                                     :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
                                     @close="index = null">
@@ -86,14 +99,16 @@
                                           :style="{ backgroundImage: 'url(' + sharedBase64Images[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-if="tracking.showImages && sharedBase64Images == 0">            
-                                    <gallery :images="sharedBase64Images" :index="index" @close="index = null"></gallery>
+                              <template v-if="tracking.showImages && sharedBase64Images.length < 1">
+                                    <gallery :images="defaultImg" 
+                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                                    @close="index = null">
+                                    </gallery>
                                     <div class="image img-fluid"
                                           @click="index = 0"
-                                          :style="{ backgroundImage: 'url(' + car.base64images[0] + ')', width:'350px', height:'300px' }"
-                                    />
+                                          :style="{ backgroundImage: 'url(' + defaultImg[0].href + ')', width:'350px', height:'300px' }"
+                                    />                            
                               </template>
-
 
                         </div>
                         <div class="col">    
@@ -193,7 +208,14 @@
                               Equipment
                         </b-button> 
                         <b-collapse id="equipment-collapse" v-model="equipmentVisible" class="mt-2">
-                              <b-table striped :items="car.equipment" responsive>                                                 </b-table>
+                              <template v-if="car.equipment.length >0">
+                                    <b-table striped :items="car.equipment" responsive></b-table>
+                              </template> 
+                              <div v-else>
+                                    <center>
+                                          <h2 class="pt-3">No equipment</h2>
+                                    </center>
+                              </div>                                                
                         </b-collapse>
                   </div>
                   <div class="pt-3">   
@@ -328,6 +350,7 @@ export default {
                   equipmentVisible: false,
                   repairsVisible: false,
                   shippingVisible: false,
+                  defaultImg: []
             }
             
       },
@@ -337,9 +360,36 @@ export default {
             ToggleButton
       },
       computed: {
+            carImages: function() {
+                  let list = [];
+                  let shared = this.car.base64images;
+                  for(let i =1;i<shared.length;i++)
+                  {
+                        let obj = {
+                              href: shared[i],
+                              title: i + '/'+shared.length
+                        }
+                        list.push(obj);
+                  } 
+                  return list;
+            },
+            trackingImages: function() {
+                  let list = [];
+                  let shared = this.tracking.base64images;
+                  for(let i =1;i<shared.length;i++)
+                  {
+                        let obj = {
+                              href: shared[i],
+                              title: i + '/'+shared.length
+                        }
+                        list.push(obj);
+                  } 
+                  return list;
+            },
             sharedBase64Images: function () {   
                   let list = [];
-                  let shared = this.tracking.base64images.concat(this.car.base64images);
+                  let shared = this.car.base64images.concat(this.tracking.base64images);
+                  console.log(shared.length);
                   for(let i =1;i<shared.length;i++)
                   {
                         let obj = {
@@ -348,14 +398,11 @@ export default {
                         }
                         list.push(obj);
                   }
-                 // console.log(list.length); 
-                 // console.log(list); 
                   return list;
-            },        
+            },
       },
       beforeRouteLeave (to, from, next) {
-            this.updateShowImagesStatus();
-            
+            this.updateShowImagesStatus();          
             next();
       },
       created() {        
@@ -412,11 +459,15 @@ export default {
                                     let to = vm.car.base64images;
                                     vm.getImagesRecursive(n, from, to); 
                               }
-                              else
-                              {                                  
-                                    vm.car.base64images[0] = vm.car.mainImageUrl; 
-                                    console.log("else heree", vm.car.mainImageUrl)
-                              }
+                              else      
+                              {
+                                    let obj = {
+                                          href: vm.car.mainImageUrl,
+                                          title: '1/1'
+                                    };
+                                    vm.defaultImg.push(obj);
+                              }                            
+                                    
                         }
                         if(response.status == 401) 
                         {
@@ -542,8 +593,7 @@ export default {
                                     let from = vm.tracking.auctionImages;
                                     let to = vm.tracking.base64images;
                                     vm.getImagesRecursive(n, from, to);
-                              }   
-                                                                        
+                              }                                                                 
                         }
                         else if(response.status == 401) 
                         {
@@ -660,9 +710,7 @@ export default {
             },
             getImage(image, saveTo){
                   axios.post(backEndUrl + "/api/get-image", image, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)

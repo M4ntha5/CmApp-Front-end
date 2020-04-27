@@ -364,6 +364,7 @@ export default {
                dangerAlert: false,
                alertMessage: '',
                alertFlag: false,
+               equipmentCodes: []
           }
      }, 
      created() {      
@@ -389,6 +390,9 @@ export default {
                          vm.loading = false;
                          vm.make = vm.car.make;
                          vm.model = vm.car.model;
+                         vm.car.equipment.forEach(element => {
+                              vm.equipmentCodes.push(element.code);
+                         });
                     }
                     if(response.status == 401) 
                     {
@@ -507,23 +511,20 @@ export default {
                     let eqname = this.equipmentName;
                     let eqcode = this.equipmentCode.toUpperCase();
 
-                    var alreadyContains = this.car.equipment.filter(
-                         function(ele){
-                              return (ele.code == eqcode)
-                         });
+                    var alreadyContains = this.equipmentCodes.includes(eqcode);
                     if(alreadyContains)
-                         console.log("error", this.$validator);
+                         window.confirm('Equipment with the same code already exists');
                     else
-                         console.log("praejo");
-               
-                    this.car.equipment.push({
-                         code: eqcode,
-                         name: eqname
-                    });
-                    this.equipmentName = '';
-                    this.equipmentCode = '';
-                    this.$validator.reset('code-input');
-                    this.$validator.reset('name-input');
+                    {     
+                         this.car.equipment.push({
+                              code: eqcode,
+                              name: eqname
+                         });
+                         this.equipmentName = '';
+                         this.equipmentCode = '';
+                         this.$validator.reset('code-input');
+                         this.$validator.reset('name-input');
+                    }
                }
           },
           async addRepairRow(){
