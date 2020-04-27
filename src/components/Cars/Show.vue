@@ -451,7 +451,7 @@ export default {
                               vm.car = response.data;                         
                               //trimming unnecessary date ending           
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
-                              vm.loading = false;
+                              
                               if(vm.car.images.length != 0)
                               {
                                     let n = vm.car.images.length;
@@ -467,7 +467,7 @@ export default {
                                     };
                                     vm.defaultImg.push(obj);
                               }                            
-                                    
+                              vm.loading = false;   
                         }
                         if(response.status == 401) 
                         {

@@ -244,21 +244,17 @@ export default {
             });       
         },
         onFileSelected(e) {
-            console.log(e);            
+            console.log(e.target.files.length); 
+            let vm = this;           
             for(let i=0; i < e.target.files.length; i++)
             {
-                if(e.target.files[i].name.endsWith(".gif")||e.target.files[i].name.endsWith(".png") ||
-                    e.target.files[i].name.endsWith(".jpg") || e.target.files[i].name.endsWith(".jpeg"))
-                {
-                    var reader = new FileReader();
-                    reader.readAsDataURL(e.target.files[i]);
-                    reader.onload = (e) => {
-                            this.car.Base64images[i] = e.target.result;
-                    }  
-                }
-                               
+                var reader = new FileReader();
+                reader.readAsDataURL(e.target.files[i]);
+                reader.onload = (ev) => {
+                        vm.car.Base64images[i] = ev.target.result;
+                }                       
             }
-            console.log(this.car.Base64images);                
+            console.log(this.car.Base64images);
         },
         bmwClick() {
             this.activeMbItem = false;

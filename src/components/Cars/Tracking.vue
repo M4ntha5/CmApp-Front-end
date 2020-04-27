@@ -313,12 +313,14 @@ export default {
                         if(response.status == 200)
                         {
                               vm.tracking.base64images = response.data;   
-                              vm.tmpImgs = response.data;
-                              vm.downloadTrackingImages(response.data);
-                              console.log(vm.tracking.base64images)  ;                             
-                              vm.dangerAlert = false;
-                              vm.alertMessage = "Images successfully updated";
-                              vm.alertFlag = true;
+                              
+                              if(vm.tracking.base64images.length > 0)   
+                              {
+                                    vm.downloadTrackingImages(response.data)                      
+                                    vm.dangerAlert = false;
+                                    vm.alertMessage = "Images successfully updated";
+                                    vm.alertFlag = true;
+                              }              
                         }
                         else if(response.status == 401) 
                         {
