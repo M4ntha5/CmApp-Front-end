@@ -29,6 +29,7 @@
                                    aria-describedby="currency-input-live-feedback"
                                    data-vv-as="currency" > 
                               </b-form-select>
+                              <small class="form-text text-muted">Choose wisley. You will not be able to change your base currency later.</small>
                               <b-form-invalid-feedback id="currency-input-live-feedback">{{ veeErrors.first('currency-input') }}</b-form-invalid-feedback>
                          </b-form-group>
                     </div>

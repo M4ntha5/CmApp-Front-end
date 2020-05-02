@@ -39,8 +39,7 @@ export default {
           return {
                form: {
                     password: '',
-                    password2: '',
-                    token: this.$route.query.token
+                    password2: ''
                },
                dangerAlert: false,
                alertFlag: false,
@@ -57,12 +56,16 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
+
                     this.resetPassword();
                });
           },
           resetPassword() {
                let vm = this;
-               axios.post(backEndUrl + `/api/auth/password/reset`, vm.form)
+               console.log(vm.form);
+               axios.post(backEndUrl + `/api/users/${vm.$route.params.id}/password/reset`, vm.form, {
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+               })
                .then(function (response){
                     if(response.status == 200)
                     {
@@ -70,7 +73,7 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
                          setTimeout(function () {
-                              vm.$router.push('/login');
+                              vm.$router.push('/cars');
                          }, 3000);
                     }
                })

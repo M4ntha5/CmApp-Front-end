@@ -55,7 +55,9 @@
                                           </a>
 
                                           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                                                <a class="dropdown-item" :href="'/users/'+ user + '/edit'">Profile</a>
+                                                <a class="dropdown-item" @click.prevent="toProfile()" href="">Profile</a>
+                                                <a class="dropdown-item" @click.prevent="toStats()" href="">My stats</a>
+                                                <a class="dropdown-item" @click.prevent="toPassReset()" href="">Change password</a>
                                                 <a class="dropdown-item" @click.prevent="logout()" href="">Log out</a>
                                           </div>
                                     </div>
@@ -81,7 +83,7 @@ export default {
       components: {
             RepairModal,
       },
-       computed: {
+      computed: {
             token: function () {  
                   return window.$cookies.get('token');  
             },
@@ -96,6 +98,15 @@ export default {
             }
       },
       methods: {
+            toProfile() {
+                  this.$router.push(`/users/${this.user}/edit`);
+            },
+            toStats() {
+                  this.$router.push(`/users/${this.user}/stats`);
+            },
+            toPassReset() {
+                  this.$router.push(`/users/${this.user}/change/password`);
+            },
             showRepairModal() {
                   this.isRepairModalVisible = true;
             },

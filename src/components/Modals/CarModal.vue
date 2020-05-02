@@ -38,7 +38,7 @@
                         <b-form-group label="Price">
                             <b-form-input id="price-input" placeholder="9000" name="price-input"
                                 v-model="summary.boughtPrice"
-                                v-validate="{ required: true, decimal:'2' }"
+                                v-validate="{ required: true, decimal:'2',min_value:1 }"
                                 :state="validateState('price-input')" 
                                 aria-describedby="price-input-live-feedback"
                                 data-vv-as="price">
@@ -244,21 +244,17 @@ export default {
             });       
         },
         onFileSelected(e) {
-            console.log(e);            
+            console.log(e.target.files.length); 
+            let vm = this;           
             for(let i=0; i < e.target.files.length; i++)
             {
-                if(e.target.files[i].name.endsWith(".gif")||e.target.files[i].name.endsWith(".png") ||
-                    e.target.files[i].name.endsWith(".jpg") || e.target.files[i].name.endsWith(".jpeg"))
-                {
-                    var reader = new FileReader();
-                    reader.readAsDataURL(e.target.files[i]);
-                    reader.onload = (e) => {
-                            this.car.Base64images[i] = e.target.result;
-                    }  
-                }
-                               
+                var reader = new FileReader();
+                reader.readAsDataURL(e.target.files[i]);
+                reader.onload = (ev) => {
+                        vm.car.Base64images[i] = ev.target.result;
+                }                       
             }
-            console.log(this.car.Base64images);                
+            console.log(this.car.Base64images);
         },
         bmwClick() {
             this.activeMbItem = false;
@@ -271,7 +267,7 @@ export default {
             this.car.make = 'Mercedes-benz'
         },
         otherClick() {
-            window.location.href= "/other-insert";
+            this.$router.push("/other-insert");
         },
         validateState(ref) {
             if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))

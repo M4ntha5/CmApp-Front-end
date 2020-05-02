@@ -52,7 +52,7 @@ export default {
                });
           },
           resetModal() {
-               this.email = '';
+               this.form.email = '';
           },
           resetPassword() {
                let vm = this;        

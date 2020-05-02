@@ -4,7 +4,7 @@
           <center class="mb-4"><h1>Your profile information</h1></center>
           <b-form>
                <div class="form-row">
-                    <b-form-group class="col-md-6" label="First name">
+                    <b-form-group class="col-sm-6" label="First name">
                          <b-form-input id="name-input" name="name-input" placeholder="John"
                               v-model="user.firstName"     
                               v-validate="{ required: false }"
@@ -16,7 +16,7 @@
                               {{ veeErrors.first('name-input') }}
                          </b-form-invalid-feedback>
                     </b-form-group>
-                    <b-form-group class="col-md-6" label="Last name">
+                    <b-form-group class="col-sm-6" label="Last name">
                          <b-form-input id="surname-input" name="surname-input" placeholder="Doe"
                               v-model="user.lastName"     
                               v-validate="{ required: false }"
@@ -30,7 +30,7 @@
                     </b-form-group>
                </div>
                <div class="form-row">
-                    <b-form-group class="col-md-12" label="Email">
+                    <b-form-group class="col-sm-6" label="Email">
                          <b-form-input disabled id="email-input" name="email-input" placeholder="example@example.com"
                               v-model="user.email"
                               v-validate="{ required: false, email: true }"
@@ -42,9 +42,21 @@
                               {{ veeErrors.first('email-input') }}
                          </b-form-invalid-feedback>
                     </b-form-group>
+                    <b-form-group class="col-sm-6" label="Your currency">
+                         <b-form-input disabled name="currency-input"
+                              v-model="user.currency"
+                              v-validate="{ required: false, email: true }"
+                              :state="validateState('currency-input')" 
+                              aria-describedby="currency-input-live-feedback"
+                              data-vv-as="currency">
+                         </b-form-input>
+                         <b-form-invalid-feedback id="currency-input-live-feedback">
+                              {{ veeErrors.first('currency-input') }}
+                         </b-form-invalid-feedback>
+                    </b-form-group>
                </div>
                <div class="form-row">
-                    <b-form-group class="col-md-2" label="Sex">
+                    <b-form-group class="col-sm-2" label="Sex">
                          <b-form-radio-group name="sex-input" id="sex-input"
                               v-model="user.sex"
                               :options="sexOptions"
@@ -57,7 +69,7 @@
                               {{ veeErrors.first('sex-input') }}
                          </b-form-invalid-feedback>
                     </b-form-group>
-                    <b-form-group class="col-md-5" label="Born date">
+                    <b-form-group class="col-sm-5" label="Born date">
                          <b-form-input name="bornDate-input" type="date"
                               v-model="user.bornDate"     
                               v-validate="{ required: false }"
@@ -70,7 +82,7 @@
                          </b-form-invalid-feedback>
                     </b-form-group>
                     
-                    <b-form-group class="col-md-5" label="Country">
+                    <b-form-group class="col-sm-5" label="Country">
                          <b-form-select name="country-input"
                               v-model="user.country" 
                               :options="countries"
@@ -111,10 +123,12 @@ export default {
                     email: '',
                     sex: '',
                     bornDate: '',
-                    country: ''
+                    country: '',
+                    currency: ''
                },
                sexOptions: ['Men', 'Women'],
-               countries: []
+               countries: [],
+               currencies: []
           }
      },
      mounted() {
@@ -138,6 +152,7 @@ export default {
                     if(response.status == 200)
                     {
                          vm.user = response.data;
+                         vm.user.bornDate = vm.user.bornDate.substring(0, 10);
                          if(vm.user.country == "")
                               vm.user.country = "Lithuania";
                          vm.loading = false;
@@ -166,7 +181,6 @@ export default {
           },
           updateUser() {
                let vm = this;
-               console.log(window.$cookies.get('token'));
                axios.put(backEndUrl + `/api/users/${vm.$route.params.id}`, vm.user, {
                     headers: {
                               Authorization: 'Bearer ' + window.$cookies.get('token')
@@ -214,7 +228,7 @@ export default {
                .catch(function (error){
                     console.log(error);
                })
-          }
+          },
      }  
 }
 </script>

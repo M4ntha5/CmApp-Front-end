@@ -11,11 +11,11 @@
 
             <div v-if="!loading && !empty">
                   <div class="row pt-4" >                    
-                        <div class="img-fluid col-sm-6 col-12">              
-                              <gallery :images="tracking.base64images" :index="index" @close="index = null"></gallery>
+                        <div class="img-fluid col-sm-6 col-12" >              
+                              <gallery :images="trackingImages" :index="index" @close="index = null"></gallery>
                               <div class="image img-fluid" 
                                     @click="index = 0"
-                                    :style="{ backgroundImage: 'url(' + tracking.base64images[0] + ')', width:'350px', height:'300px' }"
+                                    :style="{ backgroundImage: 'url(' + trackingImages[0].href + ')', width:'350px', height:'300px' }"
                               />
                         </div>
                         <div class="col-sm-6 col-12 pt-4">
@@ -194,15 +194,25 @@ export default {
       components: {
                'gallery': VueGallery,
       },
-      watch: {
-            //'$route' (to, from) {
-              //    alert("to", to.params.id);
-            //      alert("from", from.params.id);
-          //  }
-      },
       created() {
             this.fetchTracking();
             this.fetchCar();
+      },
+      computed: {
+            trackingImages: function(){
+                  let list = [];
+                  let shared = this.tracking.base64images;
+                  for(let i =0;i<shared.length;i++)
+                  {
+                        let obj = {
+                              href: shared[i],
+                              title: i + 1 + '/' + shared.length
+                        }
+                        list.push(obj);
+                  } 
+                  console.log("tracking",list);
+                  return list;
+            }
       },
 
       methods: {
@@ -281,8 +291,7 @@ export default {
                               if(vm.tracking.containerNumber != '')
                                     vm.empty = false;
                               vm.loading = false;  
-
-                              vm.tracking.base64images = vm.tmpImgs;                         
+                    
                               vm.dangerAlert = false;
                               vm.alertMessage = "Tracking data updated sccessfully.";
                               vm.alertFlag =true;
@@ -313,12 +322,14 @@ export default {
                         if(response.status == 200)
                         {
                               vm.tracking.base64images = response.data;   
-                              vm.tmpImgs = response.data;
-                              vm.downloadTrackingImages(response.data);
-                              console.log(vm.tracking.base64images)  ;                             
-                              vm.dangerAlert = false;
-                              vm.alertMessage = "Images successfully updated";
-                              vm.alertFlag = true;
+                              console.log(vm.tracking.base64images);
+                              if(vm.tracking.base64images.length > 0)   
+                              {
+                                    vm.downloadTrackingImages(response.data)                      
+                                    vm.dangerAlert = false;
+                                    vm.alertMessage = "Images successfully updated";
+                                    vm.alertFlag = true;
+                              }              
                         }
                         else if(response.status == 401) 
                         {
