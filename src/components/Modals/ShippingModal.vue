@@ -10,8 +10,8 @@
                          <b-col cols="8">
                               <b-form-group label="Transportation fee">
                                    <b-form-input placeholder="180" name="transportationFee-input"
-                                        v-model="insert.transportationFee" min="0" step=".01"
-                                        v-validate="{ required: true, decimal:'2' }"
+                                        v-model="insert.transportationFee"  step=".01"
+                                        v-validate="{ required: true, decimal:'2',min_value:0 }"
                                         :state="validateState('transportationFee-input')" 
                                         aria-describedby="transportationFee-input-live-feedback"
                                         data-vv-as="transportationFee">
@@ -42,8 +42,8 @@
                          <b-col cols="8">
                               <b-form-group label="Transfer fee">
                                    <b-form-input placeholder="220" name="transferFee-input"
-                                        v-model="insert.transferFee" min="0" step=".01"
-                                        v-validate="{ required: true, decimal:'2' }"
+                                        v-model="insert.transferFee" step=".01"
+                                        v-validate="{ required: true, decimal:'2',min_value:0 }"
                                         :state="validateState('transferFee-input')" 
                                         aria-describedby="transferFee-input-live-feedback"
                                         data-vv-as="transferFee">
@@ -73,8 +73,8 @@
                          <b-col cols="8">
                               <b-form-group label="Auction fee">
                                    <b-form-input placeholder="960" name="auctionFee-input"
-                                        v-model="insert.auctionFee" min="0" step=".01"
-                                        v-validate="{ required: true, decimal:'2' }"
+                                        v-model="insert.auctionFee" step=".01"
+                                        v-validate="{ required: true, decimal:'2',min_value:0 }"
                                         :state="validateState('auctionFee-input')" 
                                         aria-describedby="auctionFee-input-live-feedback"
                                         data-vv-as="auctionFee">
@@ -104,8 +104,8 @@
                          <b-col cols="8">
                               <b-form-group label="Customs">
                                    <b-form-input placeholder="1800" name="customs-input"
-                                        v-model="insert.customs" min="0" step=".01"
-                                        v-validate="{ required: true, decimal:'2' }"
+                                        v-model="insert.customs" step=".01"
+                                        v-validate="{ required: true, decimal:'2',min_value:0 }"
                                         :state="validateState('customs-input')" 
                                         aria-describedby="customs-input-live-feedback"
                                         data-vv-as="customs">

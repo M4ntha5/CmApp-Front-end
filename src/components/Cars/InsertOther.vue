@@ -224,7 +224,7 @@
                     </div>
                     <div class="form-row">
                          <b-form-group class="col-sm-12 mb-3" id="images-group-1" label="Images">
-                              <b-form-file name="images-input"
+                              <b-form-file name="images-input" multiple
                                    @change="onFileSelected" 
                                    v-model="example" accept="image/*"
                                    v-validate="{ required: false, image: true }" 
@@ -354,7 +354,8 @@ const backEndUrl = process.env.VUE_APP_API;
                     loading: true,
                     equipmentCode: '',
                     equipmentName: '',
-                    equipmentVisible: false
+                    equipmentVisible: false,
+                    example:[]
                }
           },
           mounted(){
@@ -517,8 +518,7 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
                               window.location.href('/login');
-                         }    
-                              
+                         }                            
                     })
                     .catch(function (error){
                          console.log(error);
@@ -551,20 +551,17 @@ const backEndUrl = process.env.VUE_APP_API;
                          this.$validator.reset('name-input');
                     }
                },
-               onFileSelected(e) {           
+               onFileSelected(e) { 
+                    let vm = this;          
                     for(let i=0; i < e.target.files.length; i++)
                     {
-                         if(e.target.files[i].name.endsWith(".gif")||e.target.files[i].name.endsWith(".png") ||
-                              e.target.files[i].name.endsWith(".jpg") || e.target.files[i].name.endsWith(".jpeg"))
-                         {
-                              var reader = new FileReader();
-                              reader.readAsDataURL(e.target.files[i]);
-                              reader.onload = (e) => {
-                                   this.car.Base64images[i] = e.target.result;
-                              }  
-                         }                          
+                         var reader = new FileReader();
+                         reader.readAsDataURL(e.target.files[i]);
+                         reader.onload = (e) => {
+                              vm.car.base64images[i] = e.target.result; 
+                         }                       
                     }
-                    console.log(this.car.Base64images);                
+                    console.log(this.car.base64images);                
                },
           }
      }

@@ -70,8 +70,7 @@
                   <div class="row mb-3 pt-5">
                         <div class="col responsive"> 
                              <template v-if="!tracking.showImages && car.base64images.length > 0">            
-                                    <gallery :images="carImages"
-                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                                    <gallery :images="carImages" :index="index"                      
                                     @close="index = null">
                                     </gallery>
                                     <div class="image img-fluid" 
@@ -79,9 +78,8 @@
                                           :style="{ backgroundImage: 'url(' + carImages[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-if="!tracking.showImages && car.base64images.length < 1">            
-                                    <gallery :images="defaultImg"
-                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                              <template v-else-if="!tracking.showImages && car.base64images.length == 0">            
+                                    <gallery :index="index" :images="defaultImg" 
                                     @close="index = null">
                                     </gallery>
                                     <div class="image img-fluid" 
@@ -89,9 +87,8 @@
                                           :style="{ backgroundImage: 'url(' + defaultImg[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-if="tracking.showImages && sharedBase64Images.length > 0">            
-                                    <gallery :images="sharedBase64Images" :index="index" 
-                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                              <template v-else-if="tracking.showImages && sharedBase64Images.length > 0">            
+                                    <gallery :images="sharedBase64Images" :index="index"                                
                                     @close="index = null">
                                     </gallery>
                                     <div class="image img-fluid" 
@@ -99,9 +96,8 @@
                                           :style="{ backgroundImage: 'url(' + sharedBase64Images[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-if="tracking.showImages && sharedBase64Images.length < 1">
-                                    <gallery :images="defaultImg" 
-                                    :options="{startSlideshow: true,slideshowInterval: 5000,clearSlides: false}"
+                              <template v-else-if="tracking.showImages && sharedBase64Images.length < 1">
+                                    <gallery :images="defaultImg" :index="index" 
                                     @close="index = null">
                                     </gallery>
                                     <div class="image img-fluid"
@@ -284,6 +280,7 @@ import VueGallery from 'vue-gallery';
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
 const backEndUrl = process.env.VUE_APP_API;
+console.log(process.env.VUE_APP_DEFAULT_IMAGE);
 export default { 
       data() {
             return {
@@ -350,7 +347,11 @@ export default {
                   equipmentVisible: false,
                   repairsVisible: false,
                   shippingVisible: false,
-                  defaultImg: []
+                  defaultImg: [{
+                        href: process.env.VUE_APP_DEFAULT_IMAGE,
+                        title: '1/1'
+                  }]
+
             }
             
       },
@@ -363,38 +364,41 @@ export default {
             carImages: function() {
                   let list = [];
                   let shared = this.car.base64images;
-                  for(let i =1;i<shared.length;i++)
+                  console.log("carbase",shared);
+                  for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
                               href: shared[i],
-                              title: i + '/'+shared.length
+                              title: i+1 + '/'+shared.length
                         }
                         list.push(obj);
                   } 
+                  console.log("car",list);
                   return list;
             },
             trackingImages: function() {
                   let list = [];
                   let shared = this.tracking.base64images;
-                  for(let i =1;i<shared.length;i++)
+                  for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
                               href: shared[i],
-                              title: i + '/'+shared.length
+                              title: i+1 + '/'+shared.length
                         }
                         list.push(obj);
                   } 
+                  console.log("tracking",list);
                   return list;
             },
             sharedBase64Images: function () {   
                   let list = [];
                   let shared = this.car.base64images.concat(this.tracking.base64images);
                   console.log(shared.length);
-                  for(let i =1;i<shared.length;i++)
+                  for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
                               href: shared[i],
-                              title: i + '/'+shared.length
+                              title: i+1 + '/'+shared.length
                         }
                         list.push(obj);
                   }
@@ -451,23 +455,14 @@ export default {
                               vm.car = response.data;                         
                               //trimming unnecessary date ending           
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
-                              
+                              vm.loading = false;  
                               if(vm.car.images.length != 0)
                               {
                                     let n = vm.car.images.length;
                                     let from = vm.car.images;
                                     let to = vm.car.base64images;
                                     vm.getImagesRecursive(n, from, to); 
-                              }
-                              else      
-                              {
-                                    let obj = {
-                                          href: vm.car.mainImageUrl,
-                                          title: '1/1'
-                                    };
-                                    vm.defaultImg.push(obj);
-                              }                            
-                              vm.loading = false;   
+                              }                               
                         }
                         if(response.status == 401) 
                         {

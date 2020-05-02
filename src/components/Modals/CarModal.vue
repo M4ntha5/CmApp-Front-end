@@ -38,7 +38,7 @@
                         <b-form-group label="Price">
                             <b-form-input id="price-input" placeholder="9000" name="price-input"
                                 v-model="summary.boughtPrice"
-                                v-validate="{ required: true, decimal:'2' }"
+                                v-validate="{ required: true, decimal:'2',min_value:1 }"
                                 :state="validateState('price-input')" 
                                 aria-describedby="price-input-live-feedback"
                                 data-vv-as="price">
@@ -267,7 +267,7 @@ export default {
             this.car.make = 'Mercedes-benz'
         },
         otherClick() {
-            window.location.href= "/other-insert";
+            this.$router.push("/other-insert");
         },
         validateState(ref) {
             if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))

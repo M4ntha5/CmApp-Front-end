@@ -123,7 +123,7 @@
                     <b-form-group class="col-sm-4 mb-3" label="Engine displacement">
                          <b-form-input placeholder="3.0" name="displacement-input"
                               v-model="car.displacement"
-                              v-validate="{ required: false, decimal:'2' }"
+                              v-validate="{ required: false, decimal:'2',min_value:0.1 }"
                               :state="validateState('displacement-input')" 
                               aria-describedby="displacement-input-live-feedback"
                               data-vv-as="displacement">
@@ -384,10 +384,11 @@ export default {
                          let n = vm.car.images.length;
                          let from = vm.car.images;
                          let to = vm.car.base64images;
+                         vm.loading = false;
                          vm.getImagesRecursive(n, from, to);
                          //trimming unnecessary dat ending           
                          vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
-                         vm.loading = false;
+                         
                          vm.make = vm.car.make;
                          vm.model = vm.car.model;
                          vm.car.equipment.forEach(element => {
@@ -489,6 +490,7 @@ export default {
                     this.alertMessage = "Saving your changes...";
                     this.dangerAlert = false;
                     this.alertFlag = true;
+                    console.log(this.car.base64images);
                     this.updateAll();
                }            
           },
@@ -639,12 +641,13 @@ export default {
                this.car.base64images.splice(index, 1);
           },
           onFileSelected(e) {
+               let vm = this;
                for(let i=0; i < e.target.files.length; i++)
                {
                     var reader = new FileReader();
                     reader.readAsDataURL(e.target.files[i]);
                     reader.onload = (e) => {
-                         this.car.base64images.push(e.target.result);
+                         vm.car.base64images.push(e.target.result);
                     }                 
                }             
           },

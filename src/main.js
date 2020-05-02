@@ -11,7 +11,7 @@ import VueCookies from 'vue-cookies';
 import Cars from './components/Cars/Cars.vue';
 import ShowCar from './components/Cars/Show.vue';
 import Edit from './components/Cars/Edit.vue';
-import About from './components/About.vue';
+import About from './components/Pages/About.vue';
 import Home from './components/Home.vue';
 import Login from './components/Auth/Login.vue';
 import Register from './components/Auth/Register.vue';
@@ -19,11 +19,14 @@ import Tracking from './components/Cars/Tracking.vue';
 import Converter from './components/ExcangeConverter/Converter.vue';
 import InsertOther from './components/Cars/InsertOther.vue';
 import NotFound from './components/Pages/404.vue';
-import UserEdit from './components/Pages/UserEdit.vue';
+import UserEdit from './components/User/UserEdit.vue';
+import CarStats from './components/User/Stats.vue';
+import ChangePass from './components/User/ChangePassword.vue';
 import EmailConfirm from './components/Auth/ConfirmEmail.vue';
 import PasswordReset from './components/Auth/PasswordReset.vue';
 import AllUsers from './components/Admin/Users.vue';
 import AllCars from './components/Admin/AllCars.vue';
+
 
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
@@ -76,6 +79,20 @@ const routes = [
       }
     },
     { path: '/users/:id/edit', component: UserEdit,
+      beforeEnter: (to, from, next) => {
+        let jwt = window.$cookies.get('token');
+        if(jwt == null || jwt.length < 10) next("/login")
+        else next()
+      }
+    },
+    { path: '/users/:id/stats', component: CarStats,
+      beforeEnter: (to, from, next) => {
+        let jwt = window.$cookies.get('token');
+        if(jwt == null || jwt.length < 10) next("/login")
+        else next()
+      }
+    },
+    { path: '/users/:id/change/password', component: ChangePass,
       beforeEnter: (to, from, next) => {
         let jwt = window.$cookies.get('token');
         if(jwt == null || jwt.length < 10) next("/login")
