@@ -15,7 +15,7 @@
                         <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
                               <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
-                                          <b-card-img img-alt="image img-fluid" img-top :src='car.mainImageUrl'
+                                          <b-card-img v-if="car.mainImageUrl != null" img-alt="image img-fluid" img-top :src='car.mainImageUrl'
                                           style="max-height:238.5px"></b-card-img>
                                           <b-card-body class="pl-3">            
                                                 <b-card-title>{{car.make}} {{car.model}}</b-card-title>
@@ -73,9 +73,6 @@
 
             </b-form>
         </b-modal>
-
-
- 
 </div>
 </template>
 
@@ -98,21 +95,8 @@ export default {
                         id: '',
                         make:'',
                         model:'',
-                        vin:'',
-                        manufactureDate:'',
-                        series:'',
-                        bodyType:'',
-                        steering:'',
-                        engine:'',
-                        displacement:'',
-                        power:'',
-                        drive:'',
-                        transmission:'',
-                        color:'',
-                        interior:'',
-                        created_at:'',
                         mainImageUrl:'',
-                        equipment: [],
+                        carImg: '',
                         summary: {
                               boughtPrice:'',
                               soldPrice:'',
@@ -148,13 +132,6 @@ export default {
                   rows: 0
             }           
       },
-
-      watch: {
-            /*'$route' (to, from) {
-                  alert("to", to.params);
-                  alert("from", from);
-            }*/
-      },
       created() {
             this.fetchCars();
       },
@@ -181,12 +158,13 @@ export default {
                               vm.cars = response.data;
                               vm.rows = response.data.length;
                               vm.loading = false;                
-                                                         
+
+                              for(let i =0; i < vm.cars.length; i++)
+                                    vm.getImage(vm.cars[i].carImg, vm.cars[i]);
                               //setting repair value to dafault - first of a list
                               if(vm.cars.length > 0)
                                     vm.insertRepair.car = vm.cars[0].id;
 
-                              vm.fetchCarsSummary();
                         }
                         if(response.status == 401) 
                         {
@@ -206,42 +184,30 @@ export default {
                         console.log(error);
                   });
             },
-            fetchCarsSummary() {
-                  let vm = this;
-                  for(let i =0; i< vm.cars.length;i++)
-                  {
-                        axios.get(backEndUrl + `/api/cars/${vm.cars[i].id}/summary`, {
-                              headers: {
-                                    Authorization: 'Bearer ' + window.$cookies.get('token')
-                              }
-                        })
-                        .then(function (response) {
-                              if(response.status == 200)
-                              {
-                                    vm.cars[i].summary = response.data;
-                                    vm.cars[i].summary.profit = 
-                                          vm.cars[i].summary.soldPrice -
-                                          vm.cars[i].summary.total;
-                                    vm.cars[i].summary.profit = 
-                                          Number.parseFloat(vm.cars[i].summary.profit).toFixed(0);             
-                              }
-                              if(response.status == 401) 
-                              {
-                                    vm.$cookies.remove('token');
-                                    vm.$cookies.remove('user-email');
-                                    vm.$cookies.remove('role');
-                                    vm.$cookies.remove('user');
-                                    vm.$cookies.remove('currency');
-                                    window.location.href = '/login';
-                              }                                
-                        })
-                        .catch(function (error) {
-                              vm.alertMessage = error.response.data;
-                              vm.dangerAlert = true;
-                              vm.alertFlag = true;
-                              console.log(error);
-                        });           
-                  }      
+            getImage(image, saveTo){
+                  axios.post(backEndUrl + "/api/get-image", image, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)
+                        {
+                              saveTo.mainImageUrl = response.data;
+                              
+                        }     
+                        if(response.status == 401) 
+                        {                  
+                              this.$cookies.remove('token');
+                              this.$cookies.remove('user-email');
+                              this.$cookies.remove('role');
+                              this.$cookies.remove('user');
+                              this.$cookies.remove('currency');
+                              window.location.href = '/login';
+                        }    
+                  })
+                  .catch(function (error) {
+                        console.log(saveTo);
+                        console.log(error);
+                  });
             },
             fetchCarSummary(index, carId) {
                   let vm = this;
