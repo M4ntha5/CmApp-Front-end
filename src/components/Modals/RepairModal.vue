@@ -112,7 +112,7 @@ export default {
                               vm.$bvModal.hide('repair-insert-modal')
                          })
                     }
-                    else if(response.status == 401) 
+                    if(response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
@@ -121,6 +121,7 @@ export default {
                          vm.$cookies.remove('currency');
                          window.location.href = '/login';
                     } 
+                    
                })
                .catch(function (error) {
                     vm.alertMessage = error.response.data;
@@ -150,7 +151,7 @@ export default {
                          window.location.href = '/login';
                     }                
                })
-               .catch(function (error) {                     
+               .catch(function (error) {                  
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;

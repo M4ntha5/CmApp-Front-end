@@ -15,7 +15,7 @@
                         <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
                               <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
-                                          <b-card-img v-if="car.mainImageUrl != null" img-alt="image img-fluid" img-top :src='car.mainImageUrl'
+                                          <b-card-img img-alt="image img-fluid" img-top :src='car.mainImageUrl'
                                           style="max-height:238.5px"></b-card-img>
                                           <b-card-body class="pl-3">            
                                                 <b-card-title>{{car.make}} {{car.model}}</b-card-title>
@@ -70,7 +70,6 @@
                               {{ veeErrors.first('soldPrice-input') }}
                         </b-form-invalid-feedback>
                   </b-form-group>     
-
             </b-form>
         </b-modal>
 </div>
@@ -129,7 +128,8 @@ export default {
                   },
                   currentPage: 1,
                   perPage: 3,
-                  rows: 0
+                  rows: 0,
+                  
             }           
       },
       created() {
@@ -160,7 +160,15 @@ export default {
                               vm.loading = false;                
 
                               for(let i =0; i < vm.cars.length; i++)
-                                    vm.getImage(vm.cars[i].carImg, vm.cars[i]);
+                              {
+                                    vm.cars[i].summary.profit = Number((vm.cars[i].summary.profit).toFixed(2)); 
+
+                                    if(vm.cars[i].carImg == null)
+                                          vm.cars[i].mainImageUrl = process.env.VUE_APP_DEFAULT_IMAGE;
+                                    else
+                                          vm.getImage(vm.cars[i].carImg, vm.cars[i]);
+                              }
+                                    
                               //setting repair value to dafault - first of a list
                               if(vm.cars.length > 0)
                                     vm.insertRepair.car = vm.cars[0].id;
@@ -184,16 +192,14 @@ export default {
                         console.log(error);
                   });
             },
-            getImage(image, saveTo){
+            getImage(image, saveTo){                
                   axios.post(backEndUrl + "/api/get-image", image, {
                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                        {
-                              saveTo.mainImageUrl = response.data;
-                              
-                        }     
+                              saveTo.mainImageUrl = response.data; 
+
                         if(response.status == 401) 
                         {                  
                               this.$cookies.remove('token');

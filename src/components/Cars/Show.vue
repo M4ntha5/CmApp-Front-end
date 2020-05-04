@@ -5,10 +5,10 @@
      
             <div v-if="!loading">     
                   <div class="row mb-2 mt-1">
-                        <div class="col-sm-6 col-12">
+                        <div class="col-sm-8 col-12">
                               <h1>{{car.make}} {{car.model}}</h1>
                         </div>
-                        <div class="col-sm-6 col-12">
+                        <div class="col-sm-4 col-12">
                               <div class="row" style="float:right;">
                                     <div class="col">
                                           <a class="btn btn-secondary" target="_blank" v-if="car.make == 'BMW'"
@@ -280,7 +280,6 @@ import VueGallery from 'vue-gallery';
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
 const backEndUrl = process.env.VUE_APP_API;
-console.log(process.env.VUE_APP_DEFAULT_IMAGE);
 export default { 
       data() {
             return {
@@ -452,8 +451,8 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {  
-                              vm.car = response.data;                         
-                              //trimming unnecessary date ending           
+                              vm.car = response.data;
+                              //trimming unnecessary date ending
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                               vm.loading = false;  
                               if(vm.car.images.length != 0)
