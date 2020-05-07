@@ -19,6 +19,9 @@
                                     <a @click.prevent="showRepairModal" href v-b-modal.repair-insert-modal class="nav-link">
                                           Add repair
                                     </a>
+                              </li>
+                              <li class="nav-item" >
+                                    <router-link :to='"/users/"+user+"/stats"' class="nav-link">Sold stats</router-link>
                               </li> 
                         </template>
                         <template v-if="role == 'admin'">
@@ -55,8 +58,7 @@
                                           </a>
 
                                           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                                                <a class="dropdown-item" @click.prevent="toProfile()" href="">Profile</a>
-                                                <a class="dropdown-item" @click.prevent="toStats()" href="">My stats</a>
+                                                <a class="dropdown-item" @click.prevent="toProfile()" href="">Profile</a>                            
                                                 <a class="dropdown-item" @click.prevent="toPassReset()" href="">Change password</a>
                                                 <a class="dropdown-item" @click.prevent="logout()" href="">Log out</a>
                                           </div>
