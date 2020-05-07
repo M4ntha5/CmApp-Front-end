@@ -11,7 +11,7 @@
 
             <div v-if="!loading && !empty">
                   <div class="row pt-4" >                    
-                        <div class="img-fluid col-sm-6 col-12" >              
+                        <div class="img-fluid col-sm-6 col-12">              
                               <gallery :images="trackingImages" :index="index" @close="index = null"></gallery>
                               <div class="image img-fluid" 
                                     @click="index = 0"

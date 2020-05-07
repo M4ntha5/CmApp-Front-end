@@ -100,9 +100,6 @@ export default {
                totalProfit: 0
           }
      },
-     created() {
-         //this.getStats();
-     },
      methods: {
           getStats(){
                let vm = this;
@@ -115,8 +112,10 @@ export default {
                          vm.stats = response.data;
                          vm.rows = vm.stats.length;
                          vm.stats.forEach(elem => {
-                              vm.totalProfit = vm.totalProfit + elem.profit
+                              vm.totalProfit = vm.totalProfit + elem.profit;
+                              elem.profit = Number((elem.profit)).toFixed(2);
                          });
+                         vm.totalProfit = Number((vm.totalProfit)).toFixed(2);
 
                          vm.isBusy = false;
                     }

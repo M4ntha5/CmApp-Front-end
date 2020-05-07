@@ -70,12 +70,8 @@
                               {{ veeErrors.first('soldPrice-input') }}
                         </b-form-invalid-feedback>
                   </b-form-group>     
-
             </b-form>
         </b-modal>
-
-
- 
 </div>
 </template>
 
@@ -98,21 +94,8 @@ export default {
                         id: '',
                         make:'',
                         model:'',
-                        vin:'',
-                        manufactureDate:'',
-                        series:'',
-                        bodyType:'',
-                        steering:'',
-                        engine:'',
-                        displacement:'',
-                        power:'',
-                        drive:'',
-                        transmission:'',
-                        color:'',
-                        interior:'',
-                        created_at:'',
                         mainImageUrl:'',
-                        equipment: [],
+                        carImg: '',
                         summary: {
                               boughtPrice:'',
                               soldPrice:'',
@@ -145,15 +128,9 @@ export default {
                   },
                   currentPage: 1,
                   perPage: 3,
-                  rows: 0
+                  rows: 0,
+                  
             }           
-      },
-
-      watch: {
-            /*'$route' (to, from) {
-                  alert("to", to.params);
-                  alert("from", from);
-            }*/
       },
       created() {
             this.fetchCars();
@@ -181,12 +158,21 @@ export default {
                               vm.cars = response.data;
                               vm.rows = response.data.length;
                               vm.loading = false;                
-                                                         
+
+                              for(let i =0; i < vm.cars.length; i++)
+                              {
+                                    vm.cars[i].summary.profit = Number((vm.cars[i].summary.profit).toFixed(2)); 
+
+                                    if(vm.cars[i].carImg == null)
+                                          vm.cars[i].mainImageUrl = process.env.VUE_APP_DEFAULT_IMAGE;
+                                    else
+                                          vm.getImage(vm.cars[i].carImg, vm.cars[i]);
+                              }
+                                    
                               //setting repair value to dafault - first of a list
                               if(vm.cars.length > 0)
                                     vm.insertRepair.car = vm.cars[0].id;
 
-                              vm.fetchCarsSummary();
                         }
                         if(response.status == 401) 
                         {
@@ -206,42 +192,28 @@ export default {
                         console.log(error);
                   });
             },
-            fetchCarsSummary() {
-                  let vm = this;
-                  for(let i =0; i< vm.cars.length;i++)
-                  {
-                        axios.get(backEndUrl + `/api/cars/${vm.cars[i].id}/summary`, {
-                              headers: {
-                                    Authorization: 'Bearer ' + window.$cookies.get('token')
-                              }
-                        })
-                        .then(function (response) {
-                              if(response.status == 200)
-                              {
-                                    vm.cars[i].summary = response.data;
-                                    vm.cars[i].summary.profit = 
-                                          vm.cars[i].summary.soldPrice -
-                                          vm.cars[i].summary.total;
-                                    vm.cars[i].summary.profit = 
-                                          Number.parseFloat(vm.cars[i].summary.profit).toFixed(0);             
-                              }
-                              if(response.status == 401) 
-                              {
-                                    vm.$cookies.remove('token');
-                                    vm.$cookies.remove('user-email');
-                                    vm.$cookies.remove('role');
-                                    vm.$cookies.remove('user');
-                                    vm.$cookies.remove('currency');
-                                    window.location.href = '/login';
-                              }                                
-                        })
-                        .catch(function (error) {
-                              vm.alertMessage = error.response.data;
-                              vm.dangerAlert = true;
-                              vm.alertFlag = true;
-                              console.log(error);
-                        });           
-                  }      
+            getImage(image, saveTo){                
+                  axios.post(backEndUrl + "/api/get-image", image, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)
+                              saveTo.mainImageUrl = response.data; 
+
+                        if(response.status == 401) 
+                        {                  
+                              this.$cookies.remove('token');
+                              this.$cookies.remove('user-email');
+                              this.$cookies.remove('role');
+                              this.$cookies.remove('user');
+                              this.$cookies.remove('currency');
+                              window.location.href = '/login';
+                        }    
+                  })
+                  .catch(function (error) {
+                        console.log(saveTo);
+                        console.log(error);
+                  });
             },
             fetchCarSummary(index, carId) {
                   let vm = this;

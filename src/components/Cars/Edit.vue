@@ -109,7 +109,7 @@
                     </b-form-group>
                </div>
                <div class="form-row">
-                    <b-form-group class="col-sm-4 mb-3" label="Engine">
+                    <b-form-group class="col-sm-4 mb-3" label="Engine name">
                          <b-form-input placeholder="N55" name="engine-input"
                               v-model="car.engine"
                               v-validate="{ required: false }"
