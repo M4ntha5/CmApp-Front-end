@@ -447,9 +447,7 @@ export default {
                          Authorization: 'Bearer ' + window.$cookies.get('token')
                     }
                })
-               .then(function (response) {
-                    if(response.status == 204)
-                         vm.$router.push(`/cars/${vm.$route.params.id}`);
+               .then(function (response) {                       
                     if(response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -583,7 +581,7 @@ export default {
           },
           deleteAllCarRepairs(){
                let vm = this;
-               axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/delete-repairs`, {
+               axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
                     headers: {
                          Authorization: 'Bearer ' + window.$cookies.get('token')
                     }
@@ -616,6 +614,10 @@ export default {
                     }
                })
                .then(function (response) {
+                    if(response.status == 200)
+                    {
+                         vm.$router.push(`/cars/${vm.$route.params.id}`);
+                    }
                     if(response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -633,9 +635,9 @@ export default {
                     console.log(error);
                })
           },
-          updateAll(){
-               this.updateCar();
+          updateAll(){               
                this.deleteAllCarRepairs();
+               this.updateCar();
           },
           removeImageFromList(index){         
                this.car.base64images.splice(index, 1);
