@@ -11,11 +11,18 @@
 
             <div v-if="!loading && !empty">
                   <div class="row pt-4" >                    
-                        <div class="img-fluid col-sm-6 col-12">              
+                        <div class="img-fluid col-sm-6 col-12" v-if="trackingImages.length != 0">              
                               <gallery :images="trackingImages" :index="index" @close="index = null"></gallery>
                               <div class="image img-fluid" 
                                     @click="index = 0"
                                     :style="{ backgroundImage: 'url(' + trackingImages[0].href + ')', width:'350px', height:'300px' }"
+                              />
+                        </div>
+                        <div class="img-fluid col-sm-6 col-12" v-else>              
+                              <gallery :images="defaultImg" :index="index" @close="index = null"></gallery>
+                              <div class="image img-fluid" 
+                                    @click="index = 0"
+                                    :style="{ backgroundImage: 'url(' + defaultImg[0].href + ')', width:'350px', height:'300px' }"
                               />
                         </div>
                         <div class="col-sm-6 col-12 pt-4">
@@ -180,15 +187,19 @@ export default {
                         auctionImages: [],
                         base64images: [],                      
                         car: ''
-                  }, 
-                  tmpImgs: [],
+                  },
                   selectedCar:{},
                   index: null,
                   loading: true,
                   empty: true,
                   alertFlag: false,
                   alertMessage: '',
-                  dangerAlert: false
+                  dangerAlert: false,
+                  urls: [],
+                  defaultImg: [{
+                        href: process.env.VUE_APP_DEFAULT_IMAGE,
+                        title: '1/1'
+                  }]
             }       
       },
       components: {
@@ -201,7 +212,8 @@ export default {
       computed: {
             trackingImages: function(){
                   let list = [];
-                  let shared = this.tracking.base64images;
+                  let shared = this.urls;
+                  console.log("shared", shared);
                   for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
@@ -210,7 +222,7 @@ export default {
                         }
                         list.push(obj);
                   } 
-                  console.log("tracking",list);
+                  console.log("tracking-img",list);
                   return list;
             }
       },
@@ -283,18 +295,20 @@ export default {
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                        {
+                        {                              
                               vm.tracking = response.data;
+
                               vm.tracking.dateReceived = vm.tracking.dateReceived.substring(0, 10);
                               vm.tracking.dateOrdered = vm.tracking.dateOrdered.substring(0, 10);
                               vm.tracking.datePickedUp = vm.tracking.datePickedUp.substring(0, 10);
+
                               if(vm.tracking.containerNumber != '')
                                     vm.empty = false;
-                              vm.loading = false;  
+                              vm.loading = false;
                     
                               vm.dangerAlert = false;
                               vm.alertMessage = "Tracking data updated sccessfully.";
-                              vm.alertFlag =true;
+                              vm.alertFlag = true;
                         }
                         else if(response.status == 401) 
                         {
@@ -321,9 +335,9 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {
-                              vm.tracking.base64images = response.data;   
-                              console.log(vm.tracking.base64images);
-                              if(vm.tracking.base64images.length > 0)   
+                              vm.urls = response.data;   
+                              console.log("urls", vm.tracking);
+                              if(vm.urls.length > 0)   
                               {
                                     vm.downloadTrackingImages(response.data)                      
                                     vm.dangerAlert = false;
@@ -385,7 +399,7 @@ export default {
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                             vm.tracking.base64images.push(response.data); 
+                             vm.urls.push(response.data); 
                               
                         if(response.status == 401) 
                         {

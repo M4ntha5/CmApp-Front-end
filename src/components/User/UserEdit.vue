@@ -182,13 +182,17 @@ export default {
           updateUser() {
                let vm = this;
                axios.put(backEndUrl + `/api/users/${vm.$route.params.id}`, vm.user, {
-                    headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then( function (response){
                     if(response.status == 204)
-                         vm.$router.push('/cars');
+                    {
+                         if(window.$cookies.get('role') == 'admin')
+                              vm.$router.push('/users');
+                         else
+                              vm.$router.push('/cars');
+                    }
+                         
 
                     if(response.status == 401) 
                     {

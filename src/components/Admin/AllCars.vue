@@ -64,6 +64,12 @@ export default {
                     if(response.status == 200)
                     {
                          vm.cars = response.data;
+                         for(let i=0;i<vm.cars.length;i++)
+                         {
+                              vm.cars[i].manufactureDate = vm.cars[i].manufactureDate.substring(0, 10);
+                              vm.cars[i].dateCreated = vm.cars[i].dateCreated.substring(0, 10);
+                         }
+                         
                          vm.rows = vm.cars.length;
                          vm.isBusy = false;
                     }
