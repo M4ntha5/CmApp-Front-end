@@ -64,7 +64,7 @@
                               v-validate="{ required: true, decimal:'2', min_value: 1 }"
                               :state="validateState('soldPrice-input')" 
                               aria-describedby="soldPrice-input-live-feedback"
-                              data-vv-as="sold price">
+                              data-vv-as="Sold price">
                         </b-form-input>
                         <b-form-invalid-feedback id="soldPrice-input-live-feedback">
                               {{ veeErrors.first('soldPrice-input') }}
@@ -162,8 +162,7 @@ export default {
                               for(let i =0; i < vm.cars.length; i++)
                               {
                                     vm.cars[i].summary.profit = Number((vm.cars[i].summary.profit).toFixed(2)); 
-
-                                    if(vm.cars[i].carImg == null)
+                                    if(vm.cars[i].carImg == null || Object.keys(vm.cars[i].carImg).length === 0)
                                           vm.cars[i].mainImageUrl = process.env.VUE_APP_DEFAULT_IMAGE;
                                     else
                                           vm.getImage(vm.cars[i].carImg, vm.cars[i]);
