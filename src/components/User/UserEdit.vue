@@ -10,7 +10,7 @@
                               v-validate="{ required: false }"
                               :state="validateState('name-input')" 
                               aria-describedby="name-input-live-feedback"
-                              data-vv-as="name">
+                              data-vv-as="First name">
                          </b-form-input>
                          <b-form-invalid-feedback id="name-input-live-feedback">
                               {{ veeErrors.first('name-input') }}
@@ -22,7 +22,7 @@
                               v-validate="{ required: false }"
                               :state="validateState('surname-input')" 
                               aria-describedby="surname-input-live-feedback"
-                              data-vv-as="surname">
+                              data-vv-as="Last name">
                          </b-form-input>
                          <b-form-invalid-feedback id="surname-input-live-feedback">
                               {{ veeErrors.first('surname-input') }}
@@ -36,7 +36,7 @@
                               v-validate="{ required: false, email: true }"
                               :state="validateState('email-input')" 
                               aria-describedby="email-input-live-feedback"
-                              data-vv-as="email">
+                              data-vv-as="Email">
                          </b-form-input>
                          <b-form-invalid-feedback id="email-input-live-feedback">
                               {{ veeErrors.first('email-input') }}
@@ -48,7 +48,7 @@
                               v-validate="{ required: false, email: true }"
                               :state="validateState('currency-input')" 
                               aria-describedby="currency-input-live-feedback"
-                              data-vv-as="currency">
+                              data-vv-as="Currency">
                          </b-form-input>
                          <b-form-invalid-feedback id="currency-input-live-feedback">
                               {{ veeErrors.first('currency-input') }}
@@ -63,7 +63,7 @@
                               v-validate="{ required: false }"
                               :state="validateState('sex-input')" 
                               aria-describedby="sex-input-live-feedback"
-                              data-vv-as="sex">
+                              data-vv-as="Sex">
                          </b-form-radio-group>
                          <b-form-invalid-feedback id="sex-input-live-feedback">
                               {{ veeErrors.first('sex-input') }}
@@ -75,7 +75,7 @@
                               v-validate="{ required: false }"
                               :state="validateState('bornDate-input')" 
                               aria-describedby="bornDate-input-live-feedback"
-                              data-vv-as="bornDate">
+                              data-vv-as="Born date">
                          </b-form-input>
                          <b-form-invalid-feedback id="bornDate-input-live-feedback">
                               {{ veeErrors.first('bornDate-input') }}
@@ -89,7 +89,7 @@
                               v-validate="{ required: false }"
                               :state="validateState('country-input')" 
                               aria-describedby="country-input-live-feedback"
-                              data-vv-as="country">
+                              data-vv-as="Country">
                          </b-form-select>
                          <b-form-invalid-feedback id="country-input-live-feedback">
                               {{ veeErrors.first('country-input') }}

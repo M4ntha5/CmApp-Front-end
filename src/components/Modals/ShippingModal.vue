@@ -14,7 +14,7 @@
                                         v-validate="{ required: true, decimal:'2',min_value:0 }"
                                         :state="validateState('transportationFee-input')" 
                                         aria-describedby="transportationFee-input-live-feedback"
-                                        data-vv-as="transportationFee">
+                                        data-vv-as="Transportation fee">
                                    </b-form-input>
                                    <b-form-invalid-feedback id="transportationFee-input-live-feedback">
                                         Transportation fee required, must be numeric and may contain 2 decimal points 
@@ -29,7 +29,7 @@
                                         v-validate="{ required: true }"
                                         :state="validateState('transportationFeeCurrency-input')"
                                         aria-describedby="transportationFeeCurrency-input-live-feedback"
-                                        data-vv-as="transportationFeeCurrency" > 
+                                        data-vv-as="Currency" > 
                                    </b-form-select>
                                    <b-form-invalid-feedback id="transportationFeeCurrency-input-live-feedback">
                                         {{ veeErrors.first('transportationFeeCurrency-input') }}
@@ -46,7 +46,7 @@
                                         v-validate="{ required: true, decimal:'2',min_value:0 }"
                                         :state="validateState('transferFee-input')" 
                                         aria-describedby="transferFee-input-live-feedback"
-                                        data-vv-as="transferFee">
+                                        data-vv-as="Transfer fee">
                                    </b-form-input>
                                    <b-form-invalid-feedback id="transferFee-input-live-feedback">
                                         Transfer fee required, must be numeric and may contain 2 decimal points 
@@ -61,7 +61,7 @@
                                         v-validate="{ required: true }"
                                         :state="validateState('transferFeeCurrency-input')"
                                         aria-describedby="transferFeeCurrency-input-live-feedback"
-                                        data-vv-as="transferFeeCurrency" > 
+                                        data-vv-as="Currency" > 
                                    </b-form-select>
                                    <b-form-invalid-feedback id="transferFeeCurrency-input-live-feedback">
                                         {{ veeErrors.first('transferFeeCurrency-input') }}
@@ -77,7 +77,7 @@
                                         v-validate="{ required: true, decimal:'2',min_value:0 }"
                                         :state="validateState('auctionFee-input')" 
                                         aria-describedby="auctionFee-input-live-feedback"
-                                        data-vv-as="auctionFee">
+                                        data-vv-as="Auction fee">
                                    </b-form-input>
                                    <b-form-invalid-feedback id="auctionFee-input-live-feedback">
                                         Auction fee required, must be numeric and may contain 2 decimal points 
@@ -92,7 +92,7 @@
                                         v-validate="{ required: true }"
                                         :state="validateState('auctionFeeCurrency-input')"
                                         aria-describedby="auctionFeeCurrency-input-live-feedback"
-                                        data-vv-as="auctionFeeCurrency" > 
+                                        data-vv-as="Currency" > 
                                    </b-form-select>
                                    <b-form-invalid-feedback id="auctionFeeCurrency-input-live-feedback">
                                         {{ veeErrors.first('auctionFeeCurrency-input') }}
@@ -108,7 +108,7 @@
                                         v-validate="{ required: true, decimal:'2',min_value:0 }"
                                         :state="validateState('customs-input')" 
                                         aria-describedby="customs-input-live-feedback"
-                                        data-vv-as="customs">
+                                        data-vv-as="Customs">
                                    </b-form-input>
                                    <b-form-invalid-feedback id="customs-input-live-feedback">
                                         Customs required, must be numeric and may contain 2 decimal points 
@@ -123,7 +123,7 @@
                                         v-validate="{ required: true }"
                                         :state="validateState('customsCurrency-input')"
                                         aria-describedby="customsCurrency-input-live-feedback"
-                                        data-vv-as="customsCurrency" > 
+                                        data-vv-as="Currency" > 
                                    </b-form-select>
                                    <b-form-invalid-feedback id="customsCurrency-input-live-feedback">
                                         {{ veeErrors.first('customsCurrency-input') }}

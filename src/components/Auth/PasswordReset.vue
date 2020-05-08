@@ -10,7 +10,7 @@
                               v-validate="{ required: true, min:8 }"
                               :state="validateState('password1-input')" 
                               aria-describedby="password1-input-live-feedback"
-                              data-vv-as="password">
+                              data-vv-as="New Password">
                          </b-form-input>
                          <b-form-invalid-feedback id="password1-input-live-feedback">{{ veeErrors.first('password1-input') }}</b-form-invalid-feedback>
                     </b-form-group>
@@ -20,7 +20,7 @@
                               v-validate="{ required: true, min:8, is: form.password }"
                               :state="validateState('password2-input')" 
                               aria-describedby="password2-input-live-feedback"
-                              data-vv-as="password">
+                              data-vv-as="Verify Password">
                          </b-form-input>
                          <b-form-invalid-feedback id="password2-input-live-feedback">{{ veeErrors.first('password2-input') }}</b-form-invalid-feedback>
                     </b-form-group>

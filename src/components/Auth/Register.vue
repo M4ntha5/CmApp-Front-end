@@ -10,24 +10,24 @@
                </center>
                <b-form class="justify-content-center" @submit.stop.prevent="onSubmit">
                     <div class="row">  
-                         <b-form-group label="Email" class="col-sm-8">
+                         <b-form-group label="Email" class="col-sm-7">
                               <b-form-input id="email-input" name="email-input" placeholder="example@example.com"
                                    v-model="form.email"
                                    v-validate="{ required: true, email: true }"
                                    :state="validateState('email-input')" 
                                    aria-describedby="email-input-live-feedback"
-                                   data-vv-as="email">
+                                   data-vv-as="Email">
                               </b-form-input>
                               <b-form-invalid-feedback id="email-input-live-feedback">{{ veeErrors.first('email-input') }}</b-form-invalid-feedback>
                          </b-form-group>
-                         <b-form-group label="Pick your currency" class="col-sm-4">
+                         <b-form-group label="Pick your currency" class="col-sm-5">
                               <b-form-select id="currency-input" name="currency-input"
                                    v-model="form.currency"
                                    :options="rates"
                                    v-validate="{ required: true }"
                                    :state="validateState('currency-input')"
                                    aria-describedby="currency-input-live-feedback"
-                                   data-vv-as="currency" > 
+                                   data-vv-as="Pick your currency" > 
                               </b-form-select>
                               <small class="form-text text-muted">Choose wisley. You will not be able to change your base currency later.</small>
                               <b-form-invalid-feedback id="currency-input-live-feedback">{{ veeErrors.first('currency-input') }}</b-form-invalid-feedback>
@@ -39,7 +39,7 @@
                               v-validate="{ required: true, min:8}"
                               :state="validateState('password1-input')" 
                               aria-describedby="password1-input-live-feedback"
-                              data-vv-as="password">
+                              data-vv-as="Password">
                          </b-form-input>
                          <b-form-invalid-feedback id="password1-input-live-feedback">{{ veeErrors.first('password1-input') }}</b-form-invalid-feedback>
                     </b-form-group>
@@ -49,7 +49,7 @@
                               v-validate="{ required: true, min:8, is: form.password}"
                               :state="validateState('password2-input')" 
                               aria-describedby="password2-input-live-feedback"
-                              data-vv-as="password">>
+                              data-vv-as="Repeat password">>
                          </b-form-input>
                          <b-form-invalid-feedback id="password2-input-live-feedback">
                               {{ veeErrors.first('password2-input') }}

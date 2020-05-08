@@ -12,7 +12,7 @@
                          v-validate="{ required: true, email: true }"
                          :state="validateState('email-input')" 
                          aria-describedby="email-input-live-feedback"
-                         data-vv-as="email">
+                         data-vv-as="Email">
                     </b-form-input>
                     <b-form-invalid-feedback id="email-input-live-feedback">{{ veeErrors.first('email-input') }}</b-form-invalid-feedback>
                </b-form-group>            

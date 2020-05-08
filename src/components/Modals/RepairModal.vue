@@ -12,7 +12,7 @@
                          v-validate="{ required: true }"
                          :state="validateState('name-input')" 
                          aria-describedby="name-input-live-feedback"
-                         data-vv-as="name">
+                         data-vv-as="Name">
                     </b-form-input>
                     <b-form-invalid-feedback id="name-input-live-feedback">
                          {{ veeErrors.first('name-input') }}
@@ -24,7 +24,7 @@
                          v-validate="{ required: true, decimal:'2',min_value:1 }"
                          :state="validateState('price-input')" 
                          aria-describedby="price-input-live-feedback"
-                         data-vv-as="price">
+                         data-vv-as="Price">
                     </b-form-input>
                     <b-form-invalid-feedback id="price-input-live-feedback">
                          {{ veeErrors.first('price-input') }}
@@ -37,7 +37,7 @@
                          v-validate="{ required: true }"
                          :state="validateState('car-input')" 
                          aria-describedby="car-input-live-feedback"
-                         data-vv-as="car">
+                         data-vv-as="Car">
                     </b-form-select>
                     <b-form-invalid-feedback id="car-input-live-feedback">
                          {{ veeErrors.first('car-input') }}

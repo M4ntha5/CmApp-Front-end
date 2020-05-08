@@ -21,13 +21,13 @@
                         </b-nav-item>
                     </b-nav>
                 </div>
-                <b-form-group label="Vin">
+                <b-form-group label="VIN">
                     <b-form-input id="vin-input" placeholder="WBA1E2C34JVD56789" name="vin-input"
                         v-model="car.vin"
                         v-validate="{ required: true, length:'17'}"
                         :state="validateState('vin-input')" 
                         aria-describedby="vin-input-live-feedback"
-                        data-vv-as="vin">
+                        data-vv-as="VIN">
                     </b-form-input>
                     <b-form-invalid-feedback id="vin-input-live-feedback">
                         Vin is required and length must be numeric exactly 17 symbols 
@@ -41,7 +41,7 @@
                                 v-validate="{ required: true, decimal:'2',min_value:1 }"
                                 :state="validateState('price-input')" 
                                 aria-describedby="price-input-live-feedback"
-                                data-vv-as="price">
+                                data-vv-as="Price">
                             </b-form-input>
                             <b-form-invalid-feedback id="price-input-live-feedback">
                                 {{ veeErrors.first('price-input') }}
@@ -56,7 +56,7 @@
                                 v-validate="{ required: true }"
                                 :state="validateState('currency-input')"
                                 aria-describedby="currency-input-live-feedback"
-                                data-vv-as="currency" > 
+                                data-vv-as="Currency" > 
                             </b-form-select>
                             <b-form-invalid-feedback id="currency-input-live-feedback">
                                 {{ veeErrors.first('currency-input') }}
@@ -71,7 +71,7 @@
                         v-validate="{ required: false, image: true }" 
                         :state="validateState('images-input')"
                         aria-describedby="images-input-live-feedback"
-                        data-vv-as="images">
+                        data-vv-as="Images">
                     </b-form-file>
                     <b-form-invalid-feedback id="images-input-live-feedback">
                         {{ veeErrors.first('images-input') }}

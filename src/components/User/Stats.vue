@@ -6,10 +6,12 @@
                <b-form>
                     <div class="form-row">
                          <b-form-group class="col-sm-6" label="Date from">
-                              <b-form-datepicker name="from-input" 
-                              v-model="form.dateFrom"
-                              v-validate="{ required: true }"
-                              :state="validateState('from-input')" 
+                              <b-form-datepicker name="from-input" ref="dateFrom"
+                              v-model="form.dateFrom" start-weekday='1'                         
+                              :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
+                              locale="en-LT"
+                              v-validate="'required:true|date_format:yyyy-mm-dd|before:dateTo,true'"
+                              :state="validateState('from-input')"
                               aria-describedby="from-input-live-feedback"
                               data-vv-as="Date from">
                               </b-form-datepicker>
@@ -18,9 +20,11 @@
                               </b-form-invalid-feedback>
                          </b-form-group>
                          <b-form-group class="col-sm-6" label="Date to">
-                              <b-form-datepicker name="to-input" 
-                              v-model="form.dateTo"
-                              v-validate="{ required: true }"
+                              <b-form-datepicker name="to-input" ref="dateTo"
+                              v-model="form.dateTo" start-weekday='1'
+                              :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
+                              locale="en-LT"
+                              v-validate="'required:true|date_format:yyyy-mm-dd|after:dateFrom,true'"
                               :state="validateState('to-input')" 
                               aria-describedby="to-input-live-feedback"
                               data-vv-as="Date to">
@@ -29,7 +33,6 @@
                                    {{ veeErrors.first('to-input') }}
                               </b-form-invalid-feedback>
                          </b-form-group>
-                         
                     </div>                  
                </b-form>
                <div class="row">
@@ -109,6 +112,7 @@ export default {
                .then(function (response) {
                     if(response.status == 200)
                     {
+                         vm.totalProfit = 0;
                          vm.stats = response.data;
                          vm.rows = vm.stats.length;
                          vm.stats.forEach(elem => {
@@ -130,8 +134,10 @@ export default {
                     }
                })
                .catch(function (error){
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
                     console.log(error);
-                    console.log(error.response.data);
                })
           },
           validateState(ref) {

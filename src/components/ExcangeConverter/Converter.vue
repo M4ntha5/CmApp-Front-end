@@ -10,7 +10,7 @@
                                    v-validate="{ required: true, decimal:3, min_value:1 }"
                                    :state="validateState('amount-input')" 
                                    aria-describedby="amount-input-live-feedback"
-                                   data-vv-as="amount">
+                                   data-vv-as="Amount">
                               </b-form-input>
                               <b-form-invalid-feedback id="amount-input-live-feedback">{{ veeErrors.first('amount-input') }}</b-form-invalid-feedback>
                          </b-form-group>
@@ -21,7 +21,7 @@
                                    v-validate="{ required: true }"
                                    :state="validateState('currency-from-input')"
                                    aria-describedby="currency-from-input-live-feedback"
-                                   data-vv-as="currency-from" > 
+                                   data-vv-as="Currency from" > 
                               </b-form-select>
                               <b-form-invalid-feedback id="currency-from-input-live-feedback">{{ veeErrors.first('currency-from-input') }}</b-form-invalid-feedback>
                          </b-form-group>
@@ -34,7 +34,7 @@
                                    v-validate="{ required: true }"
                                    :state="validateState('currency-to-input')"
                                    aria-describedby="currency-to-input-live-feedback"
-                                   data-vv-as="currency-to" > 
+                                   data-vv-as="Currency to" > 
                               </b-form-select>
                               <b-form-invalid-feedback id="currency-to-input-live-feedback">{{ veeErrors.first('currency-to-input') }}</b-form-invalid-feedback>
                          </b-form-group>

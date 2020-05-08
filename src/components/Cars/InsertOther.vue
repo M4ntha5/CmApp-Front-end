@@ -10,7 +10,7 @@
                                    v-validate="{ required: true }"
                                    :state="validateState('make-input')" 
                                    aria-describedby="make-input-live-feedback"
-                                   data-vv-as="make">
+                                   data-vv-as="Make">
                               </b-form-select>
                               <b-form-invalid-feedback id="make-input-live-feedback">
                                    {{ veeErrors.first('make-input') }}
@@ -24,7 +24,7 @@
                                    v-validate="{ required: true }"
                                    :state="validateState('model-input')" 
                                    aria-describedby="model-input-live-feedback"
-                                   data-vv-as="model">
+                                   data-vv-as="Model">
                               </b-form-select>
                               <b-form-invalid-feedback id="model-input-live-feedback">
                                    {{ veeErrors.first('model-input') }}
@@ -37,7 +37,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('series-input')" 
                                    aria-describedby="series-input-live-feedback"
-                                   data-vv-as="series">>
+                                   data-vv-as="Series">>
                               </b-form-input>
                               <b-form-invalid-feedback id="series-input-live-feedback">
                                    {{ veeErrors.first('series-input') }}
@@ -45,13 +45,13 @@
                          </b-form-group>
                     </div>
                     <div class="form-row">
-                         <b-form-group class="col-md-6 mb-3" label="Vin">
+                         <b-form-group class="col-md-6 mb-3" label="VIN">
                               <b-form-input id="vin-input" name="vin-input" placeholder="ABCD1234EFG56789"
                                    v-model="car.vin"
                                    v-validate="{ required: true, length:'17' }"
                                    :state="validateState('vin-input')" 
                                    aria-describedby="vin-input-live-feedback"
-                                   data-vv-as="vin">
+                                   data-vv-as="VIN">
                               </b-form-input>
                               <b-form-invalid-feedback id="vin-input-live-feedback">
                                    Vin is required and length must be numeric exactly 17 symbols 
@@ -63,7 +63,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('date-input')" 
                                    aria-describedby="date-input-live-feedback"
-                                   data-vv-as="date">
+                                   data-vv-as="Manufacture date">
                               </b-form-input>
                               <b-form-invalid-feedback id="date-input-live-feedback">
                                    {{ veeErrors.first('date-input') }}
@@ -78,7 +78,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('body-input')" 
                                    aria-describedby="body-input-live-feedback"
-                                   data-vv-as="body"
+                                   data-vv-as="Body type"
                               ></b-form-select>
                               <b-form-invalid-feedback id="body-input-live-feedback">
                                    {{ veeErrors.first('body-input') }}
@@ -92,7 +92,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('steering-input')" 
                                    aria-describedby="steering-input-live-feedback"
-                                   data-vv-as="steering"
+                                   data-vv-as="Steering"
                               ></b-form-select>
                               <b-form-invalid-feedback id="steering-input-live-feedback">
                                    {{ veeErrors.first('steering-input') }}
@@ -106,7 +106,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('drive-input')" 
                                    aria-describedby="drive-input-live-feedback"
-                                   data-vv-as="drive"
+                                   data-vv-as="Drive"
                               ></b-form-select>
                               <b-form-invalid-feedback id="drive-input-live-feedback">
                                    {{ veeErrors.first('drive-input') }}
@@ -120,7 +120,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('transmission-input')" 
                                    aria-describedby="transmission-input-live-feedback"
-                                   data-vv-as="transmission"
+                                   data-vv-as="Transmission"
                               ></b-form-select>
                               <b-form-invalid-feedback id="transmission-input-live-feedback">
                                    {{ veeErrors.first('transmission-input') }}
@@ -134,7 +134,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('engine-input')" 
                                    aria-describedby="engine-input-live-feedback"
-                                   data-vv-as="engine">
+                                   data-vv-as="Engine name">
                               </b-form-input>
                               <b-form-invalid-feedback id="engine-input-live-feedback">
                                    {{ veeErrors.first('engine-input') }}
@@ -147,7 +147,7 @@
                                    v-validate="{ required: false, decimal:1, min_value: 0 }"
                                    :state="validateState('displacement-input')" 
                                    aria-describedby="displacement-input-live-feedback"
-                                   data-vv-as="displacement">
+                                   data-vv-as="Engine displacement">
                               </b-form-input>
                               <b-form-invalid-feedback id="displacement-input-live-feedback">
                                    {{ veeErrors.first('displacement-input') }}
@@ -160,7 +160,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('power-input')" 
                                    aria-describedby="power-input-live-feedback"
-                                   data-vv-as="power">
+                                   data-vv-as="Power">
                               </b-form-input>
                               <b-form-invalid-feedback id="power-input-live-feedback">
                                    {{ veeErrors.first('power-input') }}
@@ -175,7 +175,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('color-input')" 
                                    aria-describedby="color-input-live-feedback"
-                                   data-vv-as="color">
+                                   data-vv-as="Color">
                               </b-form-input>
                               <b-form-invalid-feedback id="color-input-live-feedback">
                                    {{ veeErrors.first('color-input') }}
@@ -188,7 +188,7 @@
                                    v-validate="{ required: false }"
                                    :state="validateState('interior-input')" 
                                    aria-describedby="interior-input-live-feedback"
-                                   data-vv-as="interior">
+                                   data-vv-as="Interior">
                               </b-form-input>
                               <b-form-invalid-feedback id="interior-input-live-feedback">
                                    {{ veeErrors.first('interior-input') }}
@@ -202,7 +202,7 @@
                                    v-validate="{ required: true, decimal:2 }"
                                    :state="validateState('price-input')" 
                                    aria-describedby="price-input-live-feedback"
-                                   data-vv-as="price">
+                                   data-vv-as="Bought price">
                               </b-form-input>
                               <b-form-invalid-feedback id="price-input-live-feedback">
                                    {{ veeErrors.first('price-input') }}
@@ -215,7 +215,7 @@
                                 v-validate="{ required: true }"
                                 :state="validateState('currency-input')"
                                 aria-describedby="currency-input-live-feedback"
-                                data-vv-as="currency" > 
+                                data-vv-as="Bought price currency" > 
                             </b-form-select>
                             <b-form-invalid-feedback id="currency-input-live-feedback">
                                 {{ veeErrors.first('currency-input') }}
@@ -230,7 +230,7 @@
                                    v-validate="{ required: false, image: true }" 
                                    :state="validateState('images-input')" 
                                    aria-describedby="images-input-live-feedback"
-                                   data-vv-as="images"
+                                   data-vv-as="Images"
                               ></b-form-file>
                               <b-form-invalid-feedback id="images-input-live-feedback">
                                    {{ veeErrors.first('images-input') }}
