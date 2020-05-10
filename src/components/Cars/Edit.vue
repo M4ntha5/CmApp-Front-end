@@ -520,6 +520,7 @@ export default {
                               code: eqcode,
                               name: eqname
                          });
+                         this.equipmentCodes.push(eqcode);
                          this.equipmentName = '';
                          this.equipmentCode = '';
                          this.$validator.reset('code-input');

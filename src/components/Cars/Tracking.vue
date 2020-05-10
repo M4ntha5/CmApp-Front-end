@@ -213,7 +213,6 @@ export default {
             trackingImages: function(){
                   let list = [];
                   let shared = this.urls;
-                  console.log("shared", shared);
                   for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
@@ -222,7 +221,6 @@ export default {
                         }
                         list.push(obj);
                   } 
-                  console.log("tracking-img",list);
                   return list;
             }
       },
@@ -336,7 +334,6 @@ export default {
                         if(response.status == 200)
                         {
                               vm.urls = response.data;   
-                              console.log("urls", vm.tracking);
                               if(vm.urls.length > 0)   
                               {
                                     vm.downloadTrackingImages(response.data)                      
@@ -390,8 +387,14 @@ export default {
                   this.dangerAlert = false;
                   this.alertMessage = "Looking for data please wait... This may take several minutes!!";
                   this.alertFlag = true;
-                  this.lookForTracking();
-                  this.lookForTrackingImagesUrls();            
+                  if(this.tracking.vin == '')
+                  {                    
+                        this.lookForTrackingImagesUrls();  
+                        this.lookForTracking();
+                  }
+                  else
+                        this.lookForTracking();
+                                  
             },
             getImage(vm, image){
                   axios.post(backEndUrl + "/api/get-image", image, {

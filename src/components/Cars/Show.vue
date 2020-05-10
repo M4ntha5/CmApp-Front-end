@@ -67,8 +67,8 @@
                               </div>
                         </div>
                   </div> 
-                  <div class="row mb-3 pt-5">
-                        <div class="col responsive"> 
+                  <div class="row mb-3 pt-3">
+                        <div class="col responsive pt-5"> 
                              <template v-if="!tracking.showImages && car.base64images.length > 0">            
                                     <gallery :images="carImages" :index="index"                      
                                     @close="index = null">
