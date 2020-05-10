@@ -8,9 +8,7 @@
                          <b-form-group class="col-sm-6" label="Date from">
                               <b-form-datepicker name="from-input" ref="dateFrom"
                               v-model="form.dateFrom" start-weekday='1'                         
-                              :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
-                              locale="en-LT"
-                              v-validate="'required:true|date_format:yyyy-mm-dd|before:dateTo,true'"
+                              v-validate="{required:true}"
                               :state="validateState('from-input')"
                               aria-describedby="from-input-live-feedback"
                               data-vv-as="Date from">
@@ -22,10 +20,8 @@
                          <b-form-group class="col-sm-6" label="Date to">
                               <b-form-datepicker name="to-input" ref="dateTo"
                               v-model="form.dateTo" start-weekday='1'
-                              :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
-                              locale="en-LT"
-                              v-validate="'required:true|date_format:yyyy-mm-dd|after:dateFrom,true'"
-                              :state="validateState('to-input')" 
+                              v-validate="{required:true}"
+                              :state="validateState('to-input')"
                               aria-describedby="to-input-live-feedback"
                               data-vv-as="Date to">
                               </b-form-datepicker>
@@ -36,13 +32,13 @@
                     </div>                  
                </b-form>
                <div class="row">
-                    <div class="col-sm-4">
+                    <div class="col-4">
                          <b-button type="submit" @click.prevent="onSubmit()" variant="primary">Search</b-button>
                     </div>
-                    <div class="col-sm-4 text-center" v-if="stats.length > 0">
+                    <div class="col-4 text-center" v-if="stats.length > 0">
                          <h4>Cars sold: {{stats.length}}</h4>
                     </div>
-                    <div class="col-sm-4 text-right" v-if="stats.length > 0">
+                    <div class="col-4 text-right" v-if="stats.length > 0">
                          <h4>Total profit: {{totalProfit}}</h4>
                     </div>               
                </div>
@@ -81,12 +77,12 @@ export default {
           return {         
                stats:[],
                fields: [    
-                    { key: 'carName', sortable: true },
+                    { key: 'car', sortable: true },
                     { key: 'vin' },
                     { key: 'boughtPrice', sortable: true },  
                     { key: 'soldPrice', sortable: true },
                     { key: 'soldWithin', sortable: true },
-                    { key: 'spent', sortable: true },
+                    { key: 'additionallySpent', sortable: true },
                     { key: 'profit', sortable: true }
                ],
                form: {
