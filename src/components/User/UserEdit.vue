@@ -144,9 +144,7 @@ export default {
           fetchUser() {
                let vm = this;
                axios.get(backEndUrl + `/api/users/${vm.$route.params.id}`, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                })
                .then( function (response){
                     if(response.status == 200)
@@ -157,19 +155,18 @@ export default {
                               vm.user.country = "Lithuania";
                          vm.loading = false;
                     }
-                    if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.loading = false;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';              
+                         vm.$router.push('/login');
                     }
-               })
-               .catch(function (error) {
-                    console.log(error);
-                    vm.loading = false;
                })
           },
           onSubmit() {
@@ -192,45 +189,38 @@ export default {
                          else
                               vm.$router.push('/cars');
                     }
-                         
-
-                    if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';              
+                         vm.$router.push('/login');
                     }
-               })
-               .catch(function (error) {
-                    console.log(error);
                })
           },
           getAllCountries() {
                let vm = this;
                axios.get(backEndUrl + '/api/countries', {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response){
                     if(response.status == 200)
                          vm.countries = response.data;
-
-                    if(response.status == 401) 
+               })
+               .catch(function (error){
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';              
+                         vm.$router.push('/login');
                     }
-               })
-               .catch(function (error){
-                    console.log(error);
                })
           },
      }  

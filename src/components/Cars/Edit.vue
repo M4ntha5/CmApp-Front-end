@@ -395,74 +395,65 @@ export default {
                               vm.equipmentCodes.push(element.code);
                          });
                     }
-                    if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
+                    vm.loading = false;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    console.log(error);
-                    vm.alertMessage = error.response.data;
-                    vm.dangerAlert = true;
-                    vm.alertFlag = true;
-                    vm.loading = false;
+                         vm.$router.push('/login');
+                    }
                });               
           },
           fetchCarRepairs() {
                var vm = this;
                axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
                     if(response.status == 200)
-                         vm.repairs = response.data;
-                    if(response.status == 401) 
+                         vm.repairs = response.data;  
+               })
+               .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    }   
-               })
-               .catch(function (error) {
-                    vm.alertMessage = error.response.data;
-                    vm.dangerAlert = true;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                });               
           },
           updateCar() {
                let vm = this;
                axios.put(backEndUrl + `/api/cars/${this.$route.params.id}`, this.car, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
-               .then(function (response) {                       
-                    if(response.status == 401) 
+               .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.alertMessage = error.response.data;
-                    vm.dangerAlert = true;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                });     
           },
           validateState(ref) {
@@ -552,28 +543,25 @@ export default {
           },
           getImage(image, saveTo){       
                axios.post(backEndUrl + "/api/get-image2", image, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                })
                .then(function (response) {
                     if(response.status == 200)
-                         saveTo.push(response.data);               
-                    if(response.status == 401) 
+                         saveTo.push(response.data);                  
+               })
+               .catch(function (error) {
+                    this.alertMessage = error.response.data;
+                    this.dangerAlert = true;
+                    this.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          this.$cookies.remove('token');
                          this.$cookies.remove('user-email');
                          this.$cookies.remove('role');
                          this.$cookies.remove('user');
                          this.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    }    
-               })
-               .catch(function (error) {
-                    this.alertMessage = error.response.data;
-                    this.dangerAlert = true;
-                    this.alertFlag = true;
-                    console.log(error);
+                         this.$router.push('/login');
+                    }
                });
           },
           getImagesRecursive(n, from, to){
@@ -583,57 +571,49 @@ export default {
           deleteAllCarRepairs(){
                let vm = this;
                axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                })
                .then(function (response) {
                     if(response.status == 200)
                          vm.insertMultipleRepairs();
-                    if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.alertMessage = error.response.data;
-                    vm.dangerAlert = true;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                })
           },
           insertMultipleRepairs(){
                let vm = this;
                axios.post(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, vm.repairs, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
                     if(response.status == 200)
-                    {
                          vm.$router.push(`/cars/${vm.$route.params.id}`);
-                    }
-                    if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.alertMessage = error.response.data;
-                    vm.dangerAlert = true;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                })
           },
           updateAll(){               

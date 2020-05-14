@@ -73,19 +73,18 @@ export default {
                          vm.rows = vm.cars.length;
                          vm.isBusy = false;
                     }
-                    else if(response.status == 401) 
+               })
+               .catch(function (error){
+                    console.log(error.response.data);
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
+                         vm.$router.push('/login');
                     }
-               })
-               .catch(function (error){
-                    console.log(error);
-                    console.log(error.response.data);
                })
           },
      }

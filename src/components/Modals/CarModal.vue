@@ -119,30 +119,25 @@ export default {
         fetchCars() {
             let vm = this;
             axios.get(backEndUrl + "/api/cars", {
-                headers: {
-                        Authorization: 'Bearer ' + window.$cookies.get('token')
-                }
+                headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
             .then(function (response) {
                 if(response.status == 200)
-                {
-                        vm.cars = response.data;
-                }
-                if(response.status == 401) 
-                {
-                        vm.$cookies.remove('token');
-                        vm.$cookies.remove('user-email');
-                        vm.$cookies.remove('role');
-                        vm.$cookies.remove('user');
-                        vm.$cookies.remove('currency');
-                        window.location.href = '/login';              
-                }                              
+                    vm.cars = response.data;                              
             })
             .catch(function (error) {
                 vm.alertMessage = error.response.data;
                 vm.dangerAlert = true;
                 vm.alertFlag = true;
-                console.log(error);
+                if(error.response.status == 401) 
+                {
+                    vm.$cookies.remove('token');
+                    vm.$cookies.remove('user-email');
+                    vm.$cookies.remove('role');
+                    vm.$cookies.remove('user');
+                    vm.$cookies.remove('currency');
+                    vm.$router.push('/login');
+                }
             });
         },
         getCurrencies() {
@@ -168,7 +163,6 @@ export default {
             this.$validator.validateAll().then(result => {
                 if (!result)
                     return;
-
                 this.insertCar();
             });  
         },
@@ -178,9 +172,7 @@ export default {
             vm.alertMessage = "Please wait while we fill your car data";
             vm.alertFlag = true;
             axios.post(backEndUrl + "/api/cars", vm.car, {
-                headers: {
-                        Authorization: 'Bearer ' + window.$cookies.get('token')
-                }
+                headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
             .then(function (response) {             
                 if(response.status == 200)
@@ -190,15 +182,6 @@ export default {
                     vm.alertFlag = true;
                     let insertedId = response.data._id;
                     vm.insertCarSummary(insertedId);                        
-                } 
-                else if(response.status == 401) 
-                {
-                    vm.$cookies.remove('token');
-                    vm.$cookies.remove('user-email');
-                    vm.$cookies.remove('role');
-                    vm.$cookies.remove('user');
-                    vm.$cookies.remove('currency');
-                    window.location.href = '/login';
                 }              
             })
             .catch(function (error) {
@@ -208,7 +191,15 @@ export default {
                     vm.alertMessage = error.response.data;
                 vm.dangerAlert = true;
                 vm.alertFlag = true;
-                console.log(error);
+                if(error.response.status == 401) 
+                {
+                    vm.$cookies.remove('token');
+                    vm.$cookies.remove('user-email');
+                    vm.$cookies.remove('role');
+                    vm.$cookies.remove('user');
+                    vm.$cookies.remove('currency');
+                    vm.$router.push('/login');
+                }
             });
         },
         insertCarSummary(carId) {
@@ -216,9 +207,7 @@ export default {
             console.log(this.summary);
             vm.summary.car
             axios.post(backEndUrl + `/api/cars/${carId}/summary`, vm.summary, {
-                headers: {
-                        Authorization: 'Bearer ' + window.$cookies.get('token')
-                }
+                headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
             .then(function (response) {
                 if(response.status == 200)
@@ -228,30 +217,28 @@ export default {
                     vm.$nextTick(() => {
                         vm.$bvModal.hide('car-insert-modal')
                     })
-                } 
-                else if(response.status == 401) 
+                }                         
+            })
+            .catch(function (error) {
+                if(error.response.status == 401) 
                 {
                     vm.$cookies.remove('token');
                     vm.$cookies.remove('user-email');
                     vm.$cookies.remove('role');
                     vm.$cookies.remove('user');
                     vm.$cookies.remove('currency');
-                    window.location.href = '/login';
-                }                        
-            })
-            .catch(function (error) {
-                console.log(error);
+                    vm.$router.push('/login');
+                }
             });       
         },
         onFileSelected(e) {
-            console.log(e.target.files.length); 
             let vm = this;           
             for(let i=0; i < e.target.files.length; i++)
             {
                 var reader = new FileReader();
                 reader.readAsDataURL(e.target.files[i]);
                 reader.onload = (ev) => {
-                        vm.car.Base64images[i] = ev.target.result;
+                    vm.car.Base64images[i] = ev.target.result;
                 }                       
             }
             console.log(this.car.Base64images);

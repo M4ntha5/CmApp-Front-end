@@ -111,15 +111,6 @@ export default {
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('repair-insert-modal')
                          })
-                    }
-                    if(response.status == 401) 
-                    {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         window.location.href = '/login';
                     } 
                     
                })
@@ -127,7 +118,15 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
-                    console.log(error);
+                    if(error.response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/login');
+                    }
                }); 
           },
           getCarNames() {
@@ -140,22 +139,21 @@ export default {
                     {
                          vm.cars = response.data;
                          vm.insert.car = vm.cars[0].value;
-                    } 
-                    else if(response.status == 401) 
-                    {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         window.location.href = '/login';
                     }                
                })
                .catch(function (error) {                  
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
-                    console.log(error);
+                    if(error.response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/login');
+                    }
                });
           },
      }

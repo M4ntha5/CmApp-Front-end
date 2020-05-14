@@ -235,21 +235,20 @@ export default {
                               vm.$bvModal.hide('shipping-modal')
                          })
                     }
-                    else if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.dangerAlert = true;
+                    vm.alertMessage = error.response.data;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.dangerAlert = true;
-                    vm.alertMessage = error.response.data;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                }); 
           },
           updateShipping(){
@@ -271,48 +270,44 @@ export default {
                               vm.$bvModal.hide('shipping-modal')
                          })
                     }
-                    else if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.dangerAlert = true;
+                    vm.alertMessage = error.response.data;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.dangerAlert = true;
-                    vm.alertMessage = error.response.data;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                });
           },
           fetchCarShipping() {
                var vm = this;
                axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {                      
                     if(response.status == 200)
                          vm.insert = response.data;
-                    else if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.dangerAlert = true;
+                    vm.alertMessage = error.response.data;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.dangerAlert = true;
-                    vm.alertMessage = error.response.data;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                });
           },
      }

@@ -233,21 +233,18 @@ export default {
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                        {
                               vm.selectedCar = response.data;
-                        }
-                        else if(response.status == 401) 
+                  })
+                  .catch(function (error) {
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        } 
-                  })
-                  .catch(function (error) {
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   });        
             },
             fetchTracking() {
@@ -267,23 +264,22 @@ export default {
                               if(vm.tracking.containerNumber != '')
                                     vm.empty = false;
                               vm.loading = false;           
-                        }
-                        else if(response.status == 401) 
+                        }                          
+                  })
+                  .catch(function (error) {
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        vm.loading = false;
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        }                            
-                  })
-                  .catch(function (error) {
-                        console.log(error);
-                        vm.alertMessage = error.response.data;
-                        vm.dangerAlert = true;
-                        vm.alertFlag = true;
-                        vm.loading = false;
+                              vm.$router.push('/login');
+                        }
                   });
             },
             lookForTracking(){
@@ -308,21 +304,20 @@ export default {
                               vm.alertMessage = "Tracking data updated sccessfully.";
                               vm.alertFlag = true;
                         }
-                        else if(response.status == 401) 
+                  })
+                  .catch(function (error) {
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        } 
-                  })
-                  .catch(function (error) {
-                        vm.alertMessage = error.response.data;
-                        vm.dangerAlert = true;
-                        vm.alertFlag = true;
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   }); 
             },
             lookForTrackingImagesUrls(){
@@ -341,22 +336,21 @@ export default {
                                     vm.alertMessage = "Images successfully updated";
                                     vm.alertFlag = true;
                               }              
-                        }
-                        else if(response.status == 401) 
-                        {
-                              vm.$cookies.remove('token');
-                              vm.$cookies.remove('user-email');
-                              vm.$cookies.remove('role');
-                              vm.$cookies.remove('user');
-                              vm.$cookies.remove('currency');
-                              window.location.href = '/login';
                         } 
                   })
                   .catch(function (error) {
                         vm.alertMessage = error.response.data;
                         vm.dangerAlert = true;
                         vm.alertFlag = true;
-                        console.log(error);
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
                   }); 
             },
             downloadTrackingImages(urls){
@@ -364,22 +358,20 @@ export default {
                   axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking/download-images`, urls, {
                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
-                  .then(function (response) {
-                        if(response.status == 401) 
+                  .catch(function (error) {
+                        vm.alertMessage = "Failed saving tracking images, you may try again later!";
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        console.log(error.response.data);
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
+                              vm.$router.push('/login');
                         }
-                  })
-                  .catch(function (error) {
-                        vm.alertMessage = "Failed saving tracking images, you may try again later!";
-                        vm.dangerAlert = true;
-                        vm.alertFlag = true;
-                        console.log(error.response.data);
                   });
 
             },
@@ -402,20 +394,18 @@ export default {
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                             vm.urls.push(response.data); 
-                              
-                        if(response.status == 401) 
+                             vm.urls.push(response.data);     
+                  })
+                  .catch(function (error) {
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        }    
-                  })
-                  .catch(function (error) {
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   });
             },
             getImagesRecursive(){

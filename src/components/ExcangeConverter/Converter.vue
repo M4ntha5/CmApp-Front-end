@@ -92,11 +92,7 @@ export default {
                axios.post(backEndUrl + "/api/currency", this.data)
                .then(function (response) {
                     if(response.data)
-                    {
-                         //vm.data.to = 'USD';
-                         //vm.data.from = 'EUR';
                          vm.result = response.data;
-                    }
                })
                .catch(function (error){
                     console.log(error);
@@ -111,7 +107,6 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
                     this.convert();
                });
           }

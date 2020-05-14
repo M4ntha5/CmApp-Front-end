@@ -110,20 +110,18 @@ export default {
                          vm.users = response.data;
                          vm.rows = vm.users.length;
                          vm.isBusy = false;
-                    }
-                    else if(response.status == 401) 
+                    }                  
+               })
+               .catch(function (error){
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
+                         vm.$router.push('/login');
                     }
-               })
-               .catch(function (error){
-                    console.log(error);
-                    console.log(error.response.data);
                })
           },
           goToUserEdit(index){
@@ -142,21 +140,21 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
                     }
-                    else if(response.status == 401) 
-                    {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    }
                })
                .catch(function (error) {
                     console.log(error);
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    if(error.response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/login');
+                    }
                })
           },
           unblockUser(userId){
@@ -172,21 +170,21 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
                     }
-                    else if(response.status == 401) 
-                    {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    }
                })
                .catch(function (error) {
                     console.log(error);
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    if(error.response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/login');
+                    }
                })
           },
           deleteUser(userId){
@@ -202,21 +200,21 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
                     }
-                    else if(response.status == 401) 
-                    {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    }
                })
                .catch(function (error) {
                     console.log(error);
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    if(error.response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/login');
+                    }
                })
           },
           changeRole(){
@@ -235,21 +233,21 @@ export default {
                               vm.$bvModal.hide('change-role-modal')
                          })
                     }
-                    else if(response.status == 401) 
-                    {
-                         vm.$cookies.remove('token');
-                         vm.$cookies.remove('user-email');
-                         vm.$cookies.remove('role');
-                         vm.$cookies.remove('user');
-                         vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    }
                })
                .catch(function (error) {
                     console.log(error);
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    if(error.response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/login');
+                    }
                })
           },
           validateState(ref) {
