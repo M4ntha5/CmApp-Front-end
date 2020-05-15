@@ -1,11 +1,11 @@
 <template>
      <div>
-          <b-modal id="repair-insert-modal" ref="modal" title="Insert new repair"
+          <b-modal id="repair-insert-modal" ref="rep-modal" title="Insert new repair"
           @show="resetModal"
           @ok.prevent="onSubmit()"
           @close="resetModal">  
           <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger': 'success'" dismissible>{{alertMessage}}</b-alert>
-          <b-form ref="form" @submit.stop.prevent="onSubmit()">            
+          <b-form ref="form" @submit.prevent="onSubmit()">            
                <b-form-group label="Name">
                     <b-form-input id="name-input" placeholder="New engine" name="name-input" 
                          v-model="insert.name"
@@ -21,7 +21,7 @@
                <b-form-group :label="'Price (' + baseCurrency + ')'">
                     <b-form-input id="price-input" name="price-input" placeholder="500"
                          v-model="insert.price"
-                         v-validate="{ required: true, decimal:'2',min_value:1 }"
+                         v-validate="{ required: true, decimal:'2',min_value:0.01 }"
                          :state="validateState('price-input')" 
                          aria-describedby="price-input-live-feedback"
                          data-vv-as="Price">
@@ -92,7 +92,7 @@ export default {
                })          
           },
           insertRepair() {
-               this.alertMessage = "Handling your input...";
+               this.alertMessage = "Inserting repair...";
                this.dangerAlert = false;
                this.alertFlag = true;
                let vm = this;
@@ -104,15 +104,14 @@ export default {
                .then(function (response) {
                     if(response.status == 200)
                     {
-                         vm.alertMessage = "Your repair successfully saved";
+                         vm.alertMessage = response.data;
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('repair-insert-modal')
                          })
-                    } 
-                    
+                    }                 
                })
                .catch(function (error) {
                     vm.alertMessage = error.response.data;

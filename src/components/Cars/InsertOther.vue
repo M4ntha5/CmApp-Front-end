@@ -393,9 +393,10 @@ const backEndUrl = process.env.VUE_APP_API;
 
                     const areValid = (await results).every(isValid => isValid);  
                     if(!areValid)
-                         return;
-
-                    this.insertCar();          
+                         this.$el.querySelector('[name="' + 
+                              this.$validator.errors.items[0].field + '"]').scrollIntoView(false);
+                    else
+                         this.insertCar();          
                },
                insertCar() {
                     let vm = this;

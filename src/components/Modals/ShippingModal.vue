@@ -165,8 +165,7 @@ export default {
                alertMessage: ''
           }
      },
-     mounted() {
-          this.getCurrencies();
+     mounted() {         
           this.fetchCarShipping();
      },
      methods: {
@@ -219,7 +218,7 @@ export default {
           insertShipping(){
                let vm = this;
                vm.dangerAlert = false;
-               vm.alertMessage = "Please wait while we handle your given shipping data";
+               vm.alertMessage = "Updating your shipping details";
                vm.alertFlag = true;
                axios.post(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert, {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
@@ -254,13 +253,13 @@ export default {
           updateShipping(){
                let vm = this;
                vm.dangerAlert = false;
-               vm.alertMessage = "Please wait while we handle your given shipping data";
+               vm.alertMessage = "Updating your shipping details";
                vm.alertFlag = true;
                axios.put(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert, {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
-                    if(response.status == 200)
+                    if(response.status == 204)
                     {
                          vm.dangerAlert = false;
                          vm.alertMessage = "Shipping data updated successfully";
@@ -293,7 +292,10 @@ export default {
                })
                .then(function (response) {                      
                     if(response.status == 200)
+                    {
                          vm.insert = response.data;
+                         vm.getCurrencies();
+                    }                  
                })
                .catch(function (error) {
                     vm.dangerAlert = true;

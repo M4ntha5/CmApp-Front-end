@@ -38,7 +38,7 @@
                         <b-form-group label="Price">
                             <b-form-input id="price-input" placeholder="9000" name="price-input"
                                 v-model="summary.boughtPrice"
-                                v-validate="{ required: true, decimal:'2',min_value:1 }"
+                                v-validate="{ required: true, decimal:'2',min_value:0.01 }"
                                 :state="validateState('price-input')" 
                                 aria-describedby="price-input-live-feedback"
                                 data-vv-as="Price">
@@ -181,7 +181,7 @@ export default {
                     vm.alertMessage = "Car inserted successfully"
                     vm.alertFlag = true;
                     let insertedId = response.data._id;
-                    vm.insertCarSummary(insertedId);                        
+                    vm.insertCarSummary(insertedId);                      
                 }              
             })
             .catch(function (error) {
@@ -204,16 +204,12 @@ export default {
         },
         insertCarSummary(carId) {
             let vm = this;
-            console.log(this.summary);
-            vm.summary.car
             axios.post(backEndUrl + `/api/cars/${carId}/summary`, vm.summary, {
                 headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
             .then(function (response) {
                 if(response.status == 200)
                 {
-                    window.location.href = "/cars";
-                    // Hide the modal manually
                     vm.$nextTick(() => {
                         vm.$bvModal.hide('car-insert-modal')
                     })

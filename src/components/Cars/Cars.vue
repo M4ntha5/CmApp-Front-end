@@ -8,7 +8,7 @@
                   Add new car
             </button>
             <!-- bmw modal-->
-            <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal" @ok="fetchCars()" @close="fetchCars()"/>
+            <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal"/>
 
             <div class="pt-3">
                   <b-card-group deck>
@@ -141,7 +141,6 @@ export default {
       methods: {
             showBmwModal(){
                   this.isBmwModalVisible = true;
-                  this.$emit('clicked', this.cars)
             },
             closeBmwModal() {
                   this.isBmwModalVisible = false;
@@ -214,9 +213,7 @@ export default {
             fetchCarSummary(index, carId) {
                   let vm = this;
                   axios.get(backEndUrl + `/api/cars/${carId}/summary`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .then(function (response) {
                         if(response.status == 200)

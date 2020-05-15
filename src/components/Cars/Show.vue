@@ -114,9 +114,9 @@
                               <table class="table">
                                     <tr>
                                           <th>Bought Price</th>
-                                          <td>{{formatPrice(summary.boughtPrice)}} {{currency}}</td>
+                                          <td>{{formatPrice(summaryWatched.boughtPrice)}} {{currency}}</td>
                                     </tr>
-                                    <tr v-if="summary.sold">
+                                    <tr v-if="summaryWatched.sold">
                                           <th>Sold?</th>
                                           <td>Yes</td>
                                     </tr>
@@ -124,23 +124,23 @@
                                           <th>Sold?</th>
                                           <td>No</td>
                                     </tr>
-                                    <tr v-if="summary.sold">
+                                    <tr v-if="summaryWatched.sold">
                                           <th>Sold Date</th>
-                                          <td>{{summary.soldDate}}</td>
+                                          <td>{{summaryWatched.soldDate}}</td>
                                     </tr>
-                                    <tr v-if="summary.sold">
+                                    <tr v-if="summaryWatched.sold">
                                           <th>Sold Price</th>
-                                          <td>{{formatPrice(summary.soldPrice)}} {{currency}}</td>
+                                          <td>{{formatPrice(summaryWatched.soldPrice)}} {{currency}}</td>
                                     </tr>                                                                                        
                                     
-                                    <tr v-if="summary.sold">
+                                    <tr v-if="summaryWatched.sold">
                                           <th>Profit </th>
-                                          <td v-if="summary.profit < 0" style="color:red;font-weight:bold;">{{formatPrice(summary.profit)}} {{currency}}</td>
-                                          <td v-else style="color:green;font-weight:bold;">{{formatPrice(summary.profit)}} {{currency}}</td>
+                                          <td v-if="summaryWatched.profit < 0" style="color:red;font-weight:bold;">{{formatPrice(summaryWatched.profit)}} {{currency}}</td>
+                                          <td v-else style="color:green;font-weight:bold;">{{formatPrice(summaryWatched.profit)}} {{currency}}</td>
                                     </tr>
                                     <tr>
                                           <th>Total spent</th>
-                                          <td>{{formatPrice(summary.total)}} {{currency}}</td>
+                                          <td>{{formatPrice(summaryWatched.total)}} {{currency}}</td>
                                     </tr>                                                        
                               </table>
                         </div>
@@ -279,6 +279,7 @@ import VueGallery from 'vue-gallery';
 //import VuePreview from 'vue-preview'
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
+//import func from '../../../vue-temp/vue-editor-bridge';
 const backEndUrl = process.env.VUE_APP_API;
 export default { 
       data() {
@@ -399,6 +400,10 @@ export default {
                   }
                   return list;
             },
+            summaryWatched: function(){
+                  this.watchSummary();
+                  return this.summary;
+            }
       },
       beforeRouteLeave (to, from, next) {
             this.updateShowImagesStatus();          
@@ -413,6 +418,12 @@ export default {
       },
 
       methods: {
+            watchSummary(){
+                  let vm = this;
+                  setTimeout(function () {
+                        vm.fetchCarSummary();
+                  }, 2000);
+            },
             updateShowImagesStatus(){
                   let vm = this;
                   let body = {status: this.tracking.showImages} ;
@@ -491,7 +502,7 @@ export default {
             },
             fetchCarShipping() {
                   var vm = this;
-                  axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`, {
+                  axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/shipping`, {
                         headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .then(function (response) {
@@ -525,7 +536,7 @@ export default {
             },
             fetchCarSummary() {
                   var vm = this;
-                  axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/summary`, {
+                  axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/summary`, {
                         headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .then(function (response) {

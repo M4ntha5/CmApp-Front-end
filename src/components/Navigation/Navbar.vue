@@ -16,10 +16,13 @@
                                     <router-link to="/cars" class="nav-link">Cars</router-link>
                               </li>  
                               <li class="nav-item" >
-                                    <a @click.prevent="showRepairModal" href v-b-modal.repair-insert-modal class="nav-link">
+                                    <a @click.prevent="showRepairModal()" href v-b-modal.repair-insert-modal class="nav-link">
                                           Add repair
                                     </a>
+                                    <!-- repair modal-->
+                                    <RepairModal v-show="isRepairModalVisible"/>
                               </li>
+                              
                               <li class="nav-item" >
                                     <router-link :to='"/users/"+user+"/stats"' class="nav-link">Sold stats</router-link>
                               </li> 
@@ -52,14 +55,13 @@
                                     <div class="dropdown">
                                           <a class="nav-link dropdown-toggle" href="" role="button" 
                                           id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" 
-                                          aria-expanded="false"
-                                          >
+                                          aria-expanded="false">
                                                {{email}}
                                           </a>
 
                                           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                                                <a class="dropdown-item" @click.prevent="toProfile()" href="">Profile</a>                            
-                                                <a class="dropdown-item" @click.prevent="toPassReset()" href="">Change password</a>
+                                                <a class="dropdown-item" @click.prevent="$router.push(`/users/${user}/edit`)" href="">Profile</a>                            
+                                                <a class="dropdown-item" @click.prevent="$router.push(`/users/${this.user}/change/password`)" href="">Change password</a>
                                                 <a class="dropdown-item" @click.prevent="logout()" href="">Log out</a>
                                           </div>
                                     </div>
@@ -67,10 +69,7 @@
                         </template>
                   </ul>
             </div>
-      </nav>
-      <!-- repair modal-->
-      <RepairModal v-show="isRepairModalVisible" @click="closeRepairModal"/>
-      
+      </nav>    
 </div>
 </template>
 <script>
@@ -100,27 +99,15 @@ export default {
             }
       },
       methods: {
-            toProfile() {
-                  this.$router.push(`/users/${this.user}/edit`);
-            },
-            toStats() {
-                  this.$router.push(`/users/${this.user}/stats`);
-            },
-            toPassReset() {
-                  this.$router.push(`/users/${this.user}/change/password`);
-            },
             showRepairModal() {
                   this.isRepairModalVisible = true;
-            },
-            closeRepairModal() {
-                  this.isRepairModalVisible = false;
             },
             logout(){
                   window.$cookies.remove('role');
                   window.$cookies.remove('token');
                   window.$cookies.remove('user-email');
                   window.$cookies.remove('user');
-                  window.location.href = "/login";
+                  window.location.href = '/login';
             },
       }
 }

@@ -20,7 +20,9 @@
                               aria-describedby="make-input-live-feedback"
                               data-vv-as="Make">
                          </b-form-input>
-                         <b-form-invalid-feedback id="make-input-live-feedback">{{ veeErrors.first('make-input') }}</b-form-invalid-feedback>
+                         <b-form-invalid-feedback id="make-input-live-feedback">
+                              {{ veeErrors.first('make-input') }}
+                         </b-form-invalid-feedback>
                     </b-form-group>
 
                     <b-form-group class="col-sm-4 mb-3" label="Model">
@@ -123,12 +125,14 @@
                     <b-form-group class="col-sm-4 mb-3" label="Engine displacement">
                          <b-form-input placeholder="3.0" name="displacement-input"
                               v-model="car.displacement"
-                              v-validate="{ required: false, decimal:'2',min_value:0.1 }"
+                              v-validate="{ required: false, decimal:'1',min_value:0.1 }"
                               :state="validateState('displacement-input')" 
                               aria-describedby="displacement-input-live-feedback"
                               data-vv-as="Engine displacement">
                          </b-form-input>
-                         <b-form-invalid-feedback id="displacement-input-live-feedback">{{ veeErrors.first('displacement-input') }}</b-form-invalid-feedback>
+                         <b-form-invalid-feedback id="displacement-input-live-feedback">
+                              {{ veeErrors.first('displacement-input') }}
+                              </b-form-invalid-feedback>
 
                     </b-form-group>
                     <b-form-group class="col-sm-4 mb-3" label="Power">
@@ -267,17 +271,21 @@
                                         aria-describedby="repair-name-input-live-feedback"
                                         data-vv-as="name">
                                    </b-form-input>
-                                   <b-form-invalid-feedback id="repair-name-input-live-feedback">{{ veeErrors.first('repair-name-input') }}</b-form-invalid-feedback>
+                                   <b-form-invalid-feedback id="repair-name-input-live-feedback">
+                                        {{ veeErrors.first('repair-name-input') }}
+                                   </b-form-invalid-feedback>
                               </b-form-group>
                               <b-form-group class="col-sm-5 mb-3">
                                    <b-form-input placeholder="160" name="price-input" type="number" step=".01"
                                         v-model="repairPrice"
-                                        v-validate="{ required: true, min_value:1 }"
+                                        v-validate="{ required: true, decimal: 2, min_value:0.01 }"
                                         :state="validateState('price-input')" 
                                         aria-describedby="price-input-live-feedback"
                                         data-vv-as="price">
                                    </b-form-input>
-                                   <b-form-invalid-feedback id="price-input-live-feedback">{{ veeErrors.first('price-input') }}</b-form-invalid-feedback>
+                                   <b-form-invalid-feedback id="price-input-live-feedback">
+                                        {{ veeErrors.first('price-input') }}
+                                   </b-form-invalid-feedback>
                               </b-form-group>
                               <div class="col-sm-2 mb-3">
                                    <b-button size="sm" @click="addRepairRow()">
@@ -441,6 +449,10 @@ export default {
                axios.put(backEndUrl + `/api/cars/${this.$route.params.id}`, this.car, {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
+               .then(function (response){
+                    if(response.status == 204 && vm.repairs.length == 0)
+                         vm.$router.push(`/cars/${vm.$route.params.id}`);
+               })
                .catch(function (error) {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
@@ -481,7 +493,10 @@ export default {
                     this.alertFlag = true;
                     console.log(this.car.base64images);
                     this.updateAll();
-               }            
+               }  
+               else
+                    this.$el.querySelector('[name="' + 
+                         this.$validator.errors.items[0].field + '"]').scrollIntoView(false);
           },
           deleteEquipmentRow (ind) {
                this.car.equipment.splice(ind, 1);
@@ -540,6 +555,9 @@ export default {
                     this.$validator.reset('price-input');
                     this.$validator.reset('repair-name-input');
                }
+               else
+                    this.$el.querySelector('[name="' + 
+                         this.$validator.errors.items[0].field + '"]').scrollIntoView(false);
           },
           getImage(image, saveTo){       
                axios.post(backEndUrl + "/api/get-image2", image, {
@@ -616,9 +634,12 @@ export default {
                     }
                })
           },
-          updateAll(){               
-               this.deleteAllCarRepairs();
+          updateAll(){  
                this.updateCar();
+               console.log(this.repairs.length);
+               if(this.repairs.length > 0)             
+                    this.deleteAllCarRepairs();
+               
           },
           removeImageFromList(index){         
                this.car.base64images.splice(index, 1);

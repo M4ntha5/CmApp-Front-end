@@ -1,7 +1,7 @@
 <template>
      <div class="pt-5">
           <b-container fluid>
-                <b-alert v-model="alertFlag" style="text-align:center;" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
+               <b-alert v-model="alertFlag" style="text-align:center;" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
                <h1 style="text-align:center;" class="mb-5">All currently registerd users</h1>
                
                <b-table id="users-table" responsive striped hover 
