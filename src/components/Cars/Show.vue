@@ -114,9 +114,9 @@
                               <table class="table">
                                     <tr>
                                           <th>Bought Price</th>
-                                          <td>{{formatPrice(summary.boughtPrice)}} {{currency}}</td>
+                                          <td>{{formatPrice(summaryWatched.boughtPrice)}} {{currency}}</td>
                                     </tr>
-                                    <tr v-if="summary.sold">
+                                    <tr v-if="summaryWatched.sold">
                                           <th>Sold?</th>
                                           <td>Yes</td>
                                     </tr>
@@ -124,23 +124,23 @@
                                           <th>Sold?</th>
                                           <td>No</td>
                                     </tr>
-                                    <tr v-if="summary.sold">
+                                    <tr v-if="summaryWatched.sold">
                                           <th>Sold Date</th>
-                                          <td>{{summary.soldDate}}</td>
+                                          <td>{{summaryWatched.soldDate}}</td>
                                     </tr>
-                                    <tr v-if="summary.sold">
+                                    <tr v-if="summaryWatched.sold">
                                           <th>Sold Price</th>
-                                          <td>{{formatPrice(summary.soldPrice)}} {{currency}}</td>
+                                          <td>{{formatPrice(summaryWatched.soldPrice)}} {{currency}}</td>
                                     </tr>                                                                                        
                                     
-                                    <tr v-if="summary.sold">
+                                    <tr v-if="summaryWatched.sold">
                                           <th>Profit </th>
-                                          <td v-if="summary.profit < 0" style="color:red;font-weight:bold;">{{formatPrice(summary.profit)}} {{currency}}</td>
-                                          <td v-else style="color:green;font-weight:bold;">{{formatPrice(summary.profit)}} {{currency}}</td>
+                                          <td v-if="summaryWatched.profit < 0" style="color:red;font-weight:bold;">{{formatPrice(summaryWatched.profit)}} {{currency}}</td>
+                                          <td v-else style="color:green;font-weight:bold;">{{formatPrice(summaryWatched.profit)}} {{currency}}</td>
                                     </tr>
                                     <tr>
                                           <th>Total spent</th>
-                                          <td>{{formatPrice(summary.total)}} {{currency}}</td>
+                                          <td>{{formatPrice(summaryWatched.total)}} {{currency}}</td>
                                     </tr>                                                        
                               </table>
                         </div>
@@ -279,6 +279,7 @@ import VueGallery from 'vue-gallery';
 //import VuePreview from 'vue-preview'
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
+//import func from '../../../vue-temp/vue-editor-bridge';
 const backEndUrl = process.env.VUE_APP_API;
 export default { 
       data() {
@@ -363,7 +364,6 @@ export default {
             carImages: function() {
                   let list = [];
                   let shared = this.car.base64images;
-                  console.log("carbase",shared);
                   for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
@@ -372,7 +372,6 @@ export default {
                         }
                         list.push(obj);
                   } 
-                  console.log("car",list);
                   return list;
             },
             trackingImages: function() {
@@ -386,13 +385,11 @@ export default {
                         }
                         list.push(obj);
                   } 
-                  console.log("tracking",list);
                   return list;
             },
             sharedBase64Images: function () {   
                   let list = [];
                   let shared = this.car.base64images.concat(this.tracking.base64images);
-                  console.log(shared.length);
                   for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
@@ -403,6 +400,10 @@ export default {
                   }
                   return list;
             },
+            summaryWatched: function(){
+                  this.watchSummary();
+                  return this.summary;
+            }
       },
       beforeRouteLeave (to, from, next) {
             this.updateShowImagesStatus();          
@@ -417,25 +418,28 @@ export default {
       },
 
       methods: {
+            watchSummary(){
+                  let vm = this;
+                  setTimeout(function () {
+                        vm.fetchCarSummary();
+                  }, 2000);
+            },
             updateShowImagesStatus(){
                   let vm = this;
                   let body = {status: this.tracking.showImages} ;
                   axios.put(backEndUrl + `/api/cars/${vm.$route.params.id}/tracking/images/status`, body, {
                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
-                  .then(function (response) {
-                        if(response.status == 401) 
+                  .catch(function (error) {
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        } 
-                  })
-                  .catch(function (error) {
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   });
             },
             displayImages(){
@@ -444,9 +448,7 @@ export default {
             fetchCar() {
                   var vm = this;
                   axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: {  Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
@@ -462,52 +464,46 @@ export default {
                                     let to = vm.car.base64images;
                                     vm.getImagesRecursive(n, from, to); 
                               }                               
-                        }
-                        if(response.status == 401) 
+                        } 
+                  })
+                  .catch(function (error) {
+                        vm.loading = false;
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        } 
-                  })
-                  .catch(function (error) {
-                        console.log(error);
-                        vm.loading = false;
+                              vm.$router.push('/login');
+                        }
                   });        
             },
             fetchCarRepairs() {
                   var vm = this;
                   axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
                               vm.repairs = response.data;
-                        if(response.status == 401) 
+                  })
+                  .catch(function (error) {
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        } 
-                  })
-                  .catch(function (error) {
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   });
             },
             fetchCarShipping() {
                   var vm = this;
-                  axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                  axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/shipping`, {
+                        headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .then(function (response) {
                         if(response.status == 200)
@@ -524,28 +520,24 @@ export default {
                                     "Auction Fee": vm.shipping.auctionFee,
                                     "Customs": vm.shipping.customs
                               }];
-                        }
-                        if(response.status == 401) 
+                        }                
+                  })
+                  .catch(function (error) {
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        } 
-                              
-                  })
-                  .catch(function (error) {
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   });
             },
             fetchCarSummary() {
                   var vm = this;
-                  axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/summary`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                  axios.get(backEndUrl + `/api/cars/${this.$route.params.id}/summary`, {
+                        headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .then(function (response) {
                         if(response.status == 200)
@@ -555,20 +547,19 @@ export default {
                               {
                                     vm.summary.profit = vm.summary.soldPrice - vm.summary.total;
                                     vm.summary.soldDate = vm.summary.soldDate.substring(0, 10);
-                              }
-                              if(response.status == 401) 
-                              {
-                                    vm.$cookies.remove('token');
-                                    vm.$cookies.remove('user-email');
-                                    vm.$cookies.remove('role');
-                                    vm.$cookies.remove('user');
-                                    vm.$cookies.remove('currency');
-                                    window.location.href = '/login';
-                              } 
+                              }                   
                         }
                   })
                   .catch(function (error) {
-                        console.log(error);
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
                   });           
             },
             fetchTracking() {
@@ -588,19 +579,18 @@ export default {
                                     let to = vm.tracking.base64images;
                                     vm.getImagesRecursive(n, from, to);
                               }                                                                 
-                        }
-                        else if(response.status == 401) 
+                        }                
+                  })
+                  .catch(function (error) {
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        }                
-                  })
-                  .catch(function (error) {
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   });
             },
             openTracking(id){
@@ -640,63 +630,86 @@ export default {
                               vm.alertMessage = "Car successfully deleted";
                               vm.alertFlag = true;
                               vm.$router.push("/cars");
-                        }
-                        if(response.status == 401) 
+                        } 
+                  })
+                  .catch(function (error){
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        } 
-                  })
-                  .catch(function (error){
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   })
             },
             deleteCarSummary(){
                   var vm = this;
                   axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/summary`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .catch(function (error){
-                        console.log(error);
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
                   })
             },
             deleteCarTracking(){
                   var vm = this;
                   axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/tracking`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .catch(function (error){
-                        console.log(error);
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
                   })
             },
             deleteCarShipping(){
                   var vm = this;
                   axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .catch(function (error){
-                        console.log(error);
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
                   })
             },
             deleteCarRepairs(){
                   var vm = this;
                   axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .catch(function (error){
-                        console.log(error);
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
                   })
             },
             formatPrice(value) {
@@ -708,20 +721,18 @@ export default {
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                             saveTo.push(response.data); 
-                              
-                        if(response.status == 401) 
+                             saveTo.push(response.data);   
+                  })
+                  .catch(function (error) {
+                        if(error.response.status == 401) 
                         {
                               this.$cookies.remove('token');
                               this.$cookies.remove('user-email');
                               this.$cookies.remove('role');
                               this.$cookies.remove('user');
                               this.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        }    
-                  })
-                  .catch(function (error) {
-                        console.log(error);
+                              this.$router.push('/login');
+                        }
                   });
             },
             getImagesRecursive(n, from, to){

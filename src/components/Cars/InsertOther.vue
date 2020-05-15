@@ -344,7 +344,7 @@ const backEndUrl = process.env.VUE_APP_API;
                     steering: [{ text: 'Select One', value: '' }, 'Left hand drive', 'Right hand drive'],         
                     body: [
                          { text: 'Select One', value: '' }, 
-                         'Saloon / sedan', 'Hatchback',
+                         'Saloon', 'Hatchback', 'Sedan',
                          'Coupe', 'Wagon', 'Limousine',
                          'SUV', 'Minivan', 'Pick-up',
                     ],
@@ -393,9 +393,10 @@ const backEndUrl = process.env.VUE_APP_API;
 
                     const areValid = (await results).every(isValid => isValid);  
                     if(!areValid)
-                         return;
-
-                    this.insertCar();          
+                         this.$el.querySelector('[name="' + 
+                              this.$validator.errors.items[0].field + '"]').scrollIntoView(false);
+                    else
+                         this.insertCar();          
                },
                insertCar() {
                     let vm = this;
@@ -405,9 +406,7 @@ const backEndUrl = process.env.VUE_APP_API;
                     if(vm.car.manufactureDate == '')
                          vm.car.manufactureDate = '1900-01-01';
                     axios.post(backEndUrl + "/api/cars", vm.car, {
-                         headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                         }
+                         headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                     })
                     .then(function (response) {             
                          if(response.status == 200)
@@ -416,27 +415,24 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.alertFlag = false;
                               let insertedId = response.data._id;
                               vm.insertCarSummary(insertedId);                        
-                         } 
-                         if(response.status == 401) 
+                         }         
+                    })
+                    .catch(function (error) {
+                         if(error.response.status == 401) 
                          {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/login');
-                         }         
-                    })
-                    .catch(function (error) {
-                         console.log(error);
+                              vm.$router.push('/login');
+                         }
                     });
                },
                insertCarSummary(carId) {
                     let vm = this;
                     axios.post(backEndUrl + `/api/cars/${carId}/summary`, vm.summary, {
-                         headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                         }
+                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                     })
                     .then(function (response) {
                          if(response.status == 200)
@@ -447,27 +443,24 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$nextTick(() => {
                                    vm.$bvModal.hide('car-insert-modal')
                               })
-                         }  
-                         if(response.status == 401) 
+                         }                        
+                    })
+                    .catch(function (error) {
+                         if(error.response.status == 401) 
                          {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/login');
-                         }                       
-                    })
-                    .catch(function (error) {
-                         console.log(error);
+                              vm.$router.push('/login');
+                         }
                     });       
                },
                getAllMakes(){
                     let vm =this;
                     axios.get(backEndUrl + '/api/makes', {
-                         headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                         }
+                         headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                     })
                     .then(function (response){
                          if(response.status == 200)
@@ -476,29 +469,26 @@ const backEndUrl = process.env.VUE_APP_API;
                               let tmp = [{ text: 'Select One', value: null }];
                               vm.allMakes = tmp.concat(makes);
                               vm.loading = false;
-                         }  
-                         if(response.status == 401) 
+                         }         
+                    })
+                    .catch(function (error){
+                         vm.loading = false;
+                         if(error.response.status == 401) 
                          {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/login');
-                         }        
-                    })
-                    .catch(function (error){
-                         vm.loading = false;
-                         console.log(error);
+                              vm.$router.push('/login');
+                         }
                     })
                },
                getAllModelsForMake(make){
                     let vm =this;
                     vm.modelsDisabled = true;
                     axios.get(backEndUrl + `/api/makes/${make}/models`, {
-                         headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                         }
+                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                     })
                     .then(function (response){
                          if(response.status == 200)
@@ -509,25 +499,23 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.makeModels = models;
                               vm.modelsDisabled = false;
                               vm.loading = false;
-                         } 
-                         if(response.status == 401) 
+                         }                            
+                    })
+                    .catch(function (error){
+                         vm.loading = false;
+                         if(error.response.status == 401) 
                          {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href('/login');
-                         }                            
-                    })
-                    .catch(function (error){
-                         console.log(error);
-                         vm.loading = false;
+                              vm.$router.push('/login');
+                         }
                     })
                },
                deleteEquipmentRow (ind) {
                     this.car.equipment.splice(ind, 1);
-                    console.log(this.car.equipment);
                },
                async addRow() {
                     const results = Promise.all([

@@ -47,7 +47,6 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
                     this.resetPassword();
                });
           },
@@ -75,7 +74,15 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
-                    console.log(error);
+                    if(error.response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/login');
+                    }
                }); 
           },
      }

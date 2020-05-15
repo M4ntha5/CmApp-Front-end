@@ -100,20 +100,20 @@ export default {
                          let user = decodedJwtJsonData.split(',')[1].split('"')[3];
                          let currency = decodedJwtJsonData.split(',')[3].split('"')[3];
 
-                         window.$cookies.set('token', token, '1h');
-                         window.$cookies.set('user-email', email, '1h');
-                         window.$cookies.set('role', role, '1h');
-                         window.$cookies.set('user', user, '1h');
-                         window.$cookies.set('currency', currency, '1h');
+                         window.$cookies.set('token', token, '2h');
+                         window.$cookies.set('user-email', email, '2h');
+                         window.$cookies.set('role', role, '2h');
+                         window.$cookies.set('user', user, '2h');
+                         window.$cookies.set('currency', currency, '2h');
 
-                         if(role == "user")
+                         if(role == 'user')
                          {
                               vm.message = "Successfully loged in";
                               vm.dangerAlert = false;
                               vm.alertFlag = true;
                               window.location.href = "/cars";
                          }
-                         else if(role == "admin")
+                         else if(role == 'admin')
                          {
                               vm.message = "Successfully loged in admin";
                               vm.dangerAlert = false;

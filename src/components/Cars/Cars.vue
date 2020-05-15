@@ -8,7 +8,7 @@
                   Add new car
             </button>
             <!-- bmw modal-->
-            <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal" @ok="fetchCars()" @close="fetchCars()"/>
+            <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal"/>
 
             <div class="pt-3">
                   <b-card-group deck>
@@ -141,7 +141,6 @@ export default {
       methods: {
             showBmwModal(){
                   this.isBmwModalVisible = true;
-                  this.$emit('clicked', this.cars)
             },
             closeBmwModal() {
                   this.isBmwModalVisible = false;
@@ -172,54 +171,49 @@ export default {
                               if(vm.cars.length > 0)
                                     vm.insertRepair.car = vm.cars[0].id;
 
-                        }
-                        if(response.status == 401) 
-                        {
-                              vm.$cookies.remove('token');
-                              vm.$cookies.remove('user-email');
-                              vm.$cookies.remove('role');
-                              vm.$cookies.remove('user');
-                              vm.$cookies.remove('currency');
-                              window.location.href = '/login';                
-                        }                              
+                        }                             
                   })
                   .catch(function (error) {
                         vm.loading = false;
                         vm.alertMessage = error.response.data;
                         vm.dangerAlert = true;
                         vm.alertFlag = true;
-                        console.log(error);
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
                   });
             },
-            getImage(image, saveTo){                
+            getImage(image, saveTo){   
+                  let vm = this;             
                   axios.post(backEndUrl + "/api/get-image", image, {
                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
-                              saveTo.mainImageUrl = response.data; 
-
-                        if(response.status == 401) 
-                        {                  
-                              this.$cookies.remove('token');
-                              this.$cookies.remove('user-email');
-                              this.$cookies.remove('role');
-                              this.$cookies.remove('user');
-                              this.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        }    
+                              saveTo.mainImageUrl = response.data;     
                   })
                   .catch(function (error) {
-                        console.log(saveTo);
-                        console.log(error);
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
                   });
             },
             fetchCarSummary(index, carId) {
                   let vm = this;
                   axios.get(backEndUrl + `/api/cars/${carId}/summary`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .then(function (response) {
                         if(response.status == 200)
@@ -230,22 +224,21 @@ export default {
                                     vm.cars[index].summary.total;
                               vm.cars[index].summary.profit = 
                                     Number.parseFloat(vm.cars[index].summary.profit).toFixed(0);
-                        } 
-                        if(response.status == 401) 
+                        }                        
+                  })
+                  .catch(function (error) {
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        }                       
-                  })
-                  .catch(function (error) {
-                        vm.alertMessage = error.response.data;
-                        vm.dangerAlert = true;
-                        vm.alertFlag = true;
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   });       
             },
             onFileSelected(e) {
@@ -262,28 +255,25 @@ export default {
             fetchCar(carId, index) {
                   var vm = this;
                   axios.get(backEndUrl + `/api/cars/${carId}`, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
                               vm.fetchCarSummary(index, carId);
-                        if(response.status == 401) 
+                  })
+                  .catch(function (error) {
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        } 
-                  })
-                  .catch(function (error) {
-                        vm.alertMessage = error.response.data;
-                        vm.dangerAlert = true;
-                        vm.alertFlag = true;
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   });        
             },
             resetModal() {
@@ -302,9 +292,7 @@ export default {
 
                   var vm = this;
                   axios.put(backEndUrl + `/api/cars/${vm.soldDetails.car}/summary`, this.soldDetails, {
-                        headers: {
-                              Authorization: 'Bearer ' + window.$cookies.get('token')
-                        }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 204)
@@ -313,22 +301,21 @@ export default {
                               vm.$nextTick(() => {
                                     vm.$bvModal.hide('sold-modal')
                               })
-                        }
-                        if(response.status == 401) 
+                        }              
+                  })
+                  .catch(function (error){
+                        vm.alertMessage = error.response.data;
+                        vm.dangerAlert = true;
+                        vm.alertFlag = true;
+                        if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
                               vm.$cookies.remove('user-email');
                               vm.$cookies.remove('role');
                               vm.$cookies.remove('user');
                               vm.$cookies.remove('currency');
-                              window.location.href = '/login';
-                        }               
-                  })
-                  .catch(function (error){
-                        vm.alertMessage = error.response.data;
-                        vm.dangerAlert = true;
-                        vm.alertFlag = true;
-                        console.log(error);
+                              vm.$router.push('/login');
+                        }
                   }) 
             },
             openSoldModal(carId, index) {

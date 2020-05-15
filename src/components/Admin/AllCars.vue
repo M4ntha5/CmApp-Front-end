@@ -1,7 +1,7 @@
 <template>
      <div class="pt-5">
           <b-container fluid>
-                <b-alert v-model="alertFlag" style="text-align:center;" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
+               <b-alert v-model="alertFlag" style="text-align:center;" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
                <h1 style="text-align:center;" class="mb-5">All currently registerd cars</h1>
                
                <b-table id="users-table" responsive striped hover 
@@ -73,19 +73,18 @@ export default {
                          vm.rows = vm.cars.length;
                          vm.isBusy = false;
                     }
-                    else if(response.status == 401) 
+               })
+               .catch(function (error){
+                    console.log(error.response.data);
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
+                         vm.$router.push('/login');
                     }
-               })
-               .catch(function (error){
-                    console.log(error);
-                    console.log(error.response.data);
                })
           },
      }

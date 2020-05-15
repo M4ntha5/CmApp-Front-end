@@ -1,5 +1,5 @@
 <template>
-  <div class="container pt-5">
+<div class="container pt-5">
       <h1>All VIN's provided here will give you full this website functionality:</h1>
       <div class="row pt-5">
             <div class="col">
@@ -38,25 +38,5 @@
             <a href="mailto:mantas.daunoravicius@ktu.edu" target="_blank">mantas.daunoravicius@ktu.edu</a>
       </h1>
 
-  </div>
-  
+</div> 
 </template>
-
-<script>
-export default {
-      watch: {
-            //'$route' (to, from) {
-              //    alert("to", to.params.id);
-            //      alert("from", from.params.id);
-          //  }
-      },
-      created() {
-         ///   alert(this.$route.params.id);
-      },
-      methods: {
-            goHome() {
-                  this.$router.push('/');
-            }
-      }
-}
-</script>

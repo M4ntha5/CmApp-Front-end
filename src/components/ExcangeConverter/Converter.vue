@@ -7,7 +7,7 @@
                          <b-form-group label="Amount">
                               <b-form-input id="amount-input" placeholder="3000" name="amount-input"
                                    v-model="data.amount"
-                                   v-validate="{ required: true, decimal:3, min_value:1 }"
+                                   v-validate="{ required: true, decimal:3, min_value:0.001 }"
                                    :state="validateState('amount-input')" 
                                    aria-describedby="amount-input-live-feedback"
                                    data-vv-as="Amount">
@@ -92,11 +92,7 @@ export default {
                axios.post(backEndUrl + "/api/currency", this.data)
                .then(function (response) {
                     if(response.data)
-                    {
-                         //vm.data.to = 'USD';
-                         //vm.data.from = 'EUR';
                          vm.result = response.data;
-                    }
                })
                .catch(function (error){
                     console.log(error);
@@ -111,7 +107,6 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
                     this.convert();
                });
           }

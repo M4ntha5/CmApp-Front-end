@@ -165,8 +165,7 @@ export default {
                alertMessage: ''
           }
      },
-     mounted() {
-          this.getCurrencies();
+     mounted() {         
           this.fetchCarShipping();
      },
      methods: {
@@ -219,7 +218,7 @@ export default {
           insertShipping(){
                let vm = this;
                vm.dangerAlert = false;
-               vm.alertMessage = "Please wait while we handle your given shipping data";
+               vm.alertMessage = "Updating your shipping details";
                vm.alertFlag = true;
                axios.post(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert, {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
@@ -235,33 +234,32 @@ export default {
                               vm.$bvModal.hide('shipping-modal')
                          })
                     }
-                    else if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.dangerAlert = true;
+                    vm.alertMessage = error.response.data;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.dangerAlert = true;
-                    vm.alertMessage = error.response.data;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                }); 
           },
           updateShipping(){
                let vm = this;
                vm.dangerAlert = false;
-               vm.alertMessage = "Please wait while we handle your given shipping data";
+               vm.alertMessage = "Updating your shipping details";
                vm.alertFlag = true;
                axios.put(backEndUrl + `/api/cars/${vm.insert.car}/shipping`, vm.insert, {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
-                    if(response.status == 200)
+                    if(response.status == 204)
                     {
                          vm.dangerAlert = false;
                          vm.alertMessage = "Shipping data updated successfully";
@@ -271,48 +269,47 @@ export default {
                               vm.$bvModal.hide('shipping-modal')
                          })
                     }
-                    else if(response.status == 401) 
+               })
+               .catch(function (error) {
+                    vm.dangerAlert = true;
+                    vm.alertMessage = error.response.data;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.dangerAlert = true;
-                    vm.alertMessage = error.response.data;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                });
           },
           fetchCarShipping() {
                var vm = this;
                axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/shipping`, {
-                    headers: {
-                         Authorization: 'Bearer ' + window.$cookies.get('token')
-                    }
+                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {                      
                     if(response.status == 200)
+                    {
                          vm.insert = response.data;
-                    else if(response.status == 401) 
+                         vm.getCurrencies();
+                    }                  
+               })
+               .catch(function (error) {
+                    vm.dangerAlert = true;
+                    vm.alertMessage = error.response.data;
+                    vm.alertFlag = true;
+                    if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
                          vm.$cookies.remove('user-email');
                          vm.$cookies.remove('role');
                          vm.$cookies.remove('user');
                          vm.$cookies.remove('currency');
-                         window.location.href = '/login';
-                    } 
-               })
-               .catch(function (error) {
-                    vm.dangerAlert = true;
-                    vm.alertMessage = error.response.data;
-                    vm.alertFlag = true;
-                    console.log(error);
+                         vm.$router.push('/login');
+                    }
                });
           },
      }
