@@ -210,6 +210,7 @@ export default {
             .then(function (response) {
                 if(response.status == 200)
                 {
+                    window.location.href = '/login';
                     vm.$nextTick(() => {
                         vm.$bvModal.hide('car-insert-modal')
                     })

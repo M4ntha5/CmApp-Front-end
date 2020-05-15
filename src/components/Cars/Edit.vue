@@ -636,7 +636,6 @@ export default {
           },
           updateAll(){  
                this.updateCar();
-               console.log(this.repairs.length);
                if(this.repairs.length > 0)             
                     this.deleteAllCarRepairs();
                
