@@ -61,7 +61,7 @@
                   <b-form-group :label="'Sold price (' + currency + ')'">
                         <b-form-input placeholder="15000" name="soldPrice-input"
                               v-model="soldDetails.soldPrice"
-                              v-validate="{ required: true, decimal:'2', min_value: 1 }"
+                              v-validate="{ required: true, decimal:'2', min_value: 0.01 }"
                               :state="validateState('soldPrice-input')" 
                               aria-describedby="soldPrice-input-live-feedback"
                               data-vv-as="Sold price">
