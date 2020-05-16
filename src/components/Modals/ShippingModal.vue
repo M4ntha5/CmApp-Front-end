@@ -292,10 +292,8 @@ export default {
                })
                .then(function (response) {                      
                     if(response.status == 200)
-                    {
                          vm.insert = response.data;
-                         vm.getCurrencies();
-                    }                  
+                    vm.getCurrencies();               
                })
                .catch(function (error) {
                     vm.dangerAlert = true;
