@@ -2,17 +2,25 @@
 <div>
       <div class="container pt-5" v-if="!loading">
             <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
-
-            <button v-b-modal.car-insert-modal class="btn btn-primary ml-3"
-            @click="showBmwModal" >
-                  Add new car
-            </button>
-            <!-- bmw modal-->
-            <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal"/>
-
+            <div class="row mr-3 ml-1">
+                  <div class="col">
+                        <button v-b-modal.car-insert-modal class="btn btn-primary"
+                        @click="showBmwModal" >
+                              Add new car
+                        </button>
+                        <!-- bmw modal-->
+                        <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal"/>
+                  </div>
+                  <b-form-group label-cols-sm="auto" label="Sort:" class="ml-3">
+                        <b-form-select 
+                              v-model="selected" :options="options" @change="sortCars()"></b-form-select>
+                  </b-form-group>
+            </div>
+            
+            
             <div class="pt-3">
                   <b-card-group deck>
-                        <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
+                        <b-col sm="4" v-for="(car, index) in carsList" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
                               <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
                                           <b-card-img img-alt="image img-fluid" img-top :src='car.mainImageUrl'
@@ -45,13 +53,13 @@
                               </b-card>                                               
                         </b-col>
                   </b-card-group>          
-            </div>           
+            </div>          
       </div>
       <div class="pt-3" v-else>        
             <center>
                   <b-spinner label="Loading..."></b-spinner>
             </center> 
-      </div> 
+      </div>
 
       <b-modal id="sold-modal" ref="modal" title="Sold data"
       @show="resetModal"
@@ -90,6 +98,7 @@ export default {
                   dangerAlert: false,
                   currency: getSymbolFromCurrency(window.$cookies.get('currency')),
                   cars: [],
+                  displayCars:[],
                   car: {
                         id: '',
                         make:'',
@@ -126,10 +135,13 @@ export default {
                         index: '',
                         createdAt: ''
                   },
-                  currentPage: 1,
-                  perPage: 3,
                   rows: 0,
-                  
+                  selected: 1,
+                  options:[
+                        {value: 1, text: 'Show all cars' },
+                        {value: 2, text: 'Show only sold cars' },
+                        {value: 3, text: 'Show only unsold cars' },                 
+                  ]                
             }           
       },
       created() {
@@ -138,7 +150,41 @@ export default {
       components: {
             bmwModal,
       },
+      computed:{
+            carsList: function(){
+                  return this.displayCars;
+            }
+      },
       methods: {
+            sortCars(){          
+                  if(this.selected == 2)
+                  {
+                        let array = [];
+                        this.cars.forEach(element => {
+                              if(element.summary.sold)
+                                    array.push(element);
+                        });
+                        this.totalPages = Math.ceil(array.length / this.perPage);
+                        this.displayCars = array;
+                  }
+                  else if(this.selected == 3)
+                  {
+                        let array = [];
+                        this.cars.forEach(element => {
+                              if(!element.summary.sold)
+                                    array.push(element);
+                        });
+                        this.totalPages = Math.ceil(array.length / this.perPage);
+                        this.displayCars = array;
+                  }
+                  else if(this.selected == 1)
+                  {
+                        this.totalPages = Math.ceil(this.cars.length / this.perPage);
+                        this.displayCars = this.cars;
+                  }
+                       
+                  
+            },
             showBmwModal(){
                   this.isBmwModalVisible = true;
             },
@@ -155,6 +201,8 @@ export default {
                         if(response.status == 200)
                         {
                               vm.cars = response.data;
+                              vm.displayCars = response.data;
+                              vm.totalPages = Math.ceil(vm.cars.length / vm.perPage);
                               vm.rows = response.data.length;
                               vm.loading = false;                
 
