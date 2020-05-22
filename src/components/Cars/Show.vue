@@ -514,6 +514,7 @@ export default {
                                     vm.shipping.auctionFee +
                                     vm.shipping.transferFee + 
                                     vm.shipping.transportationFee;
+                              vm.shipping.total = Number.parseFloat(vm.shipping.total).toFixed(2);
                               vm.shippingItems = [{
                                     "Transportation fee": vm.shipping.transportationFee,
                                     "Transfer Fee": vm.shipping.transferFee,

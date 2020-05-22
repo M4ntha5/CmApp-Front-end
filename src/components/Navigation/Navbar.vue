@@ -61,7 +61,7 @@
 
                                           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
                                                 <a class="dropdown-item" @click.prevent="$router.push(`/users/${user}/edit`)" href="">Profile</a>                            
-                                                <a class="dropdown-item" @click.prevent="$router.push(`/users/${this.user}/change/password`)" href="">Change password</a>
+                                                <a class="dropdown-item" @click.prevent="$router.push(`/users/${user}/change/password`)" href="">Change password</a>
                                                 <a class="dropdown-item" @click.prevent="logout()" href="">Log out</a>
                                           </div>
                                     </div>

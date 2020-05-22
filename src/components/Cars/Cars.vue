@@ -164,7 +164,6 @@ export default {
                               if(element.summary.sold)
                                     array.push(element);
                         });
-                        this.totalPages = Math.ceil(array.length / this.perPage);
                         this.displayCars = array;
                   }
                   else if(this.selected == 3)
@@ -174,14 +173,10 @@ export default {
                               if(!element.summary.sold)
                                     array.push(element);
                         });
-                        this.totalPages = Math.ceil(array.length / this.perPage);
                         this.displayCars = array;
                   }
                   else if(this.selected == 1)
-                  {
-                        this.totalPages = Math.ceil(this.cars.length / this.perPage);
                         this.displayCars = this.cars;
-                  }
                        
                   
             },

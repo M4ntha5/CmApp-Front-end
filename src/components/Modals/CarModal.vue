@@ -181,7 +181,12 @@ export default {
                     vm.alertMessage = "Car inserted successfully"
                     vm.alertFlag = true;
                     let insertedId = response.data._id;
-                    vm.insertCarSummary(insertedId);                      
+                    vm.insertCarSummary(insertedId); 
+                      
+                    window.location.href = '/login';
+                    vm.$nextTick(() => {
+                        vm.$bvModal.hide('car-insert-modal')
+                    })                   
                 }              
             })
             .catch(function (error) {
@@ -207,15 +212,12 @@ export default {
             axios.post(backEndUrl + `/api/cars/${carId}/summary`, vm.summary, {
                 headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
-            .then(function (response) {
+            /*.then(function (response) {
                 if(response.status == 200)
                 {
-                    window.location.href = '/login';
-                    vm.$nextTick(() => {
-                        vm.$bvModal.hide('car-insert-modal')
-                    })
+                    
                 }                         
-            })
+            })*/
             .catch(function (error) {
                 if(error.response.status == 401) 
                 {
