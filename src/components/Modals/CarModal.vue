@@ -108,38 +108,12 @@ export default {
             dangerAlert: false,
             activeBmwItem: true,
             activeMbItem: false,
-            cars: []
         }
     },
     mounted() {
         this.getCurrencies();
-        this.fetchCars();
     },
     methods: {
-        fetchCars() {
-            let vm = this;
-            axios.get(backEndUrl + "/api/cars", {
-                headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
-            })
-            .then(function (response) {
-                if(response.status == 200)
-                    vm.cars = response.data;                              
-            })
-            .catch(function (error) {
-                vm.alertMessage = error.response.data;
-                vm.dangerAlert = true;
-                vm.alertFlag = true;
-                if(error.response.status == 401) 
-                {
-                    vm.$cookies.remove('token');
-                    vm.$cookies.remove('user-email');
-                    vm.$cookies.remove('role');
-                    vm.$cookies.remove('user');
-                    vm.$cookies.remove('currency');
-                    vm.$router.push('/login');
-                }
-            });
-        },
         getCurrencies() {
             let vm = this;
             axios.get(backEndUrl + "/api/currency")
@@ -154,7 +128,7 @@ export default {
         resetModal() {
             this.car.vin = ''
             this.summary.boughtPrice = '';
-            this.car.Base64images = []
+            this.car.base64images = []
             this.car.make = 'BMW'
             this.priceState = null
             this.vinState = null
@@ -169,7 +143,7 @@ export default {
         insertCar(){
             let vm = this;
             vm.dangerAlert = false;
-            vm.alertMessage = "Please wait while we fill your car data";
+            vm.alertMessage = "Please wait while we fetch your car data";
             vm.alertFlag = true;
             axios.post(backEndUrl + "/api/cars", vm.car, {
                 headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
@@ -181,7 +155,9 @@ export default {
                     vm.alertMessage = "Car inserted successfully"
                     vm.alertFlag = true;
                     let insertedId = response.data._id;
-                    vm.insertCarSummary(insertedId);                      
+                    vm.insertCarSummary(insertedId); 
+                    if(vm.car.base64images.length > 0)
+                        vm.insertImages(insertedId);              
                 }              
             })
             .catch(function (error) {
@@ -202,19 +178,36 @@ export default {
                 }
             });
         },
+        insertImages(carId){
+            let vm = this;
+            axios.post(backEndUrl + `/api/cars/${carId}/images`, vm.car.base64images, {
+                headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
+            })
+            .catch(function (error) {
+                if(error.response.status == 401) 
+                {
+                    vm.$cookies.remove('token');
+                    vm.$cookies.remove('user-email');
+                    vm.$cookies.remove('role');
+                    vm.$cookies.remove('user');
+                    vm.$cookies.remove('currency');
+                    vm.$router.push('/login');
+                }
+            }); 
+        },
         insertCarSummary(carId) {
             let vm = this;
             axios.post(backEndUrl + `/api/cars/${carId}/summary`, vm.summary, {
                 headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
-            .then(function (response) {
+            .then(function (response){
                 if(response.status == 200)
-                {
-                    window.location.href = '/login';
+                {                         
+                    window.location.href = '/cars';
                     vm.$nextTick(() => {
                         vm.$bvModal.hide('car-insert-modal')
-                    })
-                }                         
+                    });
+                }  
             })
             .catch(function (error) {
                 if(error.response.status == 401) 
@@ -235,10 +228,9 @@ export default {
                 var reader = new FileReader();
                 reader.readAsDataURL(e.target.files[i]);
                 reader.onload = (ev) => {
-                    vm.car.Base64images[i] = ev.target.result;
+                    vm.car.base64images[i] = ev.target.result;
                 }                       
             }
-            console.log(this.car.Base64images);
         },
         bmwClick() {
             this.activeMbItem = false;

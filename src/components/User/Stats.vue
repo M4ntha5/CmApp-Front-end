@@ -39,7 +39,7 @@
                          <h4>Cars sold: {{stats.length}}</h4>
                     </div>
                     <div class="col-4 text-right" v-if="stats.length > 0">
-                         <h4>Total profit: {{totalProfit}}</h4>
+                         <h4>Total profit: {{totalProfit}} {{currency}}</h4>
                     </div>               
                </div>
 
@@ -71,6 +71,7 @@
 
 <script>
 import axios from 'axios';
+import getSymbolFromCurrency from 'currency-symbol-map';
 const backEndUrl = process.env.VUE_APP_API;
 export default {
      data(){
@@ -96,7 +97,8 @@ export default {
                currentPage: 1,
                perPage: 10,
                isBusy: false,
-               totalProfit: 0
+               totalProfit: 0,
+               currency: getSymbolFromCurrency(window.$cookies.get('currency')),
           }
      },
      methods: {
