@@ -400,7 +400,6 @@ const backEndUrl = process.env.VUE_APP_API;
                },
                insertCar() {
                     let vm = this;
-                    console.log(vm.car);
                     if(vm.car.displacement == '')
                          vm.car.displacement = 0;
                     if(vm.car.manufactureDate == '')
@@ -411,9 +410,10 @@ const backEndUrl = process.env.VUE_APP_API;
                     .then(function (response) {             
                          if(response.status == 200)
                          {
-                              console.log(response);
                               vm.alertFlag = false;
                               let insertedId = response.data._id;
+                              if(vm.car.base64images.length > 0)
+                                   vm.insertImages(insertedId);
                               vm.insertCarSummary(insertedId);                        
                          }         
                     })
@@ -428,6 +428,23 @@ const backEndUrl = process.env.VUE_APP_API;
                               vm.$router.push('/login');
                          }
                     });
+               },
+               insertImages(carId){
+                    let vm = this;
+                    axios.post(backEndUrl + `/api/cars/${carId}/images`, vm.car.base64images, {
+                         headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
+                    })
+                    .catch(function (error) {
+                         if(error.response.status == 401) 
+                         {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                         }
+                    }); 
                },
                insertCarSummary(carId) {
                     let vm = this;
@@ -548,8 +565,7 @@ const backEndUrl = process.env.VUE_APP_API;
                          reader.onload = (e) => {
                               vm.car.base64images[i] = e.target.result; 
                          }                       
-                    }
-                    console.log(this.car.base64images);                
+                    }             
                },
           }
      }

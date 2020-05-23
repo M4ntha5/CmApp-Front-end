@@ -356,7 +356,7 @@ export default {
             
       },
       components: {
-            'gallery': VueGallery,//VuePreview,//VueGallerySlideshow,//'gallery': VueGallery,
+            'gallery': VueGallery,
             shippingModal,
             ToggleButton
       },

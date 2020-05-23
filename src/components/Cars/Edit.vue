@@ -468,6 +468,23 @@ export default {
                     }
                });     
           },
+          insertImages(carId){
+               let vm = this;
+               axios.post(backEndUrl + `/api/cars/${carId}/images`, vm.car.base64images, {
+                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
+               })
+               .catch(function (error) {
+                    if(error.response.status == 401) 
+                    {
+                         vm.$cookies.remove('token');
+                         vm.$cookies.remove('user-email');
+                         vm.$cookies.remove('role');
+                         vm.$cookies.remove('user');
+                         vm.$cookies.remove('currency');
+                         vm.$router.push('/login');
+                    }
+               }); 
+          },
           validateState(ref) {
                if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
                     return !this.veeErrors.has(ref);
@@ -491,7 +508,6 @@ export default {
                     this.alertMessage = "Saving your changes...";
                     this.dangerAlert = false;
                     this.alertFlag = true;
-                    console.log(this.car.base64images);
                     this.updateAll();
                }  
                else
@@ -592,7 +608,7 @@ export default {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                })
                .then(function (response) {
-                    if(response.status == 200)
+                    if(response.status == 204)
                          vm.insertMultipleRepairs();
                })
                .catch(function (error) {
@@ -636,9 +652,9 @@ export default {
           },
           updateAll(){  
                this.updateCar();
+               this.insertImages(this.$route.params.id);
                if(this.repairs.length > 0)             
-                    this.deleteAllCarRepairs();
-               
+                    this.deleteAllCarRepairs();                        
           },
           removeImageFromList(index){         
                this.car.base64images.splice(index, 1);

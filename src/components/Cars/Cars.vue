@@ -176,9 +176,7 @@ export default {
                         this.displayCars = array;
                   }
                   else if(this.selected == 1)
-                        this.displayCars = this.cars;
-                       
-                  
+                        this.displayCars = this.cars;              
             },
             showBmwModal(){
                   this.isBmwModalVisible = true;
@@ -197,7 +195,6 @@ export default {
                         {
                               vm.cars = response.data;
                               vm.displayCars = response.data;
-                              vm.totalPages = Math.ceil(vm.cars.length / vm.perPage);
                               vm.rows = response.data.length;
                               vm.loading = false;                
 
@@ -208,12 +205,10 @@ export default {
                                           vm.cars[i].mainImageUrl = process.env.VUE_APP_DEFAULT_IMAGE;
                                     else
                                           vm.getImage(vm.cars[i].carImg, vm.cars[i]);
-                              }
-                                    
+                              }                           
                               //setting repair value to dafault - first of a list
                               if(vm.cars.length > 0)
                                     vm.insertRepair.car = vm.cars[0].id;
-
                         }                             
                   })
                   .catch(function (error) {
@@ -292,8 +287,7 @@ export default {
                         reader.onload = (e) => {
                               this.insertCar.Base64images[i] = e.target.result;
                         }                 
-                  }
-                  console.log(this.insertCar.Base64images);                
+                  }             
             },
             fetchCar(carId, index) {
                   var vm = this;
