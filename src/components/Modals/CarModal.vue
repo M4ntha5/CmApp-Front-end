@@ -119,7 +119,7 @@ export default {
             axios.get(backEndUrl + "/api/currency")
             .then(function (response) {
                 vm.rates = response.data;
-                vm.summary.selectedCurrency = 'EUR';
+                vm.summary.selectedCurrency = vm.summary.baseCurrency;
             })
             .catch(function (error){
                 console.log(error);

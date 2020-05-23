@@ -341,7 +341,7 @@ const backEndUrl = process.env.VUE_APP_API;
                     currency: getSymbolFromCurrency(window.$cookies.get('currency')),
                     transmission: [{ text: 'Select One', value: '' }, 'Automatic', 'Manual'],
                     drive: [{ text: 'Select One', value: '' }, 'Front wheel drive', 'Rear wheel drive', 'All wheel drive (4x4)'],
-                    steering: [{ text: 'Select One', value: '' }, 'Left hand drive', 'Right hand drive'],         
+                    steering: [{ text: 'Select One', value: '' }, 'Left Hand Drive', 'Right Hand Drive'],         
                     body: [
                          { text: 'Select One', value: '' }, 
                          'Saloon', 'Hatchback', 'Sedan',
@@ -368,7 +368,7 @@ const backEndUrl = process.env.VUE_APP_API;
                     axios.get(backEndUrl + "/api/currency")
                     .then(function (response) {
                          vm.rates = response.data;
-                         vm.summary.selectedCurrency = 'EUR';
+                         vm.summary.selectedCurrency = vm.summary.baseCurrency;
                     })
                     .catch(function (error){
                          console.log(error);

@@ -58,7 +58,7 @@
                               v-validate="{ required: true }"
                               :state="validateState('date-input')" 
                               aria-describedby="date-input-live-feedback"
-                              data-vv-as="VIN">
+                              data-vv-as="Manufacture date">
                          </b-form-input>
                          <b-form-invalid-feedback id="date-input-live-feedback">{{ veeErrors.first('date-input') }}</b-form-invalid-feedback>
                     </b-form-group>
