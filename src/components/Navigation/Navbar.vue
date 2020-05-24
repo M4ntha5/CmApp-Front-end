@@ -1,6 +1,6 @@
 <template>
 <div>
-       <nav class="navbar navbar-expand-lg navbar-light bg-light my-nav">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light my-nav">
             <router-link to="/" class="navbar-brand">CmApp</router-link>
             <button class="navbar-toggler" data-toggle="collapse" 
                   data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent">
