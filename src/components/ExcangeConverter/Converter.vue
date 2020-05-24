@@ -6,7 +6,7 @@
                     <div class="col-md-5">
                          <b-form-group label="Amount">
                               <b-form-input id="amount-input" placeholder="3000" name="amount-input"
-                                   v-model="data.amount"
+                                   v-model="data.amount" type="number"
                                    v-validate="{ required: true, decimal:3, min_value:0.001 }"
                                    :state="validateState('amount-input')" 
                                    aria-describedby="amount-input-live-feedback"

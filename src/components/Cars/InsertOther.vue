@@ -143,7 +143,7 @@
                          </b-form-group>
                          <b-form-group class="col-md-4 mb-3" label="Engine displacement">
                               <b-form-input step=".1" placeholder="3.0" name="displacement-input"
-                                   v-model="car.displacement"
+                                   v-model="car.displacement" type="number"
                                    v-validate="{ required: false, decimal:1, min_value: 0 }"
                                    :state="validateState('displacement-input')" 
                                    aria-describedby="displacement-input-live-feedback"
@@ -198,7 +198,7 @@
                     <div class="form-row">
                          <b-form-group class="col-sm-8 mb-3" label="Bought price">
                               <b-form-input placeholder="5000" step=".1" name="price-input"
-                                   v-model="summary.boughtPrice"
+                                   v-model="summary.boughtPrice" type="number"
                                    v-validate="{ required: true, decimal:2 }"
                                    :state="validateState('price-input')" 
                                    aria-describedby="price-input-live-feedback"
