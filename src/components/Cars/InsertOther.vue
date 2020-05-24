@@ -143,7 +143,7 @@
                          </b-form-group>
                          <b-form-group class="col-md-4 mb-3" label="Engine displacement">
                               <b-form-input step=".1" placeholder="3.0" name="displacement-input"
-                                   v-model="car.displacement" type="number"
+                                   v-model="car.displacement"
                                    v-validate="{ required: false, decimal:1, min_value: 0 }"
                                    :state="validateState('displacement-input')" 
                                    aria-describedby="displacement-input-live-feedback"

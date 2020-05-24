@@ -37,7 +37,7 @@
                     <b-col cols="8">
                         <b-form-group label="Price">
                             <b-form-input id="price-input" placeholder="9000" name="price-input"
-                                v-model="summary.boughtPrice" type="number"
+                                v-model="summary.boughtPrice"
                                 v-validate="{ required: true, decimal:'2',min_value:0.01 }"
                                 :state="validateState('price-input')" 
                                 aria-describedby="price-input-live-feedback"
