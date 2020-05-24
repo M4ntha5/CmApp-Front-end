@@ -26,6 +26,7 @@ import EmailConfirm from './components/Auth/ConfirmEmail.vue';
 import PasswordReset from './components/Auth/PasswordReset.vue';
 import AllUsers from './components/Admin/Users.vue';
 import AllCars from './components/Admin/AllCars.vue';
+import AllMakes from './components/Admin/CarMakes.vue';
 
 
 Vue.use(VueRouter);
@@ -120,9 +121,10 @@ const routes = [
     { path: '/login', component: Login },
     { path: '/register', component: Register },
     { path: '/converter', component: Converter },
+    { path: '/makes', component: AllMakes }, 
     { path: '/about', component: About }, 
     { path: '/404', component: NotFound },
-    { path: '*', redirect: '/404' },  
+    { path: '*', redirect: '/404' },
 
 ];
 

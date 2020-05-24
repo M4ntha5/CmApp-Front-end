@@ -482,9 +482,13 @@ const backEndUrl = process.env.VUE_APP_API;
                     .then(function (response){
                          if(response.status == 200)
                          {
+                              let list = [];
                               let makes = response.data
                               let tmp = [{ text: 'Select One', value: null }];
-                              vm.allMakes = tmp.concat(makes);
+                              makes.forEach(element => {
+                                   list.push(element.name);
+                              });
+                              vm.allMakes = tmp.concat(list);
                               vm.loading = false;
                          }         
                     })
