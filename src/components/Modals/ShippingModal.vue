@@ -9,8 +9,8 @@
                     <b-row>
                          <b-col cols="8">
                               <b-form-group label="Transportation fee">
-                                   <b-form-input placeholder="180" name="transportationFee-input"
-                                        v-model="insert.transportationFee"  step=".01"
+                                   <b-form-input placeholder="180" name="transportationFee-input" type="number"
+                                        v-model="insert.transportationFee" step=".01"
                                         v-validate="{ required: true, decimal:'2',min_value:0.01 }"
                                         :state="validateState('transportationFee-input')" 
                                         aria-describedby="transportationFee-input-live-feedback"
@@ -42,7 +42,7 @@
                          <b-col cols="8">
                               <b-form-group label="Transfer fee">
                                    <b-form-input placeholder="220" name="transferFee-input"
-                                        v-model="insert.transferFee" step=".01"
+                                        v-model="insert.transferFee" step=".01" pattern="\d*"
                                         v-validate="{ required: true, decimal:'2',min_value:0.01 }"
                                         :state="validateState('transferFee-input')" 
                                         aria-describedby="transferFee-input-live-feedback"
