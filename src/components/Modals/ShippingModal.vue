@@ -73,7 +73,7 @@
                          <b-col cols="8">
                               <b-form-group label="Auction fee">
                                    <b-form-input placeholder="960" name="auctionFee-input"
-                                        v-model="insert.auctionFee" step=".01"
+                                        v-model="insert.auctionFee" step=".01" type="number" pattern="[0-9]*" inputmode="numeric"
                                         v-validate="{ required: true, decimal:'2',min_value:0.01 }"
                                         :state="validateState('auctionFee-input')" 
                                         aria-describedby="auctionFee-input-live-feedback"
