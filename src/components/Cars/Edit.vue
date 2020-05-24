@@ -276,8 +276,8 @@
                                    </b-form-invalid-feedback>
                               </b-form-group>
                               <b-form-group class="col-sm-5 mb-3">
-                                   <b-form-input placeholder="160" name="price-input" type="number" step=".01"
-                                        v-model="repairPrice"
+                                   <b-form-input placeholder="160" name="price-input"                                 
+                                        v-model="repairPrice" step=".01"
                                         v-validate="{ required: true, decimal: 2, min_value:0.01 }"
                                         :state="validateState('price-input')" 
                                         aria-describedby="price-input-live-feedback"

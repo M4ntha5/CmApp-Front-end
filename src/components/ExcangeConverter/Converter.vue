@@ -1,7 +1,7 @@
 <template>
      <div>
           <center class="pt-3"><h1>Here you can convert between most popular world currencies!</h1></center>
-          <b-form class="container pt-5" @submit.prevent="onSubmit">
+          <b-form class="container pt-5" @submit.prevent="onSubmit" novalidate>
                <div class="row">
                     <div class="col-md-5">
                          <b-form-group label="Amount">

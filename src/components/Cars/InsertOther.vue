@@ -198,7 +198,7 @@
                     <div class="form-row">
                          <b-form-group class="col-sm-8 mb-3" label="Bought price">
                               <b-form-input placeholder="5000" step=".1" name="price-input"
-                                   v-model="summary.boughtPrice"
+                                   v-model="summary.boughtPrice" type="number"
                                    v-validate="{ required: true, decimal:2 }"
                                    :state="validateState('price-input')" 
                                    aria-describedby="price-input-live-feedback"

@@ -25,7 +25,7 @@
                                         <a @click.prevent="$router.push('/about')" href="">About</a>
                                    </li>
                                    <li>
-                                        <a @click.prevent="$router.push('/404')" href="">Sugest a feature</a>
+                                        <a @click.prevent="$router.push('/404')" href="">Suggest a feature</a>
                                    </li>
                                    <li>
                                         <a @click.prevent="$router.push('/404')" href="">Report a problem</a>

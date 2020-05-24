@@ -35,12 +35,15 @@
                     <div class="col-4">
                          <b-button type="submit" @click.prevent="onSubmit()" variant="primary">Search</b-button>
                     </div>
-                    <div class="col-4 text-center" v-if="stats.length > 0">
-                         <h4>Cars sold: {{stats.length}}</h4>
-                    </div>
-                    <div class="col-4 text-right" v-if="stats.length > 0">
-                         <h4>Total profit: {{totalProfit}} {{currency}}</h4>
-                    </div>               
+                    <template v-if="show">
+                         <div class="col-4 text-center">
+                              <h4>Cars sold: {{stats.length}}</h4>
+                         </div>
+                         <div class="col-4 text-right">
+                              <h4>Total profit: {{totalProfit}} {{currency}}</h4>
+                         </div> 
+                    </template>
+                                   
                </div>
 
 
@@ -88,7 +91,7 @@ export default {
                ],
                form: {
                     dateFrom: '',
-                    dateTo: '',
+                    dateTo: ''
                },
                alertMessage: '',
                alertFlag: false,
@@ -99,6 +102,7 @@ export default {
                isBusy: false,
                totalProfit: 0,
                currency: getSymbolFromCurrency(window.$cookies.get('currency')),
+               show: false
           }
      },
      methods: {
@@ -112,6 +116,7 @@ export default {
                     {
                          vm.totalProfit = 0;
                          vm.stats = response.data;
+                         vm.show = true;
                          vm.rows = vm.stats.length;
                          vm.stats.forEach(elem => {
                               vm.totalProfit = vm.totalProfit + elem.profit;
