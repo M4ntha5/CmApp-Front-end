@@ -52,10 +52,10 @@ export default {
           }
      },
      created() {
-         this.getAllUsers();
+         this.getAllCars();
      },
      methods: {
-          getAllUsers(){
+          getAllCars(){
                let vm = this;
                axios.get(backEndUrl + '/api/allcars',{
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}

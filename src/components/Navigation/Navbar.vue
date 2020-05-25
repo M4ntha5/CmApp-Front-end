@@ -35,6 +35,9 @@
                               <li class="nav-item">
                                     <router-link to="/admin/cars" class="nav-link">Cars</router-link>
                               </li>
+                              <li class="nav-item">
+                                    <router-link to="/makes" class="nav-link">Makes</router-link>
+                              </li>
                         </template>
                                                                   
                   </ul>

@@ -11,7 +11,7 @@
                     :per-page="perPage"
                     :current-page="currentPage">
                     <template v-slot:cell(actions)="row">
-                         <b-dropdown id="actions-dropdown" text="Actions" class="" variant="info">
+                         <b-dropdown id="actions-dropdown" text="Actions" variant="info">
                               <b-dropdown-item @click="goToUserEdit(users[row.index]._id)">Edit user details</b-dropdown-item>
                               <b-dropdown-item 
                                    v-if="users[row.index].blocked"
