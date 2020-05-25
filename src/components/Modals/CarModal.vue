@@ -148,16 +148,15 @@ export default {
             axios.post(backEndUrl + "/api/cars", vm.car, {
                 headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
-            .then(function (response) {             
+            .then(function (response) {
                 if(response.status == 200)
                 {
                     vm.dangerAlert = false;
                     vm.alertMessage = "Car inserted successfully"
                     vm.alertFlag = true;
                     let insertedId = response.data._id;
-                    vm.insertCarSummary(insertedId); 
-                    if(vm.car.base64images.length > 0)
-                        vm.insertImages(insertedId);              
+                    vm.insertImages(insertedId);  
+                    vm.insertCarSummary(insertedId);
                 }              
             })
             .catch(function (error) {
@@ -202,11 +201,11 @@ export default {
             })
             .then(function (response){
                 if(response.status == 200)
-                {                         
-                    window.location.href = '/cars';
+                {
                     vm.$nextTick(() => {
                         vm.$bvModal.hide('car-insert-modal')
                     });
+                    window.location.href = '/cars';
                 }  
             })
             .catch(function (error) {
