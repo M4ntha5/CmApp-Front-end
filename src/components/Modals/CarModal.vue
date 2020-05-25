@@ -151,12 +151,12 @@ export default {
             .then(function (response) {
                 if(response.status == 200)
                 {
-                    vm.dangerAlert = false;
-                    vm.alertMessage = "Car inserted successfully"
-                    vm.alertFlag = true;
                     let insertedId = response.data._id;
                     vm.insertImages(insertedId);  
                     vm.insertCarSummary(insertedId);
+                    vm.dangerAlert = false;
+                    vm.alertMessage = "Car inserted successfully"
+                    vm.alertFlag = true;         
                 }              
             })
             .catch(function (error) {
