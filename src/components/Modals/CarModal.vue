@@ -152,7 +152,7 @@ export default {
                 if(response.status == 200)
                 {
                     let insertedId = response.data._id;
-                    vm.insertImages(insertedId);                
+                   // vm.insertImages(insertedId);                
                     vm.dangerAlert = false;
                     vm.alertMessage = "Car inserted successfully"
                     vm.alertFlag = true;  
