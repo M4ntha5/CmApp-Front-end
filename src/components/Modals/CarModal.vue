@@ -156,7 +156,7 @@ export default {
                     vm.dangerAlert = false;
                     vm.alertMessage = "Car inserted successfully"
                     vm.alertFlag = true;  
-                    vm.insertCarSummary(insertedId);       
+                    vm.insertCarSummary(insertedId);
                 }              
             })
             .catch(function (error) {
@@ -178,6 +178,7 @@ export default {
             });
         },
         insertImages(carId){
+            console.log("img-insert", this.car.base64images);
             let vm = this;
             axios.post(backEndUrl + `/api/cars/${carId}/images`, vm.car.base64images, {
                 headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
