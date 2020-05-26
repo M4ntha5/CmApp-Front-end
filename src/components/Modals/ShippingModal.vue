@@ -167,6 +167,7 @@ export default {
      },
      mounted() {         
           this.fetchCarShipping();
+          this.getCurrencies();
      },
      methods: {
           getCurrencies() {
@@ -292,8 +293,7 @@ export default {
                })
                .then(function (response) {                      
                     if(response.status == 200)
-                         vm.insert = response.data;
-                    vm.getCurrencies();               
+                         vm.insert = response.data;                             
                })
                .catch(function (error) {
                     vm.dangerAlert = true;
