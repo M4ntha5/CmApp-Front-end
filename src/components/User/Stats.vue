@@ -83,11 +83,11 @@ export default {
                fields: [    
                     { key: 'car', sortable: true },
                     { key: 'vin' },
-                    { key: 'boughtPrice', sortable: true },  
-                    { key: 'soldPrice', sortable: true },
+                    { key: 'boughtPrice', sortable: true, label:'Bought price (' + getSymbolFromCurrency(window.$cookies.get('currency')) + ')' },  
+                    { key: 'soldPrice', sortable: true, label:'Sold price (' + getSymbolFromCurrency(window.$cookies.get('currency')) + ')' },
                     { key: 'soldWithin', sortable: true },
-                    { key: 'additionallySpent', sortable: true },
-                    { key: 'profit', sortable: true }
+                    { key: 'additionallySpent', sortable: true, label:'Additionally spent (' + getSymbolFromCurrency(window.$cookies.get('currency')) + ')' },
+                    { key: 'profit', sortable: true, label:'Profit (' + getSymbolFromCurrency(window.$cookies.get('currency')) + ')' }
                ],
                form: {
                     dateFrom: '',
@@ -120,6 +120,7 @@ export default {
                          vm.rows = vm.stats.length;
                          vm.stats.forEach(elem => {
                               vm.totalProfit = vm.totalProfit + elem.profit;
+                              elem.additionallySpent = Number((elem.additionallySpent)).toFixed(2);
                               elem.profit = Number((elem.profit)).toFixed(2);
                          });
                          vm.totalProfit = Number((vm.totalProfit)).toFixed(2);
