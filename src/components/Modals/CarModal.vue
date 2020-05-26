@@ -178,12 +178,13 @@ export default {
             });
         },
         insertImages(carId){
-            console.log("img-insert", this.car.base64images);
+            console.log("img-insert", this.car.base64images, carId);
             let vm = this;
             axios.post(backEndUrl + `/api/cars/${carId}/images`, vm.car.base64images, {
                 headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
             .catch(function (error) {
+                console.log(error);
                 if(error.response.status == 401) 
                 {
                     vm.$cookies.remove('token');
