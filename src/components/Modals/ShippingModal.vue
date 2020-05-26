@@ -174,10 +174,10 @@ export default {
                axios.get(backEndUrl + "/api/currency")
                .then(function (response) {
                     vm.rates = response.data;
-                    vm.insert.customsCurrency = vm.insert.baseCurrency;
-                    vm.insert.auctionFeeCurrency = vm.insert.baseCurrency;
-                    vm.insert.transferFeeCurrency = vm.insert.baseCurrency;
-                    vm.insert.transportationFeeCurrency = vm.insert.baseCurrency;
+                    vm.insert.customsCurrency = window.$cookies.get('currency');
+                    vm.insert.auctionFeeCurrency = window.$cookies.get('currency');
+                    vm.insert.transferFeeCurrency = window.$cookies.get('currency');
+                    vm.insert.transportationFeeCurrency =window.$cookies.get('currency');
                })
                .catch(function (error){
                     vm.dangerAlert = true;
