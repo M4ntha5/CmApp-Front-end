@@ -166,8 +166,8 @@ export default {
           }
      },
      mounted() {         
-          this.fetchCarShipping();
           this.getCurrencies();
+          this.fetchCarShipping();         
      },
      methods: {
           getCurrencies() {
@@ -230,6 +230,7 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertMessage = "Your data saved successfully";
                          vm.alertFlag = true;
+                         vm.fetchCarShipping();
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('shipping-modal')
@@ -265,6 +266,7 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertMessage = "Shipping data updated successfully";
                          vm.alertFlag = true;
+                         vm.fetchCarShipping();
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('shipping-modal')
@@ -293,7 +295,11 @@ export default {
                })
                .then(function (response) {                      
                     if(response.status == 200)
-                         vm.insert = response.data;                             
+                    {
+                         vm.insert = response.data;
+                         vm.getCurrencies();
+                    } 
+                                                                
                })
                .catch(function (error) {
                     vm.dangerAlert = true;
