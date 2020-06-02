@@ -185,7 +185,8 @@ export default {
                         airBag: '',
                         radio: '',
                         auctionImages: [],
-                        base64images: [],                      
+                        base64images: [],      
+                        images: [],                
                         car: ''
                   },
                   selectedCar:{},
@@ -212,11 +213,11 @@ export default {
       computed: {
             trackingImages: function(){
                   let list = [];
-                  let shared = this.urls;
+                  let shared = this.tracking.images;
                   for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
-                              href: shared[i],
+                              href: shared[i].url,
                               title: i + 1 + '/' + shared.length
                         }
                         list.push(obj);
@@ -260,7 +261,6 @@ export default {
                               vm.tracking.dateOrdered = vm.tracking.dateOrdered.substring(0, 10);
                               vm.tracking.datePickedUp = vm.tracking.datePickedUp.substring(0, 10);
                               
-                              vm.getImagesRecursive();
                               if(vm.tracking.containerNumber != '')
                                     vm.empty = false;
                               vm.loading = false;           
@@ -387,31 +387,6 @@ export default {
                   else
                         this.lookForTracking();
                                   
-            },
-            getImage(vm, image){
-                  axios.post(backEndUrl + "/api/get-image", image, {
-                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
-                  })
-                  .then(function (response) {
-                        if(response.status == 200)
-                             vm.urls.push(response.data);     
-                  })
-                  .catch(function (error) {
-                        if(error.response.status == 401) 
-                        {
-                              vm.$cookies.remove('token');
-                              vm.$cookies.remove('user-email');
-                              vm.$cookies.remove('role');
-                              vm.$cookies.remove('user');
-                              vm.$cookies.remove('currency');
-                              vm.$router.push('/login');
-                        }
-                  });
-            },
-            getImagesRecursive(){
-                  let n = this.tracking.auctionImages.length;
-                  for(let i =0;i<n;i++)
-                        this.getImage(this, this.tracking.auctionImages[i]);              
             },
             goToSelectedCar(){
                   this.$router.push(`/cars/${this.$route.params.id}`);

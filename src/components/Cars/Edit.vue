@@ -183,8 +183,8 @@
                          <b-form-invalid-feedback id="images-input-live-feedback">
                               {{ veeErrors.first('images-input') }}
                          </b-form-invalid-feedback>
-                         <div class="col-sm-4 mt-3" v-for="(image, index) in car.base64images" v-bind:key="index">              
-                              <img class="card-img-top mb-3 pt-3" responsive-image :src="image">
+                         <div class="col-sm-4 mt-3" v-for="(image, index) in car.urls" v-bind:key="index">              
+                              <img class="card-img-top mb-3 pt-3" responsive-image :src="image.url">
                               <b-button pill variant="danger" 
                                    style="position:absolute;right:0%;top:0%;"
                                    @click.prevent="removeImageFromList(index)">
@@ -320,6 +320,8 @@ export default {
                fields: ['code', 'name', 'action'],
                repairFields: ['name', 'price', 'action'],
                images: [],
+               deletedImgs: [],
+               oldUrls: [],
                length: 0,
                car: {          
                     _id: '',
@@ -340,7 +342,7 @@ export default {
                     created_at:'',
                     mainImgUrl:'',
                     equipment: [],
-                    images:[],
+                    urls:[],
                     base64images: [],
                },
                summary: {
@@ -378,8 +380,9 @@ export default {
      created() {      
           this.fetchCar();        
           this.fetchCarRepairs();
+          
      },
-     methods: {        
+     methods: {    
           fetchCar() {
                var vm = this;
                axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}`, {
@@ -388,12 +391,13 @@ export default {
                .then(function (response) {
                     if(response.status == 200)
                     {
-                         vm.car = response.data;  
-                         let n = vm.car.images.length;
-                         let from = vm.car.images;
-                         let to = vm.car.base64images;
+                         vm.car = response.data;
+                         vm.oldUrls = response.data.urls;
+                        // let n = vm.car.images.length;
+                         //let from = vm.car.images;
+                         //let to = vm.car.base64images;
                          vm.loading = false;
-                         vm.getImagesRecursive(n, from, to);
+                         //vm.getImagesRecursive(n, from, to);
                          //trimming unnecessary dat ending           
                          vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                          
@@ -470,8 +474,9 @@ export default {
           },
           insertImages(carId){
                let vm = this;
-               axios.post(backEndUrl + `/api/cars/${carId}/images`, vm.car.base64images, {
-                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
+               let obj = {deleted: this.deletedImgs, inserted: this.car.base64images, oldUrls: this.oldUrls};
+               axios.post(backEndUrl + `/api/cars/${carId}/images`, obj, {
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .catch(function (error) {
                     if(error.response.status == 401) 
@@ -575,33 +580,6 @@ export default {
                     this.$el.querySelector('[name="' + 
                          this.$validator.errors.items[0].field + '"]').scrollIntoView(false);
           },
-          getImage(image, saveTo){       
-               axios.post(backEndUrl + "/api/get-image2", image, {
-                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
-               })
-               .then(function (response) {
-                    if(response.status == 200)
-                         saveTo.push(response.data);                  
-               })
-               .catch(function (error) {
-                    this.alertMessage = error.response.data;
-                    this.dangerAlert = true;
-                    this.alertFlag = true;
-                    if(error.response.status == 401) 
-                    {
-                         this.$cookies.remove('token');
-                         this.$cookies.remove('user-email');
-                         this.$cookies.remove('role');
-                         this.$cookies.remove('user');
-                         this.$cookies.remove('currency');
-                         this.$router.push('/login');
-                    }
-               });
-          },
-          getImagesRecursive(n, from, to){
-               for(let i =0;i<n;i++)
-                    this.getImage(from[i], to);             
-          },
           deleteAllCarRepairs(){
                let vm = this;
                axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
@@ -629,7 +607,7 @@ export default {
           insertMultipleRepairs(){
                let vm = this;
                axios.post(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, vm.repairs, {
-                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
                     if(response.status == 200)
@@ -656,8 +634,10 @@ export default {
                if(this.repairs.length > 0)             
                     this.deleteAllCarRepairs();                        
           },
-          removeImageFromList(index){         
-               this.car.base64images.splice(index, 1);
+          removeImageFromList(index){
+               this.deletedImgs.push(this.car.urls[index].url);
+               console.log("deleted", this.deletedImgs);
+               this.car.urls.splice(index, 1);
           },
           onFileSelected(e) {
                let vm = this;
@@ -667,8 +647,10 @@ export default {
                     reader.readAsDataURL(e.target.files[i]);
                     reader.onload = (e) => {
                          vm.car.base64images.push(e.target.result);
+                         vm.car.urls.push({url: e.target.result});
                     }                 
-               }             
+               }     
+               console.log("added", vm.car.base64images);
           },
           goToCar(){
                this.$router.push(`/cars/${this.$route.params.id}`);
