@@ -69,7 +69,7 @@
                   </div> 
                   <div class="row mb-3 pt-3">
                         <div class="col responsive pt-5"> 
-                             <template v-if="!tracking.showImages && car.urls.length > 0"> 1           
+                             <template v-if="!tracking.showImages && car.urls.length > 0">       
                                     <gallery :images="carImages" :index="index"                      
                                     @close="index = null">
                                     </gallery>
@@ -78,7 +78,7 @@
                                           :style="{ backgroundImage: 'url(' + carImages[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-else-if="!tracking.showImages && car.urls.length == 0">2            
+                              <template v-else-if="!tracking.showImages && car.urls.length == 0">       
                                     <gallery :index="index" :images="defaultImg" 
                                     @close="index = null">
                                     </gallery>
@@ -87,7 +87,7 @@
                                           :style="{ backgroundImage: 'url(' + defaultImg[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-else-if="tracking.showImages && sharedBase64Images.length > 0">3            
+                              <template v-else-if="tracking.showImages && sharedBase64Images.length > 0">          
                                     <gallery :images="sharedBase64Images" :index="index"                                
                                     @close="index = null">
                                     </gallery>
@@ -96,7 +96,7 @@
                                           :style="{ backgroundImage: 'url(' + sharedBase64Images[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-else-if="tracking.showImages && sharedBase64Images.length == 0">4
+                              <template v-else-if="tracking.showImages && sharedBase64Images.length == 0">
                                     <gallery :images="defaultImg" :index="index" 
                                     @close="index = null">
                                     </gallery>
@@ -275,11 +275,8 @@
 import getSymbolFromCurrency from 'currency-symbol-map'
 import { ToggleButton } from 'vue-js-toggle-button'
 import VueGallery from 'vue-gallery';
-//import VueGallerySlideshow from 'vue-gallery-slideshow';
-//import VuePreview from 'vue-preview'
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
-//import func from '../../../vue-temp/vue-editor-bridge';
 const backEndUrl = process.env.VUE_APP_API;
 export default { 
       data() {
@@ -314,13 +311,7 @@ export default {
                         sold: '',
                         soldDate:'',
                         profit: ''
-                  },
-                  repairs: [],
-                  repair: {
-                        name: '',
-                        price: '',
-                        total: ''
-                  },
+                  },               
                   shipping: {
                         customs: '',
                         auctionFee: '',
@@ -332,6 +323,7 @@ export default {
                         images: [],
                         showImages: ''
                   },
+                  repairs: [],
                   loading: true,
                   index: null,
                   isShippingModalVisible: false,
@@ -592,7 +584,6 @@ export default {
                   this.loading = true;
                   this.deleteCar();
                   this.deleteCarSummary();
-                  this.deleteCarTracking();
                   this.deleteCarRepairs();
                   this.deleteCarShipping();
             },
@@ -606,6 +597,7 @@ export default {
                         {
                               vm.alertMessage = "Car successfully deleted";
                               vm.alertFlag = true;
+                              vm.deleteCarTracking();
                               vm.$router.push("/cars");
                         } 
                   })

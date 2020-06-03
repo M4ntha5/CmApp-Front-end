@@ -483,11 +483,12 @@ const backEndUrl = process.env.VUE_APP_API;
                          if(response.status == 200)
                          {
                               let list = [];
-                              let makes = response.data
+                              let makes = response.data;
                               let tmp = [{ text: 'Select One', value: null }];
                               makes.forEach(element => {
                                    list.push(element.name);
                               });
+                              list.sort();
                               vm.allMakes = tmp.concat(list);
                               vm.loading = false;
                          }         

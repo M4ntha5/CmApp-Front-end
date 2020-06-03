@@ -183,9 +183,7 @@ export default {
                         running: '',
                         wheels: '',
                         airBag: '',
-                        radio: '',
-                        auctionImages: [],
-                        base64images: [],      
+                        radio: '',  
                         images: [],                
                         car: ''
                   },
@@ -213,16 +211,34 @@ export default {
       computed: {
             trackingImages: function(){
                   let list = [];
-                  let shared = this.tracking.images;
-                  for(let i =0;i<shared.length;i++)
+                  let shared = '';
+                  if(this.urls.length > 0)
                   {
-                        let obj = {
-                              href: shared[i].url,
-                              title: i + 1 + '/' + shared.length
-                        }
-                        list.push(obj);
-                  } 
-                  return list;
+                        shared = this.urls;
+                        for(let i =0;i<shared.length;i++)
+                        {
+                              let obj = {
+                                    href: shared[i],
+                                    title: i + 1 + '/' + shared.length
+                              }
+                              list.push(obj);
+                        } 
+                        return list;
+                  }
+                  else
+                  {
+                        shared = this.tracking.images;
+                        for(let i =0;i<shared.length;i++)
+                        {
+                              let obj = {
+                                    href: shared[i].url,
+                                    title: i + 1 + '/' + shared.length
+                              }
+                              list.push(obj);
+                        } 
+                        return list;
+                  }
+                   
             }
       },
 
@@ -331,7 +347,8 @@ export default {
                               vm.urls = response.data;   
                               if(vm.urls.length > 0)   
                               {
-                                    vm.downloadTrackingImages(response.data)                      
+                                    //bring back if needed
+                                    //vm.downloadTrackingImages(response.data)                      
                                     vm.dangerAlert = false;
                                     vm.alertMessage = "Images successfully updated";
                                     vm.alertFlag = true;
@@ -353,6 +370,8 @@ export default {
                         }
                   }); 
             },
+            //bring back if needed
+            /*
             downloadTrackingImages(urls){
                   let vm = this;
                   axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking/download-images`, urls, {
@@ -374,7 +393,7 @@ export default {
                         }
                   });
 
-            },
+            },*/
             handleTracking(){
                   this.dangerAlert = false;
                   this.alertMessage = "Looking for data please wait... This may take several minutes!!";

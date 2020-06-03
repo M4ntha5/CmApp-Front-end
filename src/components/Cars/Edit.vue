@@ -319,9 +319,9 @@ export default {
                example: null,
                fields: ['code', 'name', 'action'],
                repairFields: ['name', 'price', 'action'],
-               images: [],
-               deletedImgs: [],
-               oldUrls: [],
+               deletedUrls: [],
+               addedImgs: [],
+               leftUrls: [],
                length: 0,
                car: {          
                     _id: '',
@@ -392,12 +392,9 @@ export default {
                     if(response.status == 200)
                     {
                          vm.car = response.data;
-                         vm.oldUrls = response.data.urls;
-                        // let n = vm.car.images.length;
-                         //let from = vm.car.images;
-                         //let to = vm.car.base64images;
+                         vm.leftUrls = response.data.urls;
                          vm.loading = false;
-                         //vm.getImagesRecursive(n, from, to);
+
                          //trimming unnecessary dat ending           
                          vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                          
@@ -455,7 +452,7 @@ export default {
                })
                .then(function (response){
                     if(response.status == 204 && vm.repairs.length == 0)
-                         vm.$router.push(`/cars/${vm.$route.params.id}`);
+                         vm.updateImages(vm.$route.params.id);
                })
                .catch(function (error) {
                     vm.alertMessage = error.response.data;
@@ -472,11 +469,17 @@ export default {
                     }
                });     
           },
-          insertImages(carId){
+          updateImages(carId){
                let vm = this;
-               let obj = {deleted: this.deletedImgs, inserted: this.car.base64images, oldUrls: this.oldUrls};
-               axios.post(backEndUrl + `/api/cars/${carId}/images`, obj, {
+               let obj = {
+                    deleted: this.deletedUrls, 
+                    all: this.car.urls
+               };
+               axios.put(backEndUrl + `/api/cars/${carId}/images`, obj, {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+               })
+               .then(function () {
+                    vm.$router.push(`/cars/${vm.$route.params.id}`);
                })
                .catch(function (error) {
                     if(error.response.status == 401) 
@@ -629,14 +632,13 @@ export default {
                })
           },
           updateAll(){  
-               this.updateCar();
-               this.insertImages(this.$route.params.id);
+               this.updateCar();               
                if(this.repairs.length > 0)             
                     this.deleteAllCarRepairs();                        
           },
           removeImageFromList(index){
-               this.deletedImgs.push(this.car.urls[index].url);
-               console.log("deleted", this.deletedImgs);
+               if(this.car.urls[index].url.startsWith('http'))
+                    this.deletedUrls.push(this.car.urls[index].url);   
                this.car.urls.splice(index, 1);
           },
           onFileSelected(e) {
@@ -646,11 +648,9 @@ export default {
                     var reader = new FileReader();
                     reader.readAsDataURL(e.target.files[i]);
                     reader.onload = (e) => {
-                         vm.car.base64images.push(e.target.result);
                          vm.car.urls.push({url: e.target.result});
                     }                 
-               }     
-               console.log("added", vm.car.base64images);
+               }
           },
           goToCar(){
                this.$router.push(`/cars/${this.$route.params.id}`);
