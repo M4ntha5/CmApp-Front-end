@@ -69,8 +69,8 @@ export default {
           return {         
                makes:[],
                fields: [    
-                    { key: '_id', sortable: true, label: '#' },
-                    { key: 'name', sortable: true },
+                    { key: '_id', label: '#' },
+                    { key: 'name' },
                     'actions',
                ],
                form:{

@@ -370,6 +370,22 @@ export default {
                         }
                   }); 
             },
+            handleTracking(){
+                  this.dangerAlert = false;
+                  this.alertMessage = "Looking for data please wait... This may take several minutes!!";
+                  this.alertFlag = true;
+                  if(this.tracking.vin == '')
+                  {                    
+                        this.lookForTrackingImagesUrls();  
+                        this.lookForTracking();
+                  }
+                  else
+                        this.lookForTracking();
+                                  
+            },
+            goToSelectedCar(){
+                  this.$router.push(`/cars/${this.$route.params.id}`);
+            },
             //bring back if needed
             /*
             downloadTrackingImages(urls){
@@ -394,22 +410,6 @@ export default {
                   });
 
             },*/
-            handleTracking(){
-                  this.dangerAlert = false;
-                  this.alertMessage = "Looking for data please wait... This may take several minutes!!";
-                  this.alertFlag = true;
-                  if(this.tracking.vin == '')
-                  {                    
-                        this.lookForTrackingImagesUrls();  
-                        this.lookForTracking();
-                  }
-                  else
-                        this.lookForTracking();
-                                  
-            },
-            goToSelectedCar(){
-                  this.$router.push(`/cars/${this.$route.params.id}`);
-            }
       }
 }
 </script>
