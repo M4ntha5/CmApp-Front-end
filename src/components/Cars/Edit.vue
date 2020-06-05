@@ -543,7 +543,10 @@ export default {
 
                     var alreadyContains = this.equipmentCodes.includes(eqcode);
                     if(alreadyContains)
-                         window.confirm('Equipment with the same code already exists');
+                         this.$validator.errors.add({
+                              field: 'code-input',
+                              msg: 'Equipment with the same code already exists'
+                         });
                     else
                     {     
                          this.car.equipment.push({
