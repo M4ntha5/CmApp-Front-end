@@ -12,22 +12,22 @@
                     :current-page="currentPage">
                     <template v-slot:cell(actions)="row">
                          <b-dropdown id="actions-dropdown" text="Actions" variant="info">
-                              <b-dropdown-item @click="goToUserEdit(users[row.index]._id)">Edit user details</b-dropdown-item>
+                              <b-dropdown-item @click="goToUserEdit(users[row.index+perPage*currentPage-perPage]._id)">Edit user details</b-dropdown-item>
                               <b-dropdown-item 
-                                   v-if="users[row.index].blocked"
-                                   @click="unblockUser(users[row.index]._id)">Unblock
+                                   v-if="users[row.index+perPage*currentPage-perPage].blocked"
+                                   @click="unblockUser(users[row.index+perPage*currentPage-perPage]._id)">Unblock
                               </b-dropdown-item>
                               <b-dropdown-item v-else
-                                   @click="blockUser(users[row.index]._id)">Block
+                                   @click="blockUser(users[row.index+perPage*currentPage-perPage]._id)">Block
                               </b-dropdown-item>
                               <b-dropdown-item 
                                    v-b-modal.change-role-modal
-                                   @click="showModal(users[row.index])">
+                                   @click="showModal(users[row.index+perPage*currentPage-perPage])">
                                    Change role
                               </b-dropdown-item>
 
 
-                              <b-dropdown-item @click="deleteUser(users[row.index]._id)">Delete user</b-dropdown-item>
+                              <b-dropdown-item @click="deleteUser(users[row.index+perPage*currentPage-perPage]._id)">Delete user</b-dropdown-item>
                          </b-dropdown>
                     </template>
                     <template v-slot:table-busy>
@@ -90,7 +90,7 @@ export default {
                dangerAlert: false,
                rows: 0,
                currentPage: 1,
-               perPage: 10,
+               perPage: 2,
                isBusy: true,
                showRoleModal:''
           }

@@ -350,12 +350,13 @@ const backEndUrl = process.env.VUE_APP_API;
                     ],
                     allMakes: [],
                     rates:[],
-                    makeModels: [],
+                    makeModels: [{ text: 'Select One', value: null }],
                     loading: true,
                     equipmentCode: '',
                     equipmentName: '',
                     equipmentVisible: false,
-                    example:[]
+                    example:[],
+                    carMakes:[]
                }
           },
           mounted(){
@@ -484,9 +485,10 @@ const backEndUrl = process.env.VUE_APP_API;
                          {
                               let list = [];
                               let makes = response.data;
+                              vm.carMakes = response.data;
                               let tmp = [{ text: 'Select One', value: null }];
                               makes.forEach(element => {
-                                   list.push(element.name);
+                                   list.push(element.make);
                               });
                               list.sort();
                               vm.allMakes = tmp.concat(list);
@@ -507,7 +509,8 @@ const backEndUrl = process.env.VUE_APP_API;
                     })
                },
                getAllModelsForMake(make){
-                    let vm =this;
+                    let vm = this; 
+                    this.car.model = null;
                     vm.modelsDisabled = true;
                     axios.get(backEndUrl + `/api/makes/${make}/models`, {
                          headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }

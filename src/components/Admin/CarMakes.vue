@@ -48,7 +48,7 @@
                <b-form ref="form" @submit.stop.prevent="onSubmit()">            
                     <b-form-group label="Make">
                          <b-form-input id="make-input" name="make-input"
-                              v-model="form.make" placeholder="Audi"
+                              v-model="form.make" placeholder="Some make"
                               v-validate="{ required: true}"
                               :state="validateState('make-input')" 
                               aria-describedby="make-input-live-feedback"
@@ -62,7 +62,7 @@
                     <div class="form-row" v-for="(model, index) in form.models" v-bind:key="index">
                          <b-form-group class="col-sm-10">
                               <b-form-input id="models-input" name="models-input" class="mb-2"
-                                   v-model="model.name" placeholder="A4"
+                                   v-model="model.name" placeholder="some model"
                                    v-validate="{ required: true}"
                                    :state="validateState('models-input')" 
                                    aria-describedby="models-input-live-feedback"
@@ -81,7 +81,7 @@
                     <div class="form-row">
                          <b-form-group class="col-sm-10">
                               <b-form-input id="empty-input" name="empty-input" class="mb-2"
-                                   v-model="modelRow" placeholder="A4"
+                                   v-model="modelRow" placeholder="some model"
                                    v-validate="{ required: false}"
                                    :state="validateState('empty-input')" 
                                    aria-describedby="empty-input-live-feedback"
@@ -184,12 +184,13 @@ export default {
                this.form.make = '';
                this.form.id = null;
                this.form.models = [];
+               this.modelRow = '';
           },
           openModal(row){              
                this.resetModal();
                if(row != null)
                {
-                    let index = row.index + this.perPage * this.currentPage - 10;
+                    let index = row.index + this.perPage * this.currentPage - this.perPage;
                     this.form.make = this.makes[index].make;
                     this.form.id = this.makes[index]._id;
                     this.form.models = this.makes[index].models;
@@ -292,7 +293,7 @@ export default {
                .then(function (response) {
                     if(response.status == 204)
                     {
-                         vm.alertMessage = "Added successfully";                       
+                         vm.alertMessage = "Updated successfully";                       
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
                          vm.getAllMakes();
