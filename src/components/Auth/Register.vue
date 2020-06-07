@@ -6,7 +6,7 @@
           <div class="container w-75pt-4" v-else>
                <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
                <div class="pt-3 mb-3 text-center" v-if="registered">
-                    <a @click.prevent="resendConfirmationEmail()" href="">Resend confirmation email</a>
+                    <a @click.prevent="resendConfirmationEmail()" href="">Resend confirmation email?</a>
                </div>
                <center class="pt-3 mb-2">
                     <h1>Registration</h1>
