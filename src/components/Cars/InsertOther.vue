@@ -1,6 +1,7 @@
 <template>
      <div class="container" >
           <div v-if="!loading">
+               <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
                <b-form class="pt-4">
                     <div class="form-row">
                          <b-form-group class="col-md-4 mb-3" label="Make">
@@ -356,7 +357,11 @@ const backEndUrl = process.env.VUE_APP_API;
                     equipmentName: '',
                     equipmentVisible: false,
                     example:[],
-                    carMakes:[]
+                    carMakes:[],
+                    dangerAlert:false,
+                    alertMessage: '',
+                    alertFlag: false
+
                }
           },
           mounted(){
@@ -401,6 +406,9 @@ const backEndUrl = process.env.VUE_APP_API;
                },
                insertCar() {
                     let vm = this;
+                    vm.dangerAlert = false;
+                    vm.alertMessage = "Inserting...";
+                    vm.alertFlag = true;
                     if(vm.car.displacement == '')
                          vm.car.displacement = 0;
                     if(vm.car.manufactureDate == '')
@@ -410,8 +418,8 @@ const backEndUrl = process.env.VUE_APP_API;
                     })
                     .then(function (response) {             
                          if(response.status == 200)
-                         {
-                              vm.alertFlag = false;
+                         {       
+                              vm.alertFlag = false;                       
                               let insertedId = response.data._id;
                               if(vm.car.base64images.length > 0)
                                    vm.insertImages(insertedId);
@@ -419,6 +427,9 @@ const backEndUrl = process.env.VUE_APP_API;
                          }         
                     })
                     .catch(function (error) {
+                         vm.dangerAlert = true;
+                         vm.alertFlag = true;
+                         vm.alertMessage = error.response.data;
                          if(error.response.status == 401) 
                          {
                               vm.$cookies.remove('token');
