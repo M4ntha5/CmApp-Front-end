@@ -15,14 +15,12 @@
                     :per-page="perPage"
                     :current-page="currentPage">
                     <template v-slot:cell(actions)="row">
-                         <b-dropdown id="actions-dropdown" text="Actions" variant="info">          
-                              <b-dropdown-item v-b-modal.make-modal
+                         <b-button v-b-modal.make-modal class="mr-1" variant="info"
                                    @click="openModal(row)">Update
-                              </b-dropdown-item>
-                              <b-dropdown-item
-                                   @click="deleteMake(row)">Delete
-                              </b-dropdown-item>
-                         </b-dropdown>
+                         </b-button>
+                         <b-button variant="danger"
+                              @click="deleteMake(row)">Delete
+                         </b-button>
                     </template>
                     <template v-slot:table-busy>
                          <div class="text-center text-primary my-2">
@@ -41,11 +39,17 @@
 
           <b-modal id="make-modal" ref="modal" title="Handle make"
           @ok.prevent="onSubmit()"
-          @close="resetModal">
+          @close="resetModal"
+          :ok-disabled="buttonClicked">
+               <b-alert v-model="modalAlertFlag" style="text-align:center;" 
+                    :variant="modalDangerAlert ? 'danger' : 'success'" dismissible>
+                    {{modalAlertMessage}}
+               </b-alert>
+
                <b-form ref="form" @submit.stop.prevent="onSubmit()">            
                     <b-form-group label="Make">
                          <b-form-input id="make-input" name="make-input"
-                              v-model="form.name" placeholder="Audi"
+                              v-model="form.make" placeholder="Some make"
                               v-validate="{ required: true}"
                               :state="validateState('make-input')" 
                               aria-describedby="make-input-live-feedback"
@@ -54,7 +58,46 @@
                          <b-form-invalid-feedback id="make-input-live-feedback">
                               {{ veeErrors.first('make-input') }}
                          </b-form-invalid-feedback>
-                    </b-form-group>            
+                    </b-form-group> 
+                    <label class="row ml-1">Models</label>
+                    <div class="form-row" v-for="(model, index) in form.models" v-bind:key="index">
+                         <b-form-group class="col-sm-10">
+                              <b-form-input id="models-input" name="models-input" class="mb-2"
+                                   v-model="model.name" placeholder="some model"
+                                   v-validate="{ required: true}"
+                                   :state="validateState('models-input')" 
+                                   aria-describedby="models-input-live-feedback"
+                                   data-vv-as="Models">
+                              </b-form-input>
+                              <b-form-invalid-feedback id="make-input-live-feedback">
+                                   {{ veeErrors.first('make-input') }}
+                              </b-form-invalid-feedback>
+                         </b-form-group> 
+                         <div class="col-sm-2">
+                              <b-button size="sm" @click="deleteModelRow(index)" class="mr-2 btn-danger">
+                                   Delete
+                              </b-button>
+                         </div>                  
+                    </div>
+                    <div class="form-row">
+                         <b-form-group class="col-sm-10">
+                              <b-form-input id="empty-input" name="empty-input" class="mb-2"
+                                   v-model="modelRow" placeholder="some model"
+                                   v-validate="{ required: false}"
+                                   :state="validateState('empty-input')" 
+                                   aria-describedby="empty-input-live-feedback"
+                                   data-vv-as="Models">
+                              </b-form-input>
+                              <b-form-invalid-feedback id="empty-input-live-feedback">
+                                   {{ veeErrors.first('empty-input') }}
+                              </b-form-invalid-feedback>
+                         </b-form-group> 
+                         <div class="col-sm-2">
+                              <b-button size="sm" @click="addModelRow()">
+                                   Add
+                              </b-button>
+                         </div> 
+                    </div>                 
                </b-form>
           </b-modal> 
      </div>
@@ -68,46 +111,121 @@ export default {
      data(){
           return {         
                makes:[],
+               models:[],
                fields: [    
-                    { key: '_id', sortable: true, label: '#' },
-                    { key: 'name', sortable: true },
-                    'actions',
+                    { key: '_id', label: '#' },
+                    { key: 'make' },
+                    'Actions'
+               ],
+               fields2: [
+                    { key: 'name', label: 'models' },
                ],
                form:{
-                    name: '',
+                    make: '',
+                    models:[],
                     id: null
                },
+               modelRow: '',
                list:[],
                alertMessage: '',
                alertFlag: false,
                dangerAlert: false,
+               modalAlertFlag: false,
+               modalDangerAlert: false,
+               modalAlertMessage:'',
                rows: 0,
                currentPage: 1,
                perPage: 10,
                isBusy: true,
+               buttonClicked: false
           }
      },
      created() {
          this.getAllMakes();
      },
      methods: {
+          deleteModelRow(index){               
+               this.form.models.splice(index, 1);
+          },
+          async addModelRow(){
+               const results = Promise.all([
+                    this.$validator.validate('empty-input')
+               ]);
+
+               const areValid = (await results).every(isValid => isValid);    
+
+               if(areValid)
+               {
+                    //check if inserted model already exists
+                    let alreadyExists = false;
+                    this.form.models.forEach(element => {
+                         if(element.name.toLowerCase() == this.modelRow.toLowerCase())
+                              alreadyExists = true;
+                    });
+                    if(alreadyExists)
+                    {
+                         this.$validator.errors.add({
+                              field: 'empty-input',
+                              msg: 'Such a model already exists'
+                         });
+                    }              
+                    else
+                    {
+                         this.form.models.push({name:this.modelRow});
+                         this.modelRow = '';
+                         this.$validator.reset('empty-input');
+                    }                 
+               }      
+          },
           validateState(ref) {
                if (this.veeFields[ref] && (this.veeFields[ref].dirty || this.veeFields[ref].validated))
                     return !this.veeErrors.has(ref);
                return null;
           },
           resetModal(){
-               this.form.name = '';
+               this.form.make = '';
                this.form.id = null;
+               this.form.models = [];
+               this.modelRow = '';
           },
-          openModal(row){
+          openModal(row){              
                this.resetModal();
                if(row != null)
                {
-                    let index = row.index + this.perPage * this.currentPage - 10;
-                    this.form.name = this.makes[index].name;
+                    let index = row.index + this.perPage * this.currentPage - this.perPage;
+                    this.form.make = this.makes[index].make;
                     this.form.id = this.makes[index]._id;
+                    this.form.models = this.makes[index].models;
+                    this.form.models.sort((a, b) => (a.name > b.name) ? 1 : -1);
                }
+          },
+          onSubmit(){
+               console.log(this.form);
+               this.$validator.validateAll().then(result => {
+                    if (!result)
+                         return;
+                    if(this.form.id == null)
+                    {
+                         this.buttonClicked = true;
+                         this.form.make = this.form.make.charAt(0).toUpperCase() + 
+                              this.form.make.slice(1).toLowerCase();
+                         
+                         var alreadyContains = this.list.includes(this.form.make);
+                         if(alreadyContains)
+                              this.$validator.errors.add({
+                                   field: 'make-input',
+                                   msg: 'Such a make already exists'
+                              });
+                         else
+                              this.insertMake();
+                    }                
+                    else
+                    {
+                         this.buttonClicked = true;
+                         this.updateMake();
+                    }
+                         
+               });
           },
           getAllMakes(){
                let vm = this;
@@ -126,7 +244,9 @@ export default {
                     }
                })
                .catch(function (error){
-                    console.log(error.response.data);
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true; 
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -158,7 +278,10 @@ export default {
                     }
                })
                .catch(function (error){
-                    console.log(error.response.data);
+                    vm.modalAlertMessage = error.response.data;
+                    vm.modalDangerAlert = true;
+                    vm.modalAlertFlag = true; 
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -178,7 +301,7 @@ export default {
                .then(function (response) {
                     if(response.status == 204)
                     {
-                         vm.alertMessage = "Added successfully";                       
+                         vm.alertMessage = "Updated successfully";                       
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
                          vm.getAllMakes();
@@ -188,7 +311,10 @@ export default {
                     }
                })
                .catch(function (error){
-                    console.log(error.response.data);
+                    vm.modalAlertMessage = error.response.data;
+                    vm.modalDangerAlert = true;
+                    vm.modalAlertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -217,7 +343,9 @@ export default {
                     }
                })
                .catch(function (error){
-                    console.log(error.response.data);
+                    vm.modalAlertMessage = error.response.data;
+                    vm.modalDangerAlert = true;
+                    vm.modalAlertFlag = true;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -228,25 +356,6 @@ export default {
                          vm.$router.push('/login');
                     }
                })
-          },
-          onSubmit(){
-               this.$validator.validateAll().then(result => {
-                    if (!result)
-                         return;
-               if(this.form.id == null)
-               {
-                    var nameFirstUpper = this.form.name.charAt(0).toUpperCase() + this.form.name.slice(1).toLowerCase();
-                    this.form.name = nameFirstUpper;
-                    
-                    var alreadyContains = this.list.includes(this.form.name);              
-                    if(alreadyContains)
-                         window.confirm('Such a make already exists');
-                    else
-                         this.insertMake();
-               }                
-               else
-                    this.updateMake();
-               });
           }
      }
 }

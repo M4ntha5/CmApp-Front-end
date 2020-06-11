@@ -3,7 +3,8 @@
           <b-modal id="shipping-modal" ref="modal" title="Shipping details"
           @show="resetModal"
           @ok.prevent="handleSubmit()"
-          @close="resetModal">
+          @close="resetModal"
+          :ok-disabled="buttonClicked">
           <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
                <b-form ref="form" @submit.stop.prevent="handleSubmit()">
                     <b-row>
@@ -162,11 +163,13 @@ export default {
                },
                alertFlag: false,
                dangerAlert: false,
-               alertMessage: ''
+               alertMessage: '',
+               buttonClicked: false
           }
      },
      mounted() {         
-          this.fetchCarShipping();
+          this.getCurrencies();
+          this.fetchCarShipping();         
      },
      methods: {
           getCurrencies() {
@@ -174,10 +177,10 @@ export default {
                axios.get(backEndUrl + "/api/currency")
                .then(function (response) {
                     vm.rates = response.data;
-                    vm.insert.customsCurrency = vm.insert.baseCurrency;
-                    vm.insert.auctionFeeCurrency = vm.insert.baseCurrency;
-                    vm.insert.transferFeeCurrency = vm.insert.baseCurrency;
-                    vm.insert.transportationFeeCurrency = vm.insert.baseCurrency;
+                    vm.insert.customsCurrency = window.$cookies.get('currency');
+                    vm.insert.auctionFeeCurrency = window.$cookies.get('currency');
+                    vm.insert.transferFeeCurrency = window.$cookies.get('currency');
+                    vm.insert.transportationFeeCurrency =window.$cookies.get('currency');
                })
                .catch(function (error){
                     vm.dangerAlert = true;
@@ -208,7 +211,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
+                    this.buttonClicked = true;
                     if(!this.insert._id)
                          this.insertShipping();
                     else
@@ -229,6 +232,8 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertMessage = "Your data saved successfully";
                          vm.alertFlag = true;
+                         vm.fetchCarShipping();
+                         vm.buttonClicked = false;
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('shipping-modal')
@@ -239,6 +244,7 @@ export default {
                     vm.dangerAlert = true;
                     vm.alertMessage = error.response.data;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -264,6 +270,8 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertMessage = "Shipping data updated successfully";
                          vm.alertFlag = true;
+                         vm.buttonClicked = false;
+                         vm.fetchCarShipping();                 
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('shipping-modal')
@@ -274,6 +282,7 @@ export default {
                     vm.dangerAlert = true;
                     vm.alertMessage = error.response.data;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -292,8 +301,11 @@ export default {
                })
                .then(function (response) {                      
                     if(response.status == 200)
+                    {
                          vm.insert = response.data;
-                    vm.getCurrencies();               
+                         vm.getCurrencies();
+                    } 
+                                                                
                })
                .catch(function (error) {
                     vm.dangerAlert = true;

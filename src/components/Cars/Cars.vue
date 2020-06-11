@@ -23,7 +23,7 @@
                         <b-col sm="4" v-for="(car, index) in carsList" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
                               <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
-                                          <b-card-img img-alt="image img-fluid" img-top :src='car.mainImageUrl'
+                                          <b-card-img img-alt="image img-fluid" img-top :src='car.carImg'
                                           style="max-height:238.5px"></b-card-img>
                                           <b-card-body class="pl-3">            
                                                 <b-card-title>{{car.make}} {{car.model}}</b-card-title>
@@ -64,7 +64,8 @@
       <b-modal id="sold-modal" ref="modal" title="Sold data"
       @show="resetModal"
       @ok.prevent="handleSubmit()"
-      @close="resetModal">
+      @close="resetModal"
+      :ok-disabled="buttonClicked">
             <b-form ref="form" @submit.stop.prevent="handleSubmit()">
                   <b-form-group :label="'Sold price (' + currency + ')'">
                         <b-form-input placeholder="15000" name="soldPrice-input"
@@ -103,7 +104,6 @@ export default {
                         id: '',
                         make:'',
                         model:'',
-                        mainImageUrl:'',
                         carImg: '',
                         summary: {
                               boughtPrice:'',
@@ -120,11 +120,6 @@ export default {
                         boughtPrice: '',
                         make: '',
                         Base64images: []
-                  } ,
-                  insertRepair: {
-                        name: '',
-                        price: '',
-                        car: ''
                   },
                   loading: true,
                   isBmwModalVisible: false,
@@ -141,7 +136,8 @@ export default {
                         {value: 1, text: 'Show all cars' },
                         {value: 2, text: 'Show only sold cars' },
                         {value: 3, text: 'Show only unsold cars' },                 
-                  ]                
+                  ],
+                  buttonClicked: false            
             }           
       },
       created() {
@@ -201,14 +197,9 @@ export default {
                               for(let i =0; i < vm.cars.length; i++)
                               {
                                     vm.cars[i].summary.profit = Number((vm.cars[i].summary.profit).toFixed(2)); 
-                                    if(vm.cars[i].carImg == null || Object.keys(vm.cars[i].carImg).length === 0)
-                                          vm.cars[i].mainImageUrl = process.env.VUE_APP_DEFAULT_IMAGE;
-                                    else
-                                          vm.getImage(vm.cars[i].carImg, vm.cars[i]);
-                              }                           
-                              //setting repair value to dafault - first of a list
-                              if(vm.cars.length > 0)
-                                    vm.insertRepair.car = vm.cars[0].id;
+                                    if(vm.cars[i].carImg == "")
+                                          vm.cars[i].carImg = process.env.VUE_APP_DEFAULT_IMAGE;
+                              }
                         }                             
                   })
                   .catch(function (error) {
@@ -216,27 +207,6 @@ export default {
                         vm.alertMessage = error.response.data;
                         vm.dangerAlert = true;
                         vm.alertFlag = true;
-                        if(error.response.status == 401) 
-                        {
-                              vm.$cookies.remove('token');
-                              vm.$cookies.remove('user-email');
-                              vm.$cookies.remove('role');
-                              vm.$cookies.remove('user');
-                              vm.$cookies.remove('currency');
-                              vm.$router.push('/login');
-                        }
-                  });
-            },
-            getImage(image, saveTo){   
-                  let vm = this;             
-                  axios.post(backEndUrl + "/api/get-image", image, {
-                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
-                  })
-                  .then(function (response) {
-                        if(response.status == 200)
-                              saveTo.mainImageUrl = response.data;     
-                  })
-                  .catch(function (error) {
                         if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');
@@ -320,6 +290,7 @@ export default {
                   this.$validator.validateAll().then(result => {
                         if (!result)
                               return;
+                        this.buttonClicked = true;
                         this.insertSoldDetails();
                   });                                                                
             },
@@ -335,6 +306,7 @@ export default {
                         if(response.status == 204)
                         {
                               vm.fetchCar(vm.soldDetails.car, vm.soldDetails.index);
+                              vm.buttonClicked = false;
                               vm.$nextTick(() => {
                                     vm.$bvModal.hide('sold-modal')
                               })
@@ -344,6 +316,7 @@ export default {
                         vm.alertMessage = error.response.data;
                         vm.dangerAlert = true;
                         vm.alertFlag = true;
+                        vm.buttonClicked = false;
                         if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');

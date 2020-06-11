@@ -5,7 +5,10 @@
           </div>
           <div class="container w-75pt-4" v-else>
                <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
-               <center class="pt-3">
+               <div class="pt-3 mb-3 text-center" v-if="registered">
+                    <a @click.prevent="resendConfirmationEmail()" href="">Resend confirmation email?</a>
+               </div>
+               <center class="pt-3 mb-2">
                     <h1>Registration</h1>
                </center>
                <b-form class="justify-content-center" @submit.stop.prevent="onSubmit">
@@ -55,7 +58,7 @@
                               {{ veeErrors.first('password2-input') }}
                          </b-form-invalid-feedback>
                     </b-form-group>  
-                    <b-button type="submit" variant="primary">Register</b-button>                          
+                    <b-button type="submit" :disabled="buttonClicked" variant="primary">Register</b-button>                          
                </b-form>
           </div>
      </div>
@@ -77,7 +80,10 @@ export default {
                email:'',
                dangerAlert: false,
                alertFlag: false,
-               alertMessage: ''
+               alertMessage: '',
+               registered: false,
+               registeredWithEmail: '',
+               buttonClicked: false
           }
      }, 
      computed: {
@@ -109,7 +115,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
+                    this.buttonClicked = true;
                     this.register();
                });
           },
@@ -121,7 +127,29 @@ export default {
                     {
                          vm.alertMessage = response.data;
                          vm.dangerAlert = false;
-                         vm.alertFlag = true;     
+                         vm.alertFlag = true;  
+                         vm.registered = true;  
+                         vm.registeredWithEmail = vm.form.email;
+                         vm.buttonClicked = false;
+                    }
+               })
+               .catch(function (error){
+                    console.log(error);
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true; 
+                    vm.buttonClicked = false;
+               })
+          },
+          resendConfirmationEmail(){
+               let vm = this;
+               axios.get(backEndUrl + `/api/auth/email/resend/${this.registeredWithEmail}`)
+               .then(function (response){
+                    if(response.status == 200)
+                    {
+                         vm.alertMessage = response.data;
+                         vm.dangerAlert = false;
+                         vm.alertFlag = true;
                     }
                })
                .catch(function (error){
@@ -130,7 +158,7 @@ export default {
                     vm.dangerAlert = true;
                     vm.alertFlag = true; 
                })
-          },
+          }
      }
 }
 </script>

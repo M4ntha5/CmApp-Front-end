@@ -9,7 +9,6 @@
                </div>
                <h1 class="col-sm-8">{{make}} {{model}}</h1>
           </div> 
-          <center></center>
           <b-form class="pt-4" v-if="!loading">
                <div class="form-row">
                     <b-form-group class="col-sm-4 mb-3" label="Make">
@@ -183,8 +182,8 @@
                          <b-form-invalid-feedback id="images-input-live-feedback">
                               {{ veeErrors.first('images-input') }}
                          </b-form-invalid-feedback>
-                         <div class="col-sm-4 mt-3" v-for="(image, index) in car.base64images" v-bind:key="index">              
-                              <img class="card-img-top mb-3 pt-3" responsive-image :src="image">
+                         <div class="col-sm-4 mt-3" v-for="(image, index) in car.urls" v-bind:key="index">              
+                              <img class="card-img-top mb-3 pt-3" responsive-image :src="image.url">
                               <b-button pill variant="danger" 
                                    style="position:absolute;right:0%;top:0%;"
                                    @click.prevent="removeImageFromList(index)">
@@ -297,7 +296,7 @@
                </b-collapse>
           </div>
           <div class="pt-3">
-               <b-button type="submit" @click.prevent="onSubmit()" variant="primary">Save</b-button>
+               <b-button type="submit" :disabled="buttonClicked" @click.prevent="onSubmit()" variant="primary">Save</b-button>
           </div>
      </div>   
      <div class="pt-3" v-else>        
@@ -319,7 +318,9 @@ export default {
                example: null,
                fields: ['code', 'name', 'action'],
                repairFields: ['name', 'price', 'action'],
-               images: [],
+               deletedUrls: [],
+               addedImgs: [],
+               leftUrls: [],
                length: 0,
                car: {          
                     _id: '',
@@ -340,7 +341,7 @@ export default {
                     created_at:'',
                     mainImgUrl:'',
                     equipment: [],
-                    images:[],
+                    urls:[],
                     base64images: [],
                },
                summary: {
@@ -372,14 +373,16 @@ export default {
                dangerAlert: false,
                alertMessage: '',
                alertFlag: false,
-               equipmentCodes: []
+               equipmentCodes: [],
+               buttonClicked: false
           }
      }, 
      created() {      
           this.fetchCar();        
           this.fetchCarRepairs();
+          
      },
-     methods: {        
+     methods: {    
           fetchCar() {
                var vm = this;
                axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}`, {
@@ -388,12 +391,10 @@ export default {
                .then(function (response) {
                     if(response.status == 200)
                     {
-                         vm.car = response.data;  
-                         let n = vm.car.images.length;
-                         let from = vm.car.images;
-                         let to = vm.car.base64images;
+                         vm.car = response.data;
+                         vm.leftUrls = response.data.urls;
                          vm.loading = false;
-                         vm.getImagesRecursive(n, from, to);
+
                          //trimming unnecessary dat ending           
                          vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
                          
@@ -451,12 +452,13 @@ export default {
                })
                .then(function (response){
                     if(response.status == 204 && vm.repairs.length == 0)
-                         vm.$router.push(`/cars/${vm.$route.params.id}`);
+                         vm.updateImages(vm.$route.params.id);
                })
                .catch(function (error) {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -468,10 +470,17 @@ export default {
                     }
                });     
           },
-          insertImages(carId){
+          updateImages(carId){
                let vm = this;
-               axios.post(backEndUrl + `/api/cars/${carId}/images`, vm.car.base64images, {
-                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
+               let obj = {
+                    deleted: this.deletedUrls, 
+                    all: this.car.urls
+               };
+               axios.put(backEndUrl + `/api/cars/${carId}/images`, obj, {
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
+               })
+               .then(function () {
+                    vm.$router.push(`/cars/${vm.$route.params.id}`);
                })
                .catch(function (error) {
                     if(error.response.status == 401) 
@@ -505,6 +514,7 @@ export default {
 
                if(areValid)
                {
+                    this.buttonClicked = true;
                     this.alertMessage = "Saving your changes...";
                     this.dangerAlert = false;
                     this.alertFlag = true;
@@ -535,7 +545,10 @@ export default {
 
                     var alreadyContains = this.equipmentCodes.includes(eqcode);
                     if(alreadyContains)
-                         window.confirm('Equipment with the same code already exists');
+                         this.$validator.errors.add({
+                              field: 'code-input',
+                              msg: 'Equipment with the same code already exists'
+                         });
                     else
                     {     
                          this.car.equipment.push({
@@ -575,33 +588,6 @@ export default {
                     this.$el.querySelector('[name="' + 
                          this.$validator.errors.items[0].field + '"]').scrollIntoView(false);
           },
-          getImage(image, saveTo){       
-               axios.post(backEndUrl + "/api/get-image2", image, {
-                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
-               })
-               .then(function (response) {
-                    if(response.status == 200)
-                         saveTo.push(response.data);                  
-               })
-               .catch(function (error) {
-                    this.alertMessage = error.response.data;
-                    this.dangerAlert = true;
-                    this.alertFlag = true;
-                    if(error.response.status == 401) 
-                    {
-                         this.$cookies.remove('token');
-                         this.$cookies.remove('user-email');
-                         this.$cookies.remove('role');
-                         this.$cookies.remove('user');
-                         this.$cookies.remove('currency');
-                         this.$router.push('/login');
-                    }
-               });
-          },
-          getImagesRecursive(n, from, to){
-               for(let i =0;i<n;i++)
-                    this.getImage(from[i], to);             
-          },
           deleteAllCarRepairs(){
                let vm = this;
                axios.delete(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
@@ -615,6 +601,7 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -629,7 +616,7 @@ export default {
           insertMultipleRepairs(){
                let vm = this;
                axios.post(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, vm.repairs, {
-                    headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
+                    headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                })
                .then(function (response) {
                     if(response.status == 200)
@@ -651,13 +638,14 @@ export default {
                })
           },
           updateAll(){  
-               this.updateCar();
-               this.insertImages(this.$route.params.id);
+               this.updateCar();               
                if(this.repairs.length > 0)             
                     this.deleteAllCarRepairs();                        
           },
-          removeImageFromList(index){         
-               this.car.base64images.splice(index, 1);
+          removeImageFromList(index){
+               if(this.car.urls[index].url.startsWith('http'))
+                    this.deletedUrls.push(this.car.urls[index].url);   
+               this.car.urls.splice(index, 1);
           },
           onFileSelected(e) {
                let vm = this;
@@ -666,9 +654,9 @@ export default {
                     var reader = new FileReader();
                     reader.readAsDataURL(e.target.files[i]);
                     reader.onload = (e) => {
-                         vm.car.base64images.push(e.target.result);
+                         vm.car.urls.push({url: e.target.result});
                     }                 
-               }             
+               }
           },
           goToCar(){
                this.$router.push(`/cars/${this.$route.params.id}`);

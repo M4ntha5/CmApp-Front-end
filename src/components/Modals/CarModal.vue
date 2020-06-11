@@ -2,8 +2,9 @@
     <div>
         <b-modal id="car-insert-modal" ref="modal" title="Insert new car"
         @show="resetModal"
-        @ok.prevent="handleSubmit"
-        @close="resetModal">
+        @ok.prevent="handleSubmit()"
+        @close="resetModal"
+        :ok-disabled="buttonClicked">
         <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
             <form ref="form" @submit.stop.prevent="handleSubmit">
                 <div class="mb-4">
@@ -108,6 +109,7 @@ export default {
             dangerAlert: false,
             activeBmwItem: true,
             activeMbItem: false,
+            buttonClicked: false
         }
     },
     mounted() {
@@ -137,6 +139,7 @@ export default {
             this.$validator.validateAll().then(result => {
                 if (!result)
                     return;
+                this.buttonClicked = true;
                 this.insertCar();
             });  
         },
@@ -152,11 +155,11 @@ export default {
                 if(response.status == 200)
                 {
                     let insertedId = response.data._id;
-                    vm.insertImages(insertedId);  
-                    vm.insertCarSummary(insertedId);
+                   // vm.insertImages(insertedId);                
                     vm.dangerAlert = false;
                     vm.alertMessage = "Car inserted successfully"
-                    vm.alertFlag = true;         
+                    vm.alertFlag = true;  
+                    vm.insertCarSummary(insertedId);
                 }              
             })
             .catch(function (error) {
@@ -166,6 +169,7 @@ export default {
                     vm.alertMessage = error.response.data;
                 vm.dangerAlert = true;
                 vm.alertFlag = true;
+                vm.buttonClicked = false;
                 if(error.response.status == 401) 
                 {
                     vm.$cookies.remove('token');
@@ -178,11 +182,13 @@ export default {
             });
         },
         insertImages(carId){
+            console.log("img-insert", this.car.base64images, carId);
             let vm = this;
             axios.post(backEndUrl + `/api/cars/${carId}/images`, vm.car.base64images, {
                 headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
             })
             .catch(function (error) {
+                console.log(error);
                 if(error.response.status == 401) 
                 {
                     vm.$cookies.remove('token');

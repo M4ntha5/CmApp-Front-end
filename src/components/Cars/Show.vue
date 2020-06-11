@@ -69,7 +69,7 @@
                   </div> 
                   <div class="row mb-3 pt-3">
                         <div class="col responsive pt-5"> 
-                             <template v-if="!tracking.showImages && car.base64images.length > 0">            
+                             <template v-if="!tracking.showImages && car.urls.length > 0">       
                                     <gallery :images="carImages" :index="index"                      
                                     @close="index = null">
                                     </gallery>
@@ -78,7 +78,7 @@
                                           :style="{ backgroundImage: 'url(' + carImages[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-else-if="!tracking.showImages && car.base64images.length == 0">            
+                              <template v-else-if="!tracking.showImages && car.urls.length == 0">       
                                     <gallery :index="index" :images="defaultImg" 
                                     @close="index = null">
                                     </gallery>
@@ -87,7 +87,7 @@
                                           :style="{ backgroundImage: 'url(' + defaultImg[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-else-if="tracking.showImages && sharedBase64Images.length > 0">            
+                              <template v-else-if="tracking.showImages && sharedBase64Images.length > 0">          
                                     <gallery :images="sharedBase64Images" :index="index"                                
                                     @close="index = null">
                                     </gallery>
@@ -96,7 +96,7 @@
                                           :style="{ backgroundImage: 'url(' + sharedBase64Images[0].href + ')', width:'350px', height:'300px' }"
                                     /> 
                               </template> 
-                              <template v-else-if="tracking.showImages && sharedBase64Images.length < 1">
+                              <template v-else-if="tracking.showImages && sharedBase64Images.length == 0">
                                     <gallery :images="defaultImg" :index="index" 
                                     @close="index = null">
                                     </gallery>
@@ -275,11 +275,8 @@
 import getSymbolFromCurrency from 'currency-symbol-map'
 import { ToggleButton } from 'vue-js-toggle-button'
 import VueGallery from 'vue-gallery';
-//import VueGallerySlideshow from 'vue-gallery-slideshow';
-//import VuePreview from 'vue-preview'
 import shippingModal from '../Modals/ShippingModal.vue';
 import axios from 'axios';
-//import func from '../../../vue-temp/vue-editor-bridge';
 const backEndUrl = process.env.VUE_APP_API;
 export default { 
       data() {
@@ -304,10 +301,8 @@ export default {
                         color:'',
                         interior:'',
                         created_at:'',                       
-                        images: [],
+                        urls: [],
                         equipment: [],
-                        base64images: [], 
-                        mainImageUrl: '' 
                   },
                   summary: {
                         boughtPrice:'',
@@ -316,13 +311,7 @@ export default {
                         sold: '',
                         soldDate:'',
                         profit: ''
-                  },
-                  repairs: [],
-                  repair: {
-                        name: '',
-                        price: '',
-                        total: ''
-                  },
+                  },               
                   shipping: {
                         customs: '',
                         auctionFee: '',
@@ -331,14 +320,10 @@ export default {
                         total: 0
                   },
                   tracking:{
-                        auctionImages: [],
-                        base64images: [],
+                        images: [],
                         showImages: ''
                   },
-                  insertRepair: {
-                        name: '',
-                        price: '',
-                  }, 
+                  repairs: [],
                   loading: true,
                   index: null,
                   isShippingModalVisible: false,
@@ -363,11 +348,11 @@ export default {
       computed: {
             carImages: function() {
                   let list = [];
-                  let shared = this.car.base64images;
+                  let shared = this.car.urls;
                   for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
-                              href: shared[i],
+                              href: shared[i].url,
                               title: i+1 + '/'+shared.length
                         }
                         list.push(obj);
@@ -376,11 +361,11 @@ export default {
             },
             trackingImages: function() {
                   let list = [];
-                  let shared = this.tracking.base64images;
+                  let shared = this.tracking.images;
                   for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
-                              href: shared[i],
+                              href: shared[i].url,
                               title: i+1 + '/'+shared.length
                         }
                         list.push(obj);
@@ -389,11 +374,11 @@ export default {
             },
             sharedBase64Images: function () {   
                   let list = [];
-                  let shared = this.car.base64images.concat(this.tracking.base64images);
+                  let shared = this.car.urls.concat(this.tracking.images);
                   for(let i =0;i<shared.length;i++)
                   {
                         let obj = {
-                              href: shared[i],
+                              href: shared[i].url,
                               title: i+1 + '/'+shared.length
                         }
                         list.push(obj);
@@ -456,14 +441,7 @@ export default {
                               vm.car = response.data;
                               //trimming unnecessary date ending
                               vm.car.manufactureDate = vm.car.manufactureDate.substring(0, 10);
-                              vm.loading = false;  
-                              if(vm.car.images.length != 0)
-                              {
-                                    let n = vm.car.images.length;
-                                    let from = vm.car.images;
-                                    let to = vm.car.base64images;
-                                    vm.getImagesRecursive(n, from, to); 
-                              }                               
+                              vm.loading = false;                            
                         } 
                   })
                   .catch(function (error) {
@@ -482,7 +460,7 @@ export default {
             fetchCarRepairs() {
                   var vm = this;
                   axios.get(backEndUrl + `/api/cars/${vm.$route.params.id}/repairs`, {
-                        headers: {Authorization: 'Bearer ' + window.$cookies.get('token') }
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
                         if(response.status == 200)
@@ -569,18 +547,8 @@ export default {
                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
                   })
                   .then(function (response) {
-                        if(response.status == 200)
-                        {           
-                              vm.tracking = response.data;
-   
-                              if(vm.tracking.auctionImages.length != 0) 
-                              {
-                                    let n = vm.tracking.auctionImages.length;
-                                    let from = vm.tracking.auctionImages;
-                                    let to = vm.tracking.base64images;
-                                    vm.getImagesRecursive(n, from, to);
-                              }                                                                 
-                        }                
+                        if(response.status == 200)          
+                              vm.tracking = response.data;                
                   })
                   .catch(function (error) {
                         if(error.response.status == 401) 
@@ -616,7 +584,6 @@ export default {
                   this.loading = true;
                   this.deleteCar();
                   this.deleteCarSummary();
-                  this.deleteCarTracking();
                   this.deleteCarRepairs();
                   this.deleteCarShipping();
             },
@@ -630,6 +597,7 @@ export default {
                         {
                               vm.alertMessage = "Car successfully deleted";
                               vm.alertFlag = true;
+                              vm.deleteCarTracking();
                               vm.$router.push("/cars");
                         } 
                   })
@@ -715,30 +683,6 @@ export default {
             },
             formatPrice(value) {
                   return new Intl.NumberFormat('lt-LT').format(value);
-            },
-            getImage(image, saveTo){
-                  axios.post(backEndUrl + "/api/get-image", image, {
-                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
-                  })
-                  .then(function (response) {
-                        if(response.status == 200)
-                             saveTo.push(response.data);   
-                  })
-                  .catch(function (error) {
-                        if(error.response.status == 401) 
-                        {
-                              this.$cookies.remove('token');
-                              this.$cookies.remove('user-email');
-                              this.$cookies.remove('role');
-                              this.$cookies.remove('user');
-                              this.$cookies.remove('currency');
-                              this.$router.push('/login');
-                        }
-                  });
-            },
-            getImagesRecursive(n, from, to){
-                  for(let i =0;i<n;i++)
-                        this.getImage(from[i], to);             
             },
             goToCars(){
                   this.$router.push('/cars');
