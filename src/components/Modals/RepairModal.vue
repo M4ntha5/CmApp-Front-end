@@ -110,6 +110,7 @@ export default {
                          vm.alertMessage = response.data;
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
+                         vm.buttonClicked = false;
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('repair-insert-modal')

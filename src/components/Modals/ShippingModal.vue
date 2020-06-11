@@ -270,6 +270,7 @@ export default {
                          vm.alertMessage = "Shipping data updated successfully";
                          vm.alertFlag = true;
                          vm.fetchCarShipping();
+                         vm.buttonClicked = false;
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('shipping-modal')

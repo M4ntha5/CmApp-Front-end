@@ -306,6 +306,7 @@ export default {
                         if(response.status == 204)
                         {
                               vm.fetchCar(vm.soldDetails.car, vm.soldDetails.index);
+                              vm.buttonClicked = false;
                               vm.$nextTick(() => {
                                     vm.$bvModal.hide('sold-modal')
                               })
