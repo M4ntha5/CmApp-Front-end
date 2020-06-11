@@ -3,7 +3,8 @@
           <b-modal id="forgot-password-modal" ref="modal" title="Pssword reset"
           @show="resetModal"
           @ok.prevent="onSubmit()"
-          @close="resetModal">  
+          @close="resetModal"
+          :ok-disabled="buttonClicked">  
           <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger': 'success'" dismissible>{{alertMessage}}</b-alert>
           <b-form ref="form" @submit.stop.prevent="onSubmit()">
                <b-form-group label="Your account email address">
@@ -34,7 +35,8 @@ export default {
                },          
                alertFlag: false,
                dangerAlert: false,
-               alertMessage: ''
+               alertMessage: '',
+               buttonClicked: false
           }
      },
      methods: {
@@ -47,6 +49,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
+                    this.buttonClicked = true;
                     this.resetPassword();
                });
           },
@@ -74,6 +77,7 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');

@@ -3,7 +3,8 @@
           <b-modal id="repair-insert-modal" ref="rep-modal" title="Insert new repair"
           @show="resetModal"
           @ok.prevent="onSubmit()"
-          @close="resetModal">  
+          @close="resetModal"
+          :ok-disabled="buttonClicked">  
           <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger': 'success'" dismissible>{{alertMessage}}</b-alert>
           <b-form ref="form" @submit.prevent="onSubmit()">            
                <b-form-group label="Name">
@@ -65,7 +66,8 @@ export default {
                repairs: [],
                alertFlag: false,
                dangerAlert: false,
-               alertMessage: ''
+               alertMessage: '',
+               buttonClicked: false
           }
      },
      methods: {
@@ -88,6 +90,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
+                    this.buttonClicked = true;
                     this.insertRepair();
                })          
           },
@@ -107,6 +110,7 @@ export default {
                          vm.alertMessage = response.data;
                          vm.dangerAlert = false;
                          vm.alertFlag = true;
+                         vm.buttonClicked = false;
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('repair-insert-modal')
@@ -117,6 +121,7 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');

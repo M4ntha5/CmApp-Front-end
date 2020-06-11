@@ -183,9 +183,8 @@ export default {
                         running: '',
                         wheels: '',
                         airBag: '',
-                        radio: '',
-                        auctionImages: [],
-                        base64images: [],                      
+                        radio: '',  
+                        images: [],                
                         car: ''
                   },
                   selectedCar:{},
@@ -212,16 +211,34 @@ export default {
       computed: {
             trackingImages: function(){
                   let list = [];
-                  let shared = this.urls;
-                  for(let i =0;i<shared.length;i++)
+                  let shared = '';
+                  if(this.urls.length > 0)
                   {
-                        let obj = {
-                              href: shared[i],
-                              title: i + 1 + '/' + shared.length
-                        }
-                        list.push(obj);
-                  } 
-                  return list;
+                        shared = this.urls;
+                        for(let i =0;i<shared.length;i++)
+                        {
+                              let obj = {
+                                    href: shared[i],
+                                    title: i + 1 + '/' + shared.length
+                              }
+                              list.push(obj);
+                        } 
+                        return list;
+                  }
+                  else
+                  {
+                        shared = this.tracking.images;
+                        for(let i =0;i<shared.length;i++)
+                        {
+                              let obj = {
+                                    href: shared[i].url,
+                                    title: i + 1 + '/' + shared.length
+                              }
+                              list.push(obj);
+                        } 
+                        return list;
+                  }
+                   
             }
       },
 
@@ -260,7 +277,6 @@ export default {
                               vm.tracking.dateOrdered = vm.tracking.dateOrdered.substring(0, 10);
                               vm.tracking.datePickedUp = vm.tracking.datePickedUp.substring(0, 10);
                               
-                              vm.getImagesRecursive();
                               if(vm.tracking.containerNumber != '')
                                     vm.empty = false;
                               vm.loading = false;           
@@ -331,7 +347,8 @@ export default {
                               vm.urls = response.data;   
                               if(vm.urls.length > 0)   
                               {
-                                    vm.downloadTrackingImages(response.data)                      
+                                    //bring back if needed
+                                    //vm.downloadTrackingImages(response.data)                      
                                     vm.dangerAlert = false;
                                     vm.alertMessage = "Images successfully updated";
                                     vm.alertFlag = true;
@@ -353,6 +370,24 @@ export default {
                         }
                   }); 
             },
+            handleTracking(){
+                  this.dangerAlert = false;
+                  this.alertMessage = "Looking for data please wait... This may take several minutes!!";
+                  this.alertFlag = true;
+                  if(this.tracking.vin == '')
+                  {                    
+                        this.lookForTrackingImagesUrls();  
+                        this.lookForTracking();
+                  }
+                  else
+                        this.lookForTracking();
+                                  
+            },
+            goToSelectedCar(){
+                  this.$router.push(`/cars/${this.$route.params.id}`);
+            },
+            //bring back if needed
+            /*
             downloadTrackingImages(urls){
                   let vm = this;
                   axios.post(backEndUrl + `/api/cars/${this.$route.params.id}/tracking/download-images`, urls, {
@@ -374,48 +409,7 @@ export default {
                         }
                   });
 
-            },
-            handleTracking(){
-                  this.dangerAlert = false;
-                  this.alertMessage = "Looking for data please wait... This may take several minutes!!";
-                  this.alertFlag = true;
-                  if(this.tracking.vin == '')
-                  {                    
-                        this.lookForTrackingImagesUrls();  
-                        this.lookForTracking();
-                  }
-                  else
-                        this.lookForTracking();
-                                  
-            },
-            getImage(vm, image){
-                  axios.post(backEndUrl + "/api/get-image", image, {
-                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
-                  })
-                  .then(function (response) {
-                        if(response.status == 200)
-                             vm.urls.push(response.data);     
-                  })
-                  .catch(function (error) {
-                        if(error.response.status == 401) 
-                        {
-                              vm.$cookies.remove('token');
-                              vm.$cookies.remove('user-email');
-                              vm.$cookies.remove('role');
-                              vm.$cookies.remove('user');
-                              vm.$cookies.remove('currency');
-                              vm.$router.push('/login');
-                        }
-                  });
-            },
-            getImagesRecursive(){
-                  let n = this.tracking.auctionImages.length;
-                  for(let i =0;i<n;i++)
-                        this.getImage(this, this.tracking.auctionImages[i]);              
-            },
-            goToSelectedCar(){
-                  this.$router.push(`/cars/${this.$route.params.id}`);
-            }
+            },*/
       }
 }
 </script>

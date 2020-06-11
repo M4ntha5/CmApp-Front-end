@@ -5,6 +5,9 @@
           </div>
           <div class="container pt-5 w-75" v-else>
                <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{message}}</b-alert>
+               <div class="pt-3 mb-3 text-center" v-if="resendButton">
+                    <a @click.prevent="resendConfirmationEmail()" href="">Resend confirmation email?</a>
+               </div>
                <center><h1>Login</h1></center>
                <b-form class="justify-content-center" @submit.prevent="onSubmit" >
                     <b-form-group label="Email">
@@ -28,7 +31,7 @@
                          <b-form-invalid-feedback id="password1-input-live-feedback">{{ veeErrors.first('password1-input') }}</b-form-invalid-feedback>
                     </b-form-group>
                     <b-row>
-                         <b-button class="ml-3" type="submit" variant="primary">Log in</b-button>
+                         <b-button class="ml-3" :disabled="buttonClicked" type="submit" variant="primary">Log in</b-button>
                               <a v-b-modal.forgot-password-modal href=""
                                    @click.prevent="showResetModal" class="ml-2"
                                    @ok="fetchCars()">
@@ -57,7 +60,9 @@ export default {
                successAlert: false,
                alertFlag: false,
                message: '',
-               isResetModalVisible: false   
+               isResetModalVisible: false,
+               resendButton: false,
+               buttonClicked: false
           }
      }, 
      components:{
@@ -81,7 +86,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
+                    this.buttonClicked = true;
                     this.login();
                });
           },
@@ -125,10 +130,31 @@ export default {
                .catch(function (error){
                     console.log(error);
                     vm.message = error.response.data;
+                    if(error.response.data =='You must confirm your email, before loging in!')
+                         vm.resendButton = true;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                })
           },
+          resendConfirmationEmail(){
+               let vm = this;
+               axios.get(backEndUrl + `/api/auth/email/resend/${this.form.email}`)
+               .then(function (response){
+                    if(response.status == 200)
+                    {
+                         vm.message = response.data;
+                         vm.dangerAlert = false;
+                         vm.alertFlag = true;
+                    }
+               })
+               .catch(function (error){
+                    console.log(error);
+                    vm.alertMessage = error.response.data;
+                    vm.dangerAlert = true;
+                    vm.alertFlag = true; 
+               })
+          }
      }
 }
 </script>

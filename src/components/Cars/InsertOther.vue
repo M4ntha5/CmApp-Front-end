@@ -1,6 +1,7 @@
 <template>
      <div class="container" >
           <div v-if="!loading">
+               <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
                <b-form class="pt-4">
                     <div class="form-row">
                          <b-form-group class="col-md-4 mb-3" label="Make">
@@ -291,7 +292,7 @@
                          </b-collapse>
                     </div>  
                     <div class="pt-3">
-                         <b-button type="submit" @click.prevent="onSubmit()" variant="primary">Submit</b-button>
+                         <b-button type="submit" :disabled="buttonClicked" @click.prevent="onSubmit()" variant="primary">Submit</b-button>
                     </div>  
                </b-form>
           </div>
@@ -350,12 +351,18 @@ const backEndUrl = process.env.VUE_APP_API;
                     ],
                     allMakes: [],
                     rates:[],
-                    makeModels: [],
+                    makeModels: [{ text: 'Select One', value: null }],
                     loading: true,
                     equipmentCode: '',
                     equipmentName: '',
                     equipmentVisible: false,
-                    example:[]
+                    example:[],
+                    carMakes:[],
+                    dangerAlert:false,
+                    alertMessage: '',
+                    alertFlag: false,
+                    buttonClicked: false
+
                }
           },
           mounted(){
@@ -396,10 +403,17 @@ const backEndUrl = process.env.VUE_APP_API;
                          this.$el.querySelector('[name="' + 
                               this.$validator.errors.items[0].field + '"]').scrollIntoView(false);
                     else
-                         this.insertCar();          
+                    {
+                         this.buttonClicked = true;
+                         this.insertCar();
+                    }
+                                   
                },
                insertCar() {
                     let vm = this;
+                    vm.dangerAlert = false;
+                    vm.alertMessage = "Inserting...";
+                    vm.alertFlag = true;
                     if(vm.car.displacement == '')
                          vm.car.displacement = 0;
                     if(vm.car.manufactureDate == '')
@@ -409,15 +423,18 @@ const backEndUrl = process.env.VUE_APP_API;
                     })
                     .then(function (response) {             
                          if(response.status == 200)
-                         {
-                              vm.alertFlag = false;
+                         {             
                               let insertedId = response.data._id;
                               if(vm.car.base64images.length > 0)
                                    vm.insertImages(insertedId);
                               vm.insertCarSummary(insertedId);                        
-                         }         
+                         }
                     })
                     .catch(function (error) {
+                         vm.dangerAlert = true;
+                         vm.alertFlag = true;
+                         vm.alertMessage = error.response.data;
+                         vm.buttonClicked = false;
                          if(error.response.status == 401) 
                          {
                               vm.$cookies.remove('token');
@@ -483,11 +500,13 @@ const backEndUrl = process.env.VUE_APP_API;
                          if(response.status == 200)
                          {
                               let list = [];
-                              let makes = response.data
+                              let makes = response.data;
+                              vm.carMakes = response.data;
                               let tmp = [{ text: 'Select One', value: null }];
                               makes.forEach(element => {
-                                   list.push(element.name);
+                                   list.push(element.make);
                               });
+                              list.sort();
                               vm.allMakes = tmp.concat(list);
                               vm.loading = false;
                          }         
@@ -506,7 +525,8 @@ const backEndUrl = process.env.VUE_APP_API;
                     })
                },
                getAllModelsForMake(make){
-                    let vm =this;
+                    let vm = this; 
+                    this.car.model = null;
                     vm.modelsDisabled = true;
                     axios.get(backEndUrl + `/api/makes/${make}/models`, {
                          headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }

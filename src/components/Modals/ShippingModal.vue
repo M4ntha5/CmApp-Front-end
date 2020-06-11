@@ -3,7 +3,8 @@
           <b-modal id="shipping-modal" ref="modal" title="Shipping details"
           @show="resetModal"
           @ok.prevent="handleSubmit()"
-          @close="resetModal">
+          @close="resetModal"
+          :ok-disabled="buttonClicked">
           <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
                <b-form ref="form" @submit.stop.prevent="handleSubmit()">
                     <b-row>
@@ -162,7 +163,8 @@ export default {
                },
                alertFlag: false,
                dangerAlert: false,
-               alertMessage: ''
+               alertMessage: '',
+               buttonClicked: false
           }
      },
      mounted() {         
@@ -209,7 +211,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
+                    this.buttonClicked = true;
                     if(!this.insert._id)
                          this.insertShipping();
                     else
@@ -231,6 +233,7 @@ export default {
                          vm.alertMessage = "Your data saved successfully";
                          vm.alertFlag = true;
                          vm.fetchCarShipping();
+                         vm.buttonClicked = false;
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('shipping-modal')
@@ -241,6 +244,7 @@ export default {
                     vm.dangerAlert = true;
                     vm.alertMessage = error.response.data;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -266,7 +270,8 @@ export default {
                          vm.dangerAlert = false;
                          vm.alertMessage = "Shipping data updated successfully";
                          vm.alertFlag = true;
-                         vm.fetchCarShipping();
+                         vm.buttonClicked = false;
+                         vm.fetchCarShipping();                 
                          // Hide the modal manually
                          vm.$nextTick(() => {
                               vm.$bvModal.hide('shipping-modal')
@@ -277,6 +282,7 @@ export default {
                     vm.dangerAlert = true;
                     vm.alertMessage = error.response.data;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');

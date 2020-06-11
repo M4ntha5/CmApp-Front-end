@@ -12,22 +12,22 @@
                     :current-page="currentPage">
                     <template v-slot:cell(actions)="row">
                          <b-dropdown id="actions-dropdown" text="Actions" variant="info">
-                              <b-dropdown-item @click="goToUserEdit(users[row.index]._id)">Edit user details</b-dropdown-item>
+                              <b-dropdown-item @click="goToUserEdit(users[row.index+perPage*currentPage-perPage]._id)">Edit user details</b-dropdown-item>
                               <b-dropdown-item 
-                                   v-if="users[row.index].blocked"
-                                   @click="unblockUser(users[row.index]._id)">Unblock
+                                   v-if="users[row.index+perPage*currentPage-perPage].blocked"
+                                   @click="unblockUser(users[row.index+perPage*currentPage-perPage]._id)">Unblock
                               </b-dropdown-item>
                               <b-dropdown-item v-else
-                                   @click="blockUser(users[row.index]._id)">Block
+                                   @click="blockUser(users[row.index+perPage*currentPage-perPage]._id)">Block
                               </b-dropdown-item>
                               <b-dropdown-item 
                                    v-b-modal.change-role-modal
-                                   @click="showModal(users[row.index])">
+                                   @click="showModal(users[row.index+perPage*currentPage-perPage])">
                                    Change role
                               </b-dropdown-item>
 
 
-                              <b-dropdown-item @click="deleteUser(users[row.index]._id)">Delete user</b-dropdown-item>
+                              <b-dropdown-item @click="deleteUser(users[row.index+perPage*currentPage-perPage]._id)">Delete user</b-dropdown-item>
                          </b-dropdown>
                     </template>
                     <template v-slot:table-busy>
@@ -47,7 +47,8 @@
 
           <b-modal id="change-role-modal" ref="modal" title="Change role"
           @ok.prevent="onSubmit()"
-          @close="resetModal">
+          @close="resetModal"
+          :ok-disabled="buttonClicked">
                <b-form ref="form" @submit.stop.prevent="onSubmit()">            
                     <b-form-group>
                          <b-form-select name="role-input"
@@ -92,7 +93,8 @@ export default {
                currentPage: 1,
                perPage: 10,
                isBusy: true,
-               showRoleModal:''
+               showRoleModal:'',
+               buttonClicked:false
           }
      },
      created() {
@@ -239,6 +241,7 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -259,6 +262,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
+                    this.buttonClicked = true;
                     this.changeRole();
                })          
           },
