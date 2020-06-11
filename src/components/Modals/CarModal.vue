@@ -2,8 +2,9 @@
     <div>
         <b-modal id="car-insert-modal" ref="modal" title="Insert new car"
         @show="resetModal"
-        @ok.prevent="handleSubmit"
-        @close="resetModal">
+        @ok.prevent="handleSubmit()"
+        @close="resetModal"
+        :ok-disabled="buttonClicked">
         <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
             <form ref="form" @submit.stop.prevent="handleSubmit">
                 <div class="mb-4">
@@ -108,6 +109,7 @@ export default {
             dangerAlert: false,
             activeBmwItem: true,
             activeMbItem: false,
+            buttonClicked: false
         }
     },
     mounted() {
@@ -137,6 +139,7 @@ export default {
             this.$validator.validateAll().then(result => {
                 if (!result)
                     return;
+                this.buttonClicked = true;
                 this.insertCar();
             });  
         },
@@ -166,6 +169,7 @@ export default {
                     vm.alertMessage = error.response.data;
                 vm.dangerAlert = true;
                 vm.alertFlag = true;
+                vm.buttonClicked = false;
                 if(error.response.status == 401) 
                 {
                     vm.$cookies.remove('token');

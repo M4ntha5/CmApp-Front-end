@@ -292,7 +292,7 @@
                          </b-collapse>
                     </div>  
                     <div class="pt-3">
-                         <b-button type="submit" @click.prevent="onSubmit()" variant="primary">Submit</b-button>
+                         <b-button type="submit" :disabled="buttonClicked" @click.prevent="onSubmit()" variant="primary">Submit</b-button>
                     </div>  
                </b-form>
           </div>
@@ -360,7 +360,8 @@ const backEndUrl = process.env.VUE_APP_API;
                     carMakes:[],
                     dangerAlert:false,
                     alertMessage: '',
-                    alertFlag: false
+                    alertFlag: false,
+                    buttonClicked: false
 
                }
           },
@@ -402,7 +403,11 @@ const backEndUrl = process.env.VUE_APP_API;
                          this.$el.querySelector('[name="' + 
                               this.$validator.errors.items[0].field + '"]').scrollIntoView(false);
                     else
-                         this.insertCar();          
+                    {
+                         this.buttonClicked = true;
+                         this.insertCar();
+                    }
+                                   
                },
                insertCar() {
                     let vm = this;
@@ -418,18 +423,18 @@ const backEndUrl = process.env.VUE_APP_API;
                     })
                     .then(function (response) {             
                          if(response.status == 200)
-                         {       
-                              vm.alertFlag = false;                       
+                         {             
                               let insertedId = response.data._id;
                               if(vm.car.base64images.length > 0)
                                    vm.insertImages(insertedId);
                               vm.insertCarSummary(insertedId);                        
-                         }         
+                         }
                     })
                     .catch(function (error) {
                          vm.dangerAlert = true;
                          vm.alertFlag = true;
                          vm.alertMessage = error.response.data;
+                         vm.buttonClicked = false;
                          if(error.response.status == 401) 
                          {
                               vm.$cookies.remove('token');

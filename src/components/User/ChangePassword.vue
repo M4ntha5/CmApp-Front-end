@@ -24,7 +24,7 @@
                          </b-form-input>
                          <b-form-invalid-feedback id="password2-input-live-feedback">{{ veeErrors.first('password2-input') }}</b-form-invalid-feedback>
                     </b-form-group>
-                    <b-button type="submit" variant="primary">Reset my password</b-button>                                      
+                    <b-button type="submit" :disabled="buttonClicked" variant="primary">Reset my password</b-button>                                      
                </b-form>
           </div>
     </div>
@@ -44,6 +44,7 @@ export default {
                dangerAlert: false,
                alertFlag: false,
                message: '',
+               buttonClicked: false
           }
      },
      methods: {
@@ -56,6 +57,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
+                    this.buttonClicked = true;
                     this.resetPassword();
                });
           },
@@ -83,6 +85,7 @@ export default {
                     vm.message = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');

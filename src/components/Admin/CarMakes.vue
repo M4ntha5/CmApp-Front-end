@@ -39,7 +39,8 @@
 
           <b-modal id="make-modal" ref="modal" title="Handle make"
           @ok.prevent="onSubmit()"
-          @close="resetModal">
+          @close="resetModal"
+          :ok-disabled="buttonClicked">
                <b-alert v-model="modalAlertFlag" style="text-align:center;" 
                     :variant="modalDangerAlert ? 'danger' : 'success'" dismissible>
                     {{modalAlertMessage}}
@@ -136,6 +137,7 @@ export default {
                currentPage: 1,
                perPage: 10,
                isBusy: true,
+               buttonClicked: false
           }
      },
      created() {
@@ -204,6 +206,7 @@ export default {
                          return;
                     if(this.form.id == null)
                     {
+                         this.buttonClicked = true;
                          this.form.make = this.form.make.charAt(0).toUpperCase() + 
                               this.form.make.slice(1).toLowerCase();
                          
@@ -217,7 +220,11 @@ export default {
                               this.insertMake();
                     }                
                     else
+                    {
+                         this.buttonClicked = true;
                          this.updateMake();
+                    }
+                         
                });
           },
           getAllMakes(){
@@ -274,6 +281,7 @@ export default {
                     vm.modalAlertMessage = error.response.data;
                     vm.modalDangerAlert = true;
                     vm.modalAlertFlag = true; 
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -306,6 +314,7 @@ export default {
                     vm.modalAlertMessage = error.response.data;
                     vm.modalDangerAlert = true;
                     vm.modalAlertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');

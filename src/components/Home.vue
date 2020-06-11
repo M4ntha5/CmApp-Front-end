@@ -41,28 +41,32 @@
 </template>
 
 <script>
-  export default {
-        data() {
-          return {
-              slide: 0,
-              sliding: null
-          }
+import axios from 'axios'
+const backEndUrl = process.env.VUE_APP_API;
+export default {
+    data() {
+        return {
+            slide: 0,
+            sliding: null
+        }
     },
     methods: {
         onSlideStart() {
-            this.sliding = true
+            this.sliding = true;
         },
         onSlideEnd() {
-            this.sliding = false
-        }
+            this.sliding = false;
+        },
+        getCurrencies() {
+            axios.get(backEndUrl + "/api/currency");
+        },
     }
-  }
+}
 </script>
 <style>
     @media only screen and (min-width: 1200px) { 
         .carousel-item img {
             height:800px !important;
         }
-    }
-    
+    }   
 </style>

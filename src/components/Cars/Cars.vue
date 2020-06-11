@@ -64,7 +64,8 @@
       <b-modal id="sold-modal" ref="modal" title="Sold data"
       @show="resetModal"
       @ok.prevent="handleSubmit()"
-      @close="resetModal">
+      @close="resetModal"
+      :ok-disabled="buttonClicked">
             <b-form ref="form" @submit.stop.prevent="handleSubmit()">
                   <b-form-group :label="'Sold price (' + currency + ')'">
                         <b-form-input placeholder="15000" name="soldPrice-input"
@@ -135,7 +136,8 @@ export default {
                         {value: 1, text: 'Show all cars' },
                         {value: 2, text: 'Show only sold cars' },
                         {value: 3, text: 'Show only unsold cars' },                 
-                  ]                
+                  ],
+                  buttonClicked: false            
             }           
       },
       created() {
@@ -288,6 +290,7 @@ export default {
                   this.$validator.validateAll().then(result => {
                         if (!result)
                               return;
+                        this.buttonClicked = true;
                         this.insertSoldDetails();
                   });                                                                
             },
@@ -312,6 +315,7 @@ export default {
                         vm.alertMessage = error.response.data;
                         vm.dangerAlert = true;
                         vm.alertFlag = true;
+                        vm.buttonClicked = false;
                         if(error.response.status == 401) 
                         {
                               vm.$cookies.remove('token');

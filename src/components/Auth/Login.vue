@@ -31,7 +31,7 @@
                          <b-form-invalid-feedback id="password1-input-live-feedback">{{ veeErrors.first('password1-input') }}</b-form-invalid-feedback>
                     </b-form-group>
                     <b-row>
-                         <b-button class="ml-3" type="submit" variant="primary">Log in</b-button>
+                         <b-button class="ml-3" :disabled="buttonClicked" type="submit" variant="primary">Log in</b-button>
                               <a v-b-modal.forgot-password-modal href=""
                                    @click.prevent="showResetModal" class="ml-2"
                                    @ok="fetchCars()">
@@ -61,7 +61,8 @@ export default {
                alertFlag: false,
                message: '',
                isResetModalVisible: false,
-               resendButton: false
+               resendButton: false,
+               buttonClicked: false
           }
      }, 
      components:{
@@ -85,7 +86,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
+                    this.buttonClicked = true;
                     this.login();
                });
           },
@@ -133,6 +134,7 @@ export default {
                          vm.resendButton = true;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                })
           },
           resendConfirmationEmail(){

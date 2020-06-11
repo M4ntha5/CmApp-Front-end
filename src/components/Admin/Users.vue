@@ -47,7 +47,8 @@
 
           <b-modal id="change-role-modal" ref="modal" title="Change role"
           @ok.prevent="onSubmit()"
-          @close="resetModal">
+          @close="resetModal"
+          :ok-disabled="buttonClicked">
                <b-form ref="form" @submit.stop.prevent="onSubmit()">            
                     <b-form-group>
                          <b-form-select name="role-input"
@@ -92,7 +93,8 @@ export default {
                currentPage: 1,
                perPage: 10,
                isBusy: true,
-               showRoleModal:''
+               showRoleModal:'',
+               buttonClicked:false
           }
      },
      created() {
@@ -239,6 +241,7 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -259,6 +262,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
+                    this.buttonClicked = true;
                     this.changeRole();
                })          
           },

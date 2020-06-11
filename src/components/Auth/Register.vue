@@ -58,7 +58,7 @@
                               {{ veeErrors.first('password2-input') }}
                          </b-form-invalid-feedback>
                     </b-form-group>  
-                    <b-button type="submit" variant="primary">Register</b-button>                          
+                    <b-button type="submit" :disabled="buttonClicked" variant="primary">Register</b-button>                          
                </b-form>
           </div>
      </div>
@@ -82,7 +82,8 @@ export default {
                alertFlag: false,
                alertMessage: '',
                registered: false,
-               registeredWithEmail: ''
+               registeredWithEmail: '',
+               buttonClicked: false
           }
      }, 
      computed: {
@@ -114,7 +115,7 @@ export default {
                this.$validator.validateAll().then(result => {
                     if (!result)
                          return;
-
+                    this.buttonClicked = true;
                     this.register();
                });
           },
@@ -129,6 +130,7 @@ export default {
                          vm.alertFlag = true;  
                          vm.registered = true;  
                          vm.registeredWithEmail = vm.form.email;
+                         vm.buttonClicked = false;
                     }
                })
                .catch(function (error){
@@ -136,6 +138,7 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true; 
+                    vm.buttonClicked = false;
                })
           },
           resendConfirmationEmail(){

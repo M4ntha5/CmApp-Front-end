@@ -9,7 +9,6 @@
                </div>
                <h1 class="col-sm-8">{{make}} {{model}}</h1>
           </div> 
-          <center></center>
           <b-form class="pt-4" v-if="!loading">
                <div class="form-row">
                     <b-form-group class="col-sm-4 mb-3" label="Make">
@@ -297,7 +296,7 @@
                </b-collapse>
           </div>
           <div class="pt-3">
-               <b-button type="submit" @click.prevent="onSubmit()" variant="primary">Save</b-button>
+               <b-button type="submit" :disabled="buttonClicked" @click.prevent="onSubmit()" variant="primary">Save</b-button>
           </div>
      </div>   
      <div class="pt-3" v-else>        
@@ -374,7 +373,8 @@ export default {
                dangerAlert: false,
                alertMessage: '',
                alertFlag: false,
-               equipmentCodes: []
+               equipmentCodes: [],
+               buttonClicked: false
           }
      }, 
      created() {      
@@ -458,6 +458,7 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
@@ -513,6 +514,7 @@ export default {
 
                if(areValid)
                {
+                    this.buttonClicked = true;
                     this.alertMessage = "Saving your changes...";
                     this.dangerAlert = false;
                     this.alertFlag = true;
@@ -599,6 +601,7 @@ export default {
                     vm.alertMessage = error.response.data;
                     vm.dangerAlert = true;
                     vm.alertFlag = true;
+                    vm.buttonClicked = false;
                     if(error.response.status == 401) 
                     {
                          vm.$cookies.remove('token');
