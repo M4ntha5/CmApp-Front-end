@@ -50,6 +50,9 @@ export default {
             sliding: null
         }
     },
+    created(){
+        this.getCurrencies();
+    },
     methods: {
         onSlideStart() {
             this.sliding = true;
