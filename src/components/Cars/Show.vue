@@ -40,9 +40,9 @@
                                                       @click.prevent="showShippingModal">
                                                       Add/edit shipping info
                                                 </a>
-                                                <a @click.prevent="openTracking(car._id)" class="dropdown-item" href="">
+                                                <!--<a @click.prevent="openTracking(car._id)" class="dropdown-item" href="" disabled>
                                                       Tracking info
-                                                </a>                       
+                                                </a>   -->                    
                                           </div>
                                           <!--shipping modal-->
                                           <shippingModal v-show="isShippingModalVisible" @click="closeShippingModal"/>

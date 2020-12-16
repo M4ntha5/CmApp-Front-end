@@ -5,7 +5,7 @@
             <div class="row mr-3 ml-1">
                   <div class="col">
                         <button v-b-modal.car-insert-modal class="btn btn-primary"
-                        @click="showBmwModal" >
+                        @click="$router.push('/other-insert')" >
                               Add new car
                         </button>
                         <!-- bmw modal-->
