@@ -49,7 +49,7 @@
                <b-form ref="form" @submit.stop.prevent="onSubmit()">            
                     <b-form-group label="Make">
                          <b-form-input id="make-input" name="make-input"
-                              v-model="form.make" placeholder="Some make"
+                              v-model="form.name" placeholder="Some make"
                               v-validate="{ required: true}"
                               :state="validateState('make-input')" 
                               aria-describedby="make-input-live-feedback"
@@ -113,8 +113,8 @@ export default {
                makes:[],
                models:[],
                fields: [    
-                    { key: '_id', label: '#' },
-                    { key: 'make' },
+                    { key: 'id', label: '#' },
+                    { key: 'name' },
                     'Actions'
                ],
                fields2: [
@@ -264,7 +264,7 @@ export default {
                     headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                })
                .then(function (response) {
-                    if(response.status == 200)
+                    if(response.status == 201)
                     {
                          vm.alertMessage = "Added successfully";
                          vm.dangerAlert = false;

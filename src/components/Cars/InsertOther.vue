@@ -5,9 +5,11 @@
                <b-form class="pt-4">
                     <div class="form-row">
                          <b-form-group class="col-md-4 mb-3" label="Make">
-                              <b-form-select id="make-input" name="make-input" @change="getAllModelsForMake(car.make)"
-                                   v-model="car.make"
+                              <b-form-select id="make-input" name="make-input" @change="getAllModelsForMake(car.makeId)"
+                                   v-model="car.makeId"
                                    :options="allMakes"
+                                   text-field="name"
+                                   value-field="id"
                                    v-validate="{ required: true }"
                                    :state="validateState('make-input')" 
                                    aria-describedby="make-input-live-feedback"
@@ -20,8 +22,10 @@
 
                          <b-form-group class="col-md-4 mb-3" label="Model">
                               <b-form-select id="model-input" name="model-input" :disabled="modelsDisabled"
-                                   v-model="car.model"
+                                   v-model="car.modelId"
                                    :options="makeModels"
+                                   text-field="name"
+                                   value-field="id"
                                    v-validate="{ required: true }"
                                    :state="validateState('model-input')" 
                                    aria-describedby="model-input-live-feedback"
@@ -314,8 +318,8 @@ const backEndUrl = process.env.VUE_APP_API;
           data() {
                return {
                     car: {
-                         make: null,
-                         model: null,
+                         makeId: null,
+                         modelId: null,
                          vin:'',
                          manufactureDate:'',
                          series:'',
@@ -414,10 +418,7 @@ const backEndUrl = process.env.VUE_APP_API;
                     vm.dangerAlert = false;
                     vm.alertMessage = "Inserting...";
                     vm.alertFlag = true;
-                    if(vm.car.displacement == '')
-                         vm.car.displacement = 0;
-                    if(vm.car.manufactureDate == '')
-                         vm.car.manufactureDate = '1900-01-01';
+                    console.log('car', vm.car)
                     axios.post(backEndUrl + "/api/cars", vm.car, {
                          headers: {Authorization: 'Bearer ' + window.$cookies.get('token')}
                     })
@@ -499,15 +500,9 @@ const backEndUrl = process.env.VUE_APP_API;
                     .then(function (response){
                          if(response.status == 200)
                          {
-                              let list = [];
                               let makes = response.data;
-                              vm.carMakes = response.data;
-                              let tmp = [{ text: 'Select One', value: null }];
-                              makes.forEach(element => {
-                                   list.push(element.make);
-                              });
-                              list.sort();
-                              vm.allMakes = tmp.concat(list);
+                              let tmp = [{ name: 'Select One', id: null }];
+                              vm.allMakes = tmp.concat(makes);
                               vm.loading = false;
                          }         
                     })
@@ -526,7 +521,7 @@ const backEndUrl = process.env.VUE_APP_API;
                },
                getAllModelsForMake(make){
                     let vm = this; 
-                    this.car.model = null;
+                    this.car.modelId = null;
                     vm.modelsDisabled = true;
                     axios.get(backEndUrl + `/api/makes/${make}/models`, {
                          headers: { Authorization: 'Bearer ' + window.$cookies.get('token') }
@@ -535,7 +530,7 @@ const backEndUrl = process.env.VUE_APP_API;
                          if(response.status == 200)
                          {
                               let models = response.data;
-                              let tmp = [{ text: 'Select One', value: null }];
+                              let tmp = [{ name: 'Select One', id: null }];
                               models = tmp.concat(models);
                               vm.makeModels = models;
                               vm.modelsDisabled = false;
