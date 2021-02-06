@@ -203,7 +203,7 @@
                     <div class="form-row">
                          <b-form-group class="col-sm-8 mb-3" label="Bought price">
                               <b-form-input placeholder="5000" step=".1" name="price-input"
-                                   v-model="summary.boughtPrice" type="number"
+                                   v-model="car.boughtPrice" type="number"
                                    v-validate="{ required: true, decimal:2 }"
                                    :state="validateState('price-input')" 
                                    aria-describedby="price-input-live-feedback"
@@ -335,6 +335,7 @@ const backEndUrl = process.env.VUE_APP_API;
                          equipment: [],
                          images: [],
                          base64images: [],
+                         boughtPrice: ''
                     },
                     summary: {
                          boughtPrice: '',
@@ -424,11 +425,12 @@ const backEndUrl = process.env.VUE_APP_API;
                     })
                     .then(function (response) {             
                          if(response.status == 200)
-                         {             
+                         {     
+                              vm.$router.push("/cars");        
                               let insertedId = response.data._id;
-                              if(vm.car.base64images.length > 0)
+                              /*if(vm.car.base64images.length > 0)
                                    vm.insertImages(insertedId);
-                              vm.insertCarSummary(insertedId);                        
+                              vm.insertCarSummary(insertedId); */                 
                          }
                     })
                     .catch(function (error) {

@@ -20,7 +20,7 @@
             
             <div class="pt-3">
                   <b-card-group deck>
-                        <b-col sm="4" v-for="(car, index) in carsList" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
+                        <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
                               <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
                                           <b-card-img img-alt="image img-fluid" img-top :src='car.carImg'
@@ -30,14 +30,14 @@
                                           </b-card-body>
                                     </b-link>
                                     <b-card-text class="pl-3" style="flex-grow:1;">                                          
-                                          <h4>Already paid: {{car.summary.total}} {{currency}}</h4>
-                                          <template v-if="car.summary.sold">
+                                          <h4>Already paid: {{car.total}} {{currency}}</h4>
+                                          <template v-if="car.sold">
                                                 <h2 style="color:red;font-weight:bold;">SOLD</h2>
-                                                <h2 v-if="car.summary.profit < 0" style="color:red;">
-                                                      Profit: {{car.summary.profit}} {{currency}}
+                                                <h2 v-if="car.profit < 0" style="color:red;">
+                                                      Profit: {{car.profit}} {{currency}}
                                                 </h2>
                                                 <h2 v-else style="color:green;">
-                                                      Profit: {{car.summary.profit}} {{currency}}
+                                                      Profit: {{car.profit}} {{currency}}
                                                 </h2>
                                           </template>
                                     </b-card-text>         
@@ -45,10 +45,10 @@
                                           <b-button v-b-modal.sold-modal block
                                                 @click="openSoldModal(car.id, index)" 
                                                 type="button" class="btn btn-warning"
-                                                v-if="!car.summary.sold">
+                                                v-if="!car.sold">
                                                 Sold?
                                           </b-button>
-                                          <small v-else>{{car.summary.soldWithin}}</small>
+                                          <small v-else>{{car.soldWithin}}</small>
                                     </template>
                               </b-card>                                               
                         </b-col>
@@ -189,17 +189,18 @@ export default {
                   .then(function (response) {
                         if(response.status == 200)
                         {
+                              console.log('res', response)
                               vm.cars = response.data;
                               vm.displayCars = response.data;
                               vm.rows = response.data.length;
                               vm.loading = false;                
 
-                              for(let i =0; i < vm.cars.length; i++)
+                             /* for(let i =0; i < vm.cars.length; i++)
                               {
                                     vm.cars[i].summary.profit = Number((vm.cars[i].summary.profit).toFixed(2)); 
                                     if(vm.cars[i].carImg == "")
                                           vm.cars[i].carImg = process.env.VUE_APP_DEFAULT_IMAGE;
-                              }
+                              }*/
                         }                             
                   })
                   .catch(function (error) {
