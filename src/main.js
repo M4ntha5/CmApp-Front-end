@@ -8,7 +8,9 @@ import App from './App.vue'
 import BootstrapVue from 'bootstrap-vue'
 import VueRouter from 'vue-router'
 import VueCookies from 'vue-cookies';
-import Cars from './components/Cars/Cars.vue';
+//import Cars from './components/Cars/Cars.vue';
+import Cars from './components/Cars/list.vue';
+
 import ShowCar from './components/Cars/Show.vue';
 import Edit from './components/Cars/Edit.vue';
 import About from './components/Pages/About.vue';

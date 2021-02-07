@@ -215,7 +215,7 @@
                          </b-form-group>
                          <b-form-group class="col-sm-4 mb-3" label="Bought price currency">
                             <b-form-select id="currency-input" name="currency-input"
-                                v-model="summary.selectedCurrency"
+                                v-model="car.boughtPriceCurrency"
                                 :options="rates"
                                 v-validate="{ required: true }"
                                 :state="validateState('currency-input')"
@@ -335,7 +335,8 @@ const backEndUrl = process.env.VUE_APP_API;
                          equipment: [],
                          images: [],
                          base64images: [],
-                         boughtPrice: ''
+                         boughtPrice: '',
+                         boughtPriceCurrency: '',
                     },
                     summary: {
                          boughtPrice: '',
@@ -380,7 +381,7 @@ const backEndUrl = process.env.VUE_APP_API;
                     axios.get(backEndUrl + "/api/currency")
                     .then(function (response) {
                          vm.rates = response.data;
-                         vm.summary.selectedCurrency = vm.summary.baseCurrency;
+                         vm.car.boughtPriceCurrency = vm.summary.baseCurrency;
                     })
                     .catch(function (error){
                          console.log(error);

@@ -5,25 +5,21 @@
             <div class="row mr-3 ml-1">
                   <div class="col">
                         <button v-b-modal.car-insert-modal class="btn btn-primary"
-                        @click="showBmwModal" >
+                        @click="$router.push('/other-insert')">
                               Add new car
                         </button>
-                        <!-- bmw modal-->
-                        <bmwModal v-show="isBmwModalVisible" @click="closeBmwModal"/>
                   </div>
                   <b-form-group label-cols-sm="auto" label="Sort:" class="ml-3">
-                        <b-form-select 
-                              v-model="selected" :options="options" @change="sortCars()"></b-form-select>
+                        <b-form-select v-model="selected" :options="options" @change="sortCars()"></b-form-select>
                   </b-form-group>
-            </div>
-            
+            </div>         
             
             <div class="pt-3">
                   <b-card-group deck>
                         <b-col sm="4" v-for="(car, index) in cars" v-bind:key="car.id" class="mb-4 d-flex align-items-stretch">                              
                               <b-card no-body>
                                     <b-link :to="'/cars/' + car.id">
-                                          <b-card-img img-alt="image img-fluid" img-top :src='car.carImg'
+                                          <b-card-img img-alt="image img-fluid" img-top :src='car.defaultImage'
                                           style="max-height:238.5px"></b-card-img>
                                           <b-card-body class="pl-3">            
                                                 <b-card-title>{{car.make}} {{car.model}}</b-card-title>
@@ -88,7 +84,7 @@
 
 
 import getSymbolFromCurrency from 'currency-symbol-map'
-import bmwModal from '../Modals/CarModal.vue';
+//import bmwModal from '../Modals/CarModal.vue';
 import axios from 'axios';
 const backEndUrl = process.env.VUE_APP_API;
 export default {      
@@ -144,7 +140,7 @@ export default {
             this.fetchCars();
       },
       components: {
-            bmwModal,
+            //bmwModal,
       },
       computed:{
             carsList: function(){
