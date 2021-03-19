@@ -34,7 +34,7 @@
                <b-form-group label="Car">
                     <b-form-select id="car-input" name="car-input" 
                          v-model="insert.car"
-                         :options="cars.sort()"
+                         :options="cars"
                          v-validate="{ required: true }"
                          :state="validateState('car-input')" 
                          aria-describedby="car-input-live-feedback"
