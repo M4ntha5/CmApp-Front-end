@@ -412,7 +412,7 @@ export default {
                   var rows = vm.equipmentData.split('\n')
                   var data = []
                   rows.forEach(row => {
-                        let rowSplit = row.split(' ')
+                        let rowSplit = row.split('\t')
                         data.push({
                               code: rowSplit[0],
                               name: rowSplit[1]
