@@ -409,7 +409,18 @@ export default {
       methods: {
             addEquipment(){
                   let vm = this;
-                  axios.post(backEndUrl + `/api/cars/${vm.$route.params.id}/equipment`, vm.equipmentData, {
+                  var rows = vm.equipmentData.split('\n')
+                  var data = []
+                  rows.forEach(row => {
+                        let rowSplit = row.split(' ')
+                        data.push({
+                              code: rowSplit[0],
+                              name: rowSplit[1]
+                        })
+                  });
+                  console.log('data', data, rows)
+
+                  axios.post(backEndUrl + `/api/cars/${vm.$route.params.id}/equipment`, data, {
                         headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
                   })
                   .then(function (response) {
