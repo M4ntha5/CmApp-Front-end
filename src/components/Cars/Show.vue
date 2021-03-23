@@ -208,6 +208,8 @@
                                     <b-table striped :items="car.equipment" responsive></b-table>
                               </template> 
                               <div v-else>
+                                    <b-form-textarea v-model="equipmentData" placeholder="Code EnglishName GermanName" rows="3" max-rows="6"/>
+                                    <v-button @click="addEquipment">Submit</v-button>
                                     <center>
                                           <h2 class="pt-3">No equipment</h2>
                                     </center>
@@ -335,7 +337,8 @@ export default {
                   defaultImg: [{
                         href: process.env.VUE_APP_DEFAULT_IMAGE,
                         title: '1/1'
-                  }]
+                  }],
+                  equipmentData:''
 
             }
             
@@ -403,6 +406,27 @@ export default {
       },
 
       methods: {
+            addEquipment(){
+                  let vm = this;
+                  axios.post(backEndUrl + `/api/cars/${vm.$route.params.id}/equipment`, vm.equipmentData, {
+                        headers: { Authorization: 'Bearer ' + window.$cookies.get('token')}
+                  })
+                  .then(function (response) {
+                        if(response.status == 200)  
+                              vm.fetchCar();                         
+                  })
+                  .catch(function (error) {
+                        if(error.response.status == 401) 
+                        {
+                              vm.$cookies.remove('token');
+                              vm.$cookies.remove('user-email');
+                              vm.$cookies.remove('role');
+                              vm.$cookies.remove('user');
+                              vm.$cookies.remove('currency');
+                              vm.$router.push('/login');
+                        }
+                  });
+            },
             watchSummary(){
                   let vm = this;
                   setTimeout(function () {
