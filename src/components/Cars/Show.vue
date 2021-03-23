@@ -208,8 +208,9 @@
                                     <b-table striped :items="car.equipment" responsive></b-table>
                               </template> 
                               <div v-else>
+                                    <label>Paste your shit here</label>
                                     <b-form-textarea v-model="equipmentData" placeholder="Code EnglishName GermanName" rows="3" max-rows="6"/>
-                                    <v-button @click="addEquipment">Submit</v-button>
+                                    <b-button variant="primary" @click="addEquipment">Submit</b-button>
                                     <center>
                                           <h2 class="pt-3">No equipment</h2>
                                     </center>
