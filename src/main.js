@@ -15,7 +15,7 @@ import About from './components/Pages/About.vue';
 import Home from './components/Home.vue';
 import Login from './components/Auth/Login.vue';
 import Register from './components/Auth/Register.vue';
-//import Tracking from './components/Cars/Tracking.vue';
+import Tracking from './components/Cars/Tracking.vue';
 import Converter from './components/ExcangeConverter/Converter.vue';
 import InsertOther from './components/Cars/InsertOther.vue';
 import NotFound from './components/Pages/404.vue';
@@ -58,13 +58,13 @@ const routes = [
           else next()
       }
     },
-  /*{ path: '/cars/:id/tracking', component: Tracking,
+  { path: '/cars/:id/tracking', component: Tracking,
       beforeEnter: (to, from, next) => {
           let jwt = window.$cookies.get('token');
           if(jwt == null || jwt.length < 10) next("/login")
           else next()
       }  
-    },*/
+    },
     { path: '/cars/:id/edit', component: Edit,
       beforeEnter: (to, from, next) => {
           let jwt = window.$cookies.get('token');
