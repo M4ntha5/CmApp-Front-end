@@ -2,8 +2,6 @@ import Vue from 'vue'
 import { wrapFunctional } from './utils'
 
 const components = {
-  Logo: () => import('../..\\components\\Logo.vue' /* webpackChunkName: "components/logo" */).then(c => wrapFunctional(c.default || c)),
-  VuetifyLogo: () => import('../..\\components\\VuetifyLogo.vue' /* webpackChunkName: "components/vuetify-logo" */).then(c => wrapFunctional(c.default || c)),
   CarsCarCard: () => import('../..\\components\\cars\\car-card.vue' /* webpackChunkName: "components/cars-car-card" */).then(c => wrapFunctional(c.default || c)),
   CarsList: () => import('../..\\components\\cars\\list.vue' /* webpackChunkName: "components/cars-list" */).then(c => wrapFunctional(c.default || c))
 }
