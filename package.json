@@ -1,62 +1,22 @@
 {
-  "name": "cm-app-front-end",
-  "version": "0.1.0",
+  "name": "CMAPP",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "start": "node server.js"
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "bootstrap": "^4.4.1",
-    "bootstrap-vue": "^2.8.0",
-    "core-js": "^3.6.4",
-    "currency-symbol-map": "^4.0.4",
-    "express": "^4.17.1",
-    "jquery": "^3.5.0",
-    "mdbvue": "^6.7.0",
-    "serve-static": "^1.14.1",
-    "vee-validate": "^2.2.0",
-    "vue": "^2.6.11",
-    "vue-cookies": "^1.7.0",
-    "vue-gallery": "^2.0.1",
-    "vue-gallery-slideshow": "^1.5.0",
-    "vue-images": "^1.1.0",
-    "vue-js-toggle-button": "^1.3.3",
-    "vue-litebox": "^1.0.2",
-    "vue-picture-swipe": "^1.2.0",
-    "vue-preview": "^1.1.3",
-    "vue-router": "^3.1.5",
-    "vue-runtime-helpers": "^1.1.2",
-    "@babel/compat-data": "^7.9.0"
+    "core-js": "^3.8.3",
+    "js-cookie": "^2.2.1",
+    "nuxt": "^2.14.12",
+    "vue-axios": "^3.2.4",
+    "vue-cookie": "^1.1.4",
+    "vue-router": "^3.5.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.2.0",
-    "@vue/cli-plugin-eslint": "~4.2.0",
-    "@vue/cli-service": "~4.2.0",
-    "babel-eslint": "^10.0.3",
-    "eslint": "^6.8.0",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
-  ]
+    "@nuxtjs/vuetify": "^1.11.3"
+  }
 }

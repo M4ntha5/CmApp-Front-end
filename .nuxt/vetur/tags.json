@@ -1,0 +1,14 @@
+{
+  "Logo": {
+    "description": "Auto imported from components/Logo.vue"
+  },
+  "VuetifyLogo": {
+    "description": "Auto imported from components/VuetifyLogo.vue"
+  },
+  "CarsCarCard": {
+    "description": "Auto imported from components/cars/car-card.vue"
+  },
+  "CarsList": {
+    "description": "Auto imported from components/cars/list.vue"
+  }
+}

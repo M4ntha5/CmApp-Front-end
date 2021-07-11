@@ -1,0 +1,23 @@
+[
+  {
+    "name": "cars",
+    "path": "/cars",
+    "component": "E:\\\\Github\\\\cmapp-frontend-v2\\\\pages\\\\cars.vue",
+    "chunkName": "pages/cars",
+    "_name": "_2a3af268"
+  },
+  {
+    "name": "login",
+    "path": "/login",
+    "component": "E:\\\\Github\\\\cmapp-frontend-v2\\\\pages\\\\login.vue",
+    "chunkName": "pages/login",
+    "_name": "_a3684120"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "E:\\\\Github\\\\cmapp-frontend-v2\\\\pages\\\\index.vue",
+    "chunkName": "pages/index",
+    "_name": "_36b7874e"
+  }
+]
