@@ -74,16 +74,17 @@ export default {
         },
         {
           icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
+          title: 'Login',
+          to: '/login'
         }
       ],
     }
   },
   created(){
-    //var token = Cookies.get('token')
-    //if(!token)
-      //this.$router.go('/login')
+    var token = Cookies.get('token')
+    var currRoute = this.$router.currentRoute.fullPath
+    if(!token && currRoute != '/login')
+      this.$router.push('/login')
   },
   methods:{
     logout(){

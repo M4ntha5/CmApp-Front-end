@@ -13,17 +13,12 @@
 import CarsList from '@/components/cars/list.vue'
 
 export default {
+  middleware: 'authenticated',
   components:{
     CarsList
   },
   data(){
     return{
-      items: [],
-      filters: {},
-      announcementTypes: [],
-      tab:0,
-      loading: true,
-
       snackbarMessage: null,
       snackbarColor: null,
       showSnackbar: false
@@ -36,5 +31,6 @@ export default {
   },
   methods:{
   }
+
 }
 </script>
