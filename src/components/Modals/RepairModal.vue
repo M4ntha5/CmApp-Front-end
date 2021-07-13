@@ -22,7 +22,7 @@
                <b-form-group :label="'Price (' + baseCurrency + ')'">
                     <b-form-input id="price-input" name="price-input" placeholder="500"
                          v-model="insert.price"
-                         v-validate="{ required: true, decimal:'2',min_value:0.01 }"
+                         v-validate="{ required: true, decimal:'2' }"
                          :state="validateState('price-input')" 
                          aria-describedby="price-input-live-feedback"
                          data-vv-as="Price">
