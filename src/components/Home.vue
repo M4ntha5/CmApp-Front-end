@@ -50,6 +50,11 @@ export default {
             sliding: null
         }
     },
+    mounted(){
+        window.setInterval(() => {
+            this.getCurrencies()
+        }, 15 * 60 * 1000)
+    },
     methods: {
         onSlideStart() {
             this.sliding = true;
