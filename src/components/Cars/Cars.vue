@@ -131,7 +131,7 @@ export default {
                         createdAt: ''
                   },
                   rows: 0,
-                  selected: 1,
+                  selected: 3,
                   options:[
                         {value: 1, text: 'Show all cars' },
                         {value: 2, text: 'Show only sold cars' },
