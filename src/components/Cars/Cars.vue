@@ -140,8 +140,9 @@ export default {
                   buttonClicked: false            
             }           
       },
-      created() {
-            this.fetchCars();
+      async created() {
+            await this.fetchCars();
+            this.sortCars()
       },
       components: {
             bmwModal,
