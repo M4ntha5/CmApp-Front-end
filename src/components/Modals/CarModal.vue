@@ -1,11 +1,13 @@
 <template>
     <div>
         <b-modal id="car-insert-modal" ref="modal" title="Insert new car"
-        @show="resetModal"
-        @ok.prevent="handleSubmit()"
-        @close="resetModal"
-        :ok-disabled="buttonClicked">
-        <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
+            
+            @show="resetModal"
+            @ok.prevent="handleSubmit()"
+            @close="resetModal"
+            :ok-disabled="buttonClicked"
+        >
+            <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger' : 'success'" dismissible>{{alertMessage}}</b-alert>
             <form ref="form" @submit.stop.prevent="handleSubmit">
                 <div class="mb-4">
                     <b-nav tabs>

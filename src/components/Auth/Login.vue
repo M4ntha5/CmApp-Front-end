@@ -94,13 +94,14 @@ export default {
                let vm = this;
                axios.post(backEndUrl + '/api/auth/login', this.form)
                .then(function (response){
+                    console.log('response', response)
                     if(response.status == 200)
                     {
                          let token = response.data;   
                          //decode role from token
                          let jwtData = token.split('.')[1];
                          let decodedJwtJsonData = window.atob(jwtData);
-                         let role = decodedJwtJsonData.split(',')[0].split('"')[3];
+                         let role = 'user'//decodedJwtJsonData.split(',')[0].split('"')[3];
                          let email = decodedJwtJsonData.split(',')[2].split('"')[3];
                          let user = decodedJwtJsonData.split(',')[1].split('"')[3];
                          let currency = decodedJwtJsonData.split(',')[3].split('"')[3];

@@ -1,52 +1,53 @@
 <template>
      <div>
           <b-modal id="repair-insert-modal" ref="rep-modal" title="Insert new repair"
-          @show="resetModal"
-          @ok.prevent="onSubmit()"
-          @close="resetModal"
-          :ok-disabled="buttonClicked">  
-          <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger': 'success'" dismissible>{{alertMessage}}</b-alert>
-          <b-form ref="form" @submit.prevent="onSubmit()">            
-               <b-form-group label="Name">
-                    <b-form-input id="name-input" placeholder="New engine" name="name-input" 
-                         v-model="insert.name"
-                         v-validate="{ required: true }"
-                         :state="validateState('name-input')" 
-                         aria-describedby="name-input-live-feedback"
-                         data-vv-as="Name">
-                    </b-form-input>
-                    <b-form-invalid-feedback id="name-input-live-feedback">
-                         {{ veeErrors.first('name-input') }}
-                    </b-form-invalid-feedback>
-               </b-form-group>
-               <b-form-group :label="'Price (' + baseCurrency + ')'">
-                    <b-form-input id="price-input" name="price-input" placeholder="500"
-                         v-model="insert.price"
-                         v-validate="{ required: true, decimal:'2',min_value:0.01 }"
-                         :state="validateState('price-input')" 
-                         aria-describedby="price-input-live-feedback"
-                         data-vv-as="Price">
-                    </b-form-input>
-                    <b-form-invalid-feedback id="price-input-live-feedback">
-                         {{ veeErrors.first('price-input') }}
-                    </b-form-invalid-feedback>
-               </b-form-group>
-               <b-form-group label="Car">
-                    <b-form-select id="car-input" name="car-input" 
-                         v-model="insert.car"
-                         :options="cars"
-                         v-validate="{ required: true }"
-                         :state="validateState('car-input')" 
-                         aria-describedby="car-input-live-feedback"
-                         data-vv-as="Car">
-                    </b-form-select>
-                    <b-form-invalid-feedback id="car-input-live-feedback">
-                         {{ veeErrors.first('car-input') }}
-                    </b-form-invalid-feedback>
-               </b-form-group>
-          </b-form>
-        </b-modal>
-    </div>
+               @show="resetModal"
+               @ok.prevent="onSubmit()"
+               @close="resetModal"
+               :ok-disabled="buttonClicked"
+          >  
+               <b-alert v-model="alertFlag" :variant="dangerAlert ? 'danger': 'success'" dismissible>{{alertMessage}}</b-alert>
+               <b-form ref="form" @submit.prevent="onSubmit()">            
+                    <b-form-group label="Name">
+                         <b-form-input id="name-input" placeholder="New engine" name="name-input" 
+                              v-model="insert.name"
+                              v-validate="{ required: true }"
+                              :state="validateState('name-input')" 
+                              aria-describedby="name-input-live-feedback"
+                              data-vv-as="Name">
+                         </b-form-input>
+                         <b-form-invalid-feedback id="name-input-live-feedback">
+                              {{ veeErrors.first('name-input') }}
+                         </b-form-invalid-feedback>
+                    </b-form-group>
+                    <b-form-group :label="'Price (' + baseCurrency + ')'">
+                         <b-form-input id="price-input" name="price-input" placeholder="500"
+                              v-model="insert.price"
+                              v-validate="{ required: true, decimal:'2',min_value:0.01 }"
+                              :state="validateState('price-input')" 
+                              aria-describedby="price-input-live-feedback"
+                              data-vv-as="Price">
+                         </b-form-input>
+                         <b-form-invalid-feedback id="price-input-live-feedback">
+                              {{ veeErrors.first('price-input') }}
+                         </b-form-invalid-feedback>
+                    </b-form-group>
+                    <b-form-group label="Car">
+                         <b-form-select id="car-input" name="car-input" 
+                              v-model="insert.car"
+                              :options="cars"
+                              v-validate="{ required: true }"
+                              :state="validateState('car-input')" 
+                              aria-describedby="car-input-live-feedback"
+                              data-vv-as="Car">
+                         </b-form-select>
+                         <b-form-invalid-feedback id="car-input-live-feedback">
+                              {{ veeErrors.first('car-input') }}
+                         </b-form-invalid-feedback>
+                    </b-form-group>
+               </b-form>
+          </b-modal>
+     </div>
 </template>
 
 <script>

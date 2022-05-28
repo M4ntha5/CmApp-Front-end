@@ -17,11 +17,9 @@
                                     <router-link to="/cars" class="nav-link">Cars</router-link>
                               </li>  
                               <li class="nav-item" >
-                                    <a @click.prevent="showRepairModal()" href v-b-modal.repair-insert-modal class="nav-link">
+                                    <a @click.prevent="showRepairModal = true" href v-b-modal.repair-insert-modal class="nav-link">
                                           Add repair
-                                    </a>
-                                    <!-- repair modal-->
-                                    <RepairModal v-show="isRepairModalVisible"/>
+                                    </a>   
                               </li>
                               
                               <li class="nav-item" >
@@ -73,20 +71,22 @@
                         </template>
                   </ul>
             </div>
-      </nav>    
+      </nav> 
+      
+      <repair-modal v-if="showRepairModal" />
 </div>
 </template>
 <script>
 import RepairModal from '../Modals/RepairModal.vue';
 
 export default {
+      components:{
+            RepairModal
+      },
       data() {
             return {
-                  isRepairModalVisible: false,
+                  showRepairModal: false
             }
-      },
-      components: {
-            RepairModal,
       },
       computed: {
             token: function () {  
@@ -103,9 +103,6 @@ export default {
             }
       },
       methods: {
-            showRepairModal() {
-                  this.isRepairModalVisible = true;
-            },
             logout(){
                   window.$cookies.remove('role');
                   window.$cookies.remove('token');
